@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "חתונה של אבי וענבל",
+    "date": "2024-06-10",
+    "location": "תל אביב",
+    "guestCount": 200,
+    "budget": 50000,
+    "gifts": [
+      { "name": "מתנה 1", "amount": 500 },
+      { "name": "מתנה 2", "amount": 300 }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "בר מצווה של דני",
+    "date": "2024-07-15",
+    "location": "ירושלים",
+    "guestCount": 150,
+    "budget": 30000,
+    "gifts": [
+      { "name": "מתנה 1", "amount": 400 },
+      { "name": "מתנה 2", "amount": 250 }
+    ]
+  }
+]
