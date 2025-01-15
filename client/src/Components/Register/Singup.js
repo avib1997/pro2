@@ -1,8 +1,15 @@
 import React, { useState, useContext } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  InputAdornment,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Context } from "../../App";
+import { Email as EmailIcon, Lock as LockIcon } from "@mui/icons-material";
 
 const Signup = (props) => {
   const Navigate = useNavigate();
@@ -61,9 +68,18 @@ const Signup = (props) => {
           alignItems="center"
           justifyContent={"center"}
           margin="auto"
+          sx={{
+            fontFamily: "Roboto, sans-serif",
+            direction: "rtl", // הגדרת כיוון מימין לשמאל
+          }}
         >
-          <Typography variant="h2" padding={3} textAlign="center">
-            Signup
+          <Typography
+            variant="h2"
+            padding={3}
+            textAlign="center"
+            sx={{ fontWeight: "600", color: "#1976D2" }} // טקסט כחול ובולט
+          >
+            הרשמה
           </Typography>
           <TextField
             onChange={handelchange}
@@ -72,8 +88,23 @@ const Signup = (props) => {
             margin="normal"
             type={"text"}
             variant="outlined"
-            placeholder="First Name"
-            label="First Name"
+            placeholder="שם"
+            label="שם"
+            sx={{
+              width: "300px",
+              backgroundColor: "white", // רקע לבן לשדה הקלט
+              "& .MuiInputLabel-root": { fontWeight: "600" }, // תווית בולטת
+              "& .MuiOutlinedInput-root": { fontWeight: "600" }, // טקסט בולט
+            }}
+            InputProps={{
+              // העברת הסמל לצד השני
+              endAdornment: (
+                <InputAdornment position="end">
+                  <EmailIcon sx={{ color: "#1976D2" }} />{" "}
+                  {/* סמל אימייל כחול */}
+                </InputAdornment>
+              ),
+            }}
           />
           <TextField
             onChange={handelchange}
@@ -82,8 +113,23 @@ const Signup = (props) => {
             margin="normal"
             type={"text"}
             variant="outlined"
-            placeholder="Last name"
-            label="Last Name"
+            placeholder="שם משפחה"
+            label="שם משפחה"
+            sx={{
+              width: "300px",
+              backgroundColor: "white", // רקע לבן לשדה הקלט
+              "& .MuiInputLabel-root": { fontWeight: "600" }, // תווית בולטת
+              "& .MuiOutlinedInput-root": { fontWeight: "600" }, // טקסט בולט
+            }}
+            InputProps={{
+              // העברת הסמל לצד השני
+              endAdornment: (
+                <InputAdornment position="end">
+                  <LockIcon sx={{ color: "#FF5722" }} />{" "}
+                  {/* סמל מנעול בצבע כתום */}
+                </InputAdornment>
+              ),
+            }}
           />
           <TextField
             onChange={handelchange}
@@ -94,6 +140,21 @@ const Signup = (props) => {
             variant="outlined"
             placeholder="Email"
             label="Email"
+            sx={{
+              width: "300px",
+              backgroundColor: "white", // רקע לבן לשדה הקלט
+              "& .MuiInputLabel-root": { fontWeight: "600" }, // תווית בולטת
+              "& .MuiOutlinedInput-root": { fontWeight: "600" }, // טקסט בולט
+            }}
+            InputProps={{
+              // העברת הסמל לצד השני
+              endAdornment: (
+                <InputAdornment position="end">
+                  <LockIcon sx={{ color: "#FF5722" }} />{" "}
+                  {/* סמל מנעול בצבע כתום */}
+                </InputAdornment>
+              ),
+            }}
           />
           <TextField
             onChange={handelchange}
@@ -104,6 +165,21 @@ const Signup = (props) => {
             variant="outlined"
             placeholder="Password"
             label="Password"
+            sx={{
+              width: "300px",
+              backgroundColor: "white", // רקע לבן לשדה הקלט
+              "& .MuiInputLabel-root": { fontWeight: "600" }, // תווית בולטת
+              "& .MuiOutlinedInput-root": { fontWeight: "600" }, // טקסט בולט
+            }}
+            InputProps={{
+              // העברת הסמל לצד השני
+              endAdornment: (
+                <InputAdornment position="end">
+                  <LockIcon sx={{ color: "#FF5722" }} />{" "}
+                  {/* סמל מנעול בצבע כתום */}
+                </InputAdornment>
+              ),
+            }}
           />
           {/* {props.a === "manager" && <Button>change to login</Button>} */}
           <Button
