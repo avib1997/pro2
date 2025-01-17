@@ -12,6 +12,10 @@ import axios from "axios";
 import { Context } from "../../App";
 
 const Login = (props) => {
+  // Toggle bypass mode for testing.
+  // Set to true for testing without manager permissions.
+  // Remember to set back to false (or remove) when in production.
+  const bypassManagerCheck = true; // <-- Change to `false` when not testing
   const { setUserId, setDetailsId, setIsEventManager } = useContext(Context);
   const navigate = useNavigate();
   const [input, setInput] = useState({
@@ -28,8 +32,7 @@ const Login = (props) => {
 
   const handleClick = (e) => {
     e.preventDefault();
-    const email = input.email;
-    const password = input.password;
+    const { email, password } = input;
 
     axios
       .post("http://localhost:2001/api/users/login", {
@@ -46,11 +49,26 @@ const Login = (props) => {
             setDetailsId(response.data.userid[0].giftsId);
           });
 
+        // במקרה שהדילוג פעיל – לא משנה אם ניסיון התחברות כמנהל או לא, נעביר לעמוד המתאים.
+        if (bypassManagerCheck) {
+          if (props.a === "manager") {
+            // אם מדובר בהתחברות כמנהל, נעדכן isEventManager וננווט לעמוד מנהל.
+            setIsEventManager(true);
+            navigate("/EventManager");
+          } else {
+            // אם לא, נניח שאין הרשאות מנהל וננחות לעמוד הפרטים.
+            setIsEventManager(false);
+            navigate("/Details");
+          }
+          return; // עוצר את המשך הריצה
+        }
+
+        // Normal flow with manager permission check:
         if (
           props.a === "manager" &&
           response.data === "Assignment to constant variable."
         ) {
-          setIsEventManager(true); // הגדרת isEventManager ל-true
+          setIsEventManager(true);
           navigate("/EventManager");
         } else if (response.data === "Assignment to constant variable.") {
           setIsEventManager(false);
@@ -58,6 +76,9 @@ const Login = (props) => {
         } else {
           console.log("התחברות נכשלה:", response.data.message);
         }
+      })
+      .catch((error) => {
+        console.error("Error during login:", error);
       });
   };
 
