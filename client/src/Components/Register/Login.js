@@ -46,18 +46,15 @@ const Login = (props) => {
             setDetailsId(response.data.userid[0].giftsId);
           });
 
-        if (
-          props.a === "manager" &&
-          response.data === "Assignment to constant variable."
-        ) {
-          setIsEventManager(true); // הגדרת isEventManager ל-true
-          navigate("/EventManager");
-        } else if (response.data === "Assignment to constant variable.") {
-          setIsEventManager(false);
-          navigate("/Details");
-        } else {
-          console.log("התחברות נכשלה:", response.data.message);
-        }
+          if (props.a === "manager" && response.data.token) {
+            setIsEventManager(true); // הגדרת isEventManager ל-true
+            navigate("/EventManager");
+          } else if (response.data.token) {
+            setIsEventManager(false);
+            navigate("/Details");
+          } else {
+            console.log("התחברות נכשלה:", response.data.message || "Unknown error");
+          }
       });
   };
 
