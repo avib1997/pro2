@@ -49,26 +49,11 @@ const Login = (props) => {
             setDetailsId(response.data.userid[0].giftsId);
           });
 
-        // במקרה שהדילוג פעיל – לא משנה אם ניסיון התחברות כמנהל או לא, נעביר לעמוד המתאים.
-        if (bypassManagerCheck) {
-          if (props.a === "manager") {
-            // אם מדובר בהתחברות כמנהל, נעדכן isEventManager וננווט לעמוד מנהל.
-            setIsEventManager(true);
-            navigate("/EventManager");
-          } else {
-            // אם לא, נניח שאין הרשאות מנהל וננחות לעמוד הפרטים.
-            setIsEventManager(false);
-            navigate("/Details");
-          }
-          return; // עוצר את המשך הריצה
-        }
-
-        // Normal flow with manager permission check:
         if (
           props.a === "manager" &&
           response.data === "Assignment to constant variable."
         ) {
-          setIsEventManager(true);
+          setIsEventManager(true); // הגדרת isEventManager ל-true
           navigate("/EventManager");
         } else if (response.data === "Assignment to constant variable.") {
           setIsEventManager(false);
@@ -76,9 +61,6 @@ const Login = (props) => {
         } else {
           console.log("התחברות נכשלה:", response.data.message);
         }
-      })
-      .catch((error) => {
-        console.error("Error during login:", error);
       });
   };
 
