@@ -6,9 +6,14 @@ const userController = require("../DL/controllers/userController");
  * (למשל לצורך הצגת רשימת אירועים)
  */
 async function getAllEvents() {
-  console.log("==> [INFO] קריאת כל האירועים (getAllEvents)");
   const events = await eventController.read({});
   return events;
+}
+
+async function getEventNumber(reqNum) {
+  let num = reqNum;
+  const eventNumber = await eventController.readOne({Event_number : num});
+  return eventNumber;
 }
 
 /**
@@ -17,8 +22,6 @@ async function getAllEvents() {
  * @throws {Object} אם אחד מהשדות החיוניים חסר, ייזרק אובייקט שגיאה עם code:400.
  */
 async function addevent(eventFields) {
-  console.log("==> [INFO] התחלת יצירת אירוע חדש:", eventFields);
-
   // בדיקה אם אחד השדות החיוניים חסר/ריק
   if (
     !eventFields.NameOfGroom ||
@@ -27,36 +30,41 @@ async function addevent(eventFields) {
     !eventFields.TypeOfEvent ||
     !eventFields.NumOfGuests ||
     !eventFields.phone ||
-    !eventFields.DateOfEvent
+    !eventFields.DateOfEvent||
+    !eventFields.userid_event
   ) {
-    console.error("==> [ERROR] שדות חסרים ליצירת האירוע:", eventFields);
     throw { code: 400, message: "missing data" };
   }
 
-  try {
-    // יצירת האירוע במסד הנתונים
-    const newEvent = await eventController.create(eventFields);
-    console.log("==> [SUCCESS] אירוע חדש נוצר בהצלחה:", newEvent._id);
 
-    // עדכון המשתמש והוספת מזהה האירוע במערך שלו
-    await userController.update(
-      { _id: eventFields.userid_event },
-      { $push: { eventId: newEvent._id } }
-    );
-    console.log(
-      "==> [SUCCESS] מזהה האירוע נוסף למשתמש:",
-      eventFields.userid_event
-    );
+  //יצירת ID לאירוע למשתמש
+  let number = Math.floor(Math.random() * (999 - 10 + 1)) + 10; // טווח המספרים: 10 עד 999;
 
-    // אפשר להחזיר את האירוע החדש, אם תרצה שהראוט ישלח את המידע חזרה ללקוח
-    return newEvent;
-  } catch (error) {
-    console.error(
-      "==> [ERROR] כשל ביצירת האירוע או בעדכון המשתמש:",
-      error.message
-    );
-    throw error;
-  }
+  // do {
+  //   number = Math.floor(Math.random() * (999 - 10 + 1)) + 10; // טווח המספרים: 10 עד 999
+  //   // בדיקה ב-database אם המספר קיים
+  //   const event = await eventController.read({ Event_number: number });
+  //   console.log("event: ", event);
+  // } while (event.length > 0); // המשך הלולאה אם המספר קיים ב-database
+
+  eventFields.Event_number = number;
+
+  console.log("eventFields: ", eventFields);
+
+  // יצירת האירוע במסד הנתונים
+  let newEvent = await eventController.create(eventFields);
+  console.log("newEvent: ", newEvent);
+  // עדכון המשתמש והוספת מזהה האירוע במערך שלו
+  await userController.update(
+    { _id: eventFields.userid_event },
+    { $push: { eventId: newEvent._id } }
+  );
+  console.log(
+    "eventFields.userid_event", eventFields.userid_event);
+
+  // אפשר להחזיר את האירוע החדש, אם תרצה שהראוט ישלח את המידע חזרה ללקוח
+  return newEvent;
+
 }
 
 /**
@@ -65,10 +73,8 @@ async function addevent(eventFields) {
  * @param {Object} updateFields - אובייקט המכיל את השדות החדשים/המעודכנים
  */
 async function updateEvent(eventId, updateFields) {
-  console.log("==> [INFO] תחילת עדכון אירוע", { eventId }, { updateFields });
 
   if (!eventId) {
-    console.error("==> [ERROR] לא הוזן מזהה אירוע (eventId)");
     throw { code: 400, message: "missing eventId" };
   }
 
@@ -78,10 +84,8 @@ async function updateEvent(eventId, updateFields) {
       { _id: eventId },
       updateFields
     );
-    console.log("==> [SUCCESS] אירוע עודכן בהצלחה:", updated);
     return updated;
   } catch (error) {
-    console.error("==> [ERROR] כשל בעדכון אירוע:", error.message);
     throw error;
   }
 }
@@ -92,17 +96,14 @@ async function updateEvent(eventId, updateFields) {
  * @param {String} eventId - מזהה האירוע (ObjectId) למחיקה
  */
 async function deleteEvent(eventId) {
-  console.log("==> [INFO] תחילת מחיקת אירוע:", eventId);
 
   if (!eventId) {
-    console.error("==> [ERROR] לא הוזן מזהה אירוע (eventId)");
     throw { code: 400, message: "missing eventId" };
   }
 
   try {
     // אפשרות א: מחיקה פיזית
     const deleted = await eventController.deleteOne({ _id: eventId });
-    console.log("==> [SUCCESS] אירוע נמחק בהצלחה:", deleted);
 
     // אפשרות ב: מחיקה רכה
     // const deleted = await eventController.update(
@@ -112,13 +113,13 @@ async function deleteEvent(eventId) {
 
     return deleted;
   } catch (error) {
-    console.error("==> [ERROR] כשל במחיקת אירוע:", error.message);
     throw error;
   }
 }
 
 /** ייצוא כל הפונקציות */
 module.exports = {
+  getEventNumber,
   getAllEvents,
   addevent,
   updateEvent,

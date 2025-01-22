@@ -59,7 +59,7 @@ const Details = () => {
       blessing: inputs.blessing,
       amount: inputs.amount,
       userid_gift: userId,
-      toEventId: event._id.$oid,
+      EventId: event,
       toEventName: event.NameOfGroom + " & " + event.NameOfBride,
     };
     setState(newGift.amount);

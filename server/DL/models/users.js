@@ -13,13 +13,11 @@ const userSchema = new Schema({
 });
 
 // [DEBUG] הצגת הלוג (אופציונלי, למחיקה בפרודקשן)
-console.log("==> [DEBUG] הגדרת userSchema נטענה בהצלחה");
 
 // [INFO] יצירת מודל Mongoose על בסיס הסכמה
 const userModel = mongoose.model("user", userSchema);
 
 // [DEBUG] הצגת הלוג (אופציונלי, למחיקה בפרודקשן)
-console.log("==> [DEBUG] מודל userModel נוצר בהצלחה");
 
 // ייצוא המודל לשימוש בקבצים אחרים
 module.exports = { userModel };
