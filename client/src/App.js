@@ -32,32 +32,12 @@ export const Context = createContext();
 function App() {
   const whatsappGroupLink = "https://chat.whatsapp.com/KN1etpCLloyD1wbunuEwdX";
   const [IsEvent, setIsEvent] = useState(true);
-  const [eventId, setEventId] = useState(""); // סטייט עבור ה-ID של האירוע
+  const [eventId, setEventNumber] = useState(""); // סטייט עבור ה-ID של האירוע
   const [userId, setUserId] = useState("");
   const [detailsId, setDetailsId] = useState([]);
   const [isEventManager, setIsEventManager] = useState(false); // הוספת סטייט למנהל אירועים
   const [state, setState] = useState();
-  const [event, setEvent] = useState({
-    _id: {
-      $oid: "63932607ce449ca31a572268",
-    },
-    NameOfGroom: "Moti",
-    NameOfBride: "Ayelet",
-    NameOfManager: "Moti Brodetsky",
-    TypeOfEvent: "Wedding",
-    NumOfGuests: 200,
-    phone: 5169919648,
-    userid_event: "6394ad8e8ed751bf44bbefa9",
-    DateOfEvent: {
-      $date: {
-        $numberLong: "2022-12-10T16:02:22.882+00:00",
-      },
-    },
-    // image:{
-    //   data:
-    // }
-    __v: 0,
-  });
+  const [event, setEvent] = useState("");
   return (
     <div>
       <Context.Provider
@@ -75,7 +55,7 @@ function App() {
           state,
           setState,
           eventId,
-          setEventId,
+          setEventNumber,
         }}
       >
         <BrowserRouter>

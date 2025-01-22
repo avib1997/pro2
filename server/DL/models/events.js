@@ -6,15 +6,16 @@ const Schema = mongoose.Schema;
  * מגדיר את השדות והחוקים עבור מסמכי אירועים בבסיס הנתונים.
  */
 const eventSchema = new Schema({
-  NameOfGroom: { type: String, required: true }, // שם החתן
-  NameOfBride: { type: String, required: true }, // שם הכלה
-  NameOfManager: { type: String, required: true }, // מנהל האירוע (אולי אחד מההורים / מפיק?)
-  TypeOfEvent: { type: String, required: true }, // סוג האירוע (חתונה, בר מצווה, וכו')
-  NumOfGuests: { type: Number, required: true }, // מספר אורחים
-  phone: { type: Number, required: true }, // מספר טלפון ליצירת קשר
+  NameOfGroom: { type: String, required: false }, // שם החתן
+  NameOfBride: { type: String, required: false }, // שם הכלה
+  NameOfManager: { type: String, required: false }, // מנהל האירוע (אולי אחד מההורים / מפיק?)
+  TypeOfEvent: { type: String, required: false }, // סוג האירוע (חתונה, בר מצווה, וכו')
+  NumOfGuests: { type: Number, required: false }, // מספר אורחים
+  phone: { type: Number, required: false }, // מספר טלפון ליצירת קשר
   userid_event: { type: String }, // מזהה משתמש (לרוב מנהל האירוע)
-  DateOfEvent: { type: Date, required: true }, // תאריך האירוע
+  DateOfEvent: { type: Date, required: false }, // תאריך האירוע
   giftsId: [String], // רשימת מזהים של מתנות הקשורות לאירוע
+  Event_number: { type: Number, required: true }, // מזהה האירוע
 });
 
 /**
@@ -23,7 +24,6 @@ const eventSchema = new Schema({
 const eventModel = mongoose.model("event", eventSchema);
 
 // לוג בסיסי לצורך אימות שהמודל נטען:
-console.log("==> [DEBUG] eventModel הוגדר בהצלחה.");
 
 /**
  * ייצוא המודל לשימוש בשאר חלקי המערכת

@@ -13,7 +13,7 @@ const giftSchema = new Schema({
   blessing: { type: String }, // ברכה או הודעה המצורפת למתנה
   amount: { type: Number, required: true }, // סכום / כמות המתנה
   userid_gift: { type: String }, // מזהה המשתמש שהעניק את המתנה
-  toEventId: { type: String }, // מזהה האירוע הרלוונטי
+  EventId: { type: String }, // מזהה האירוע הרלוונטי
   toEventName: { type: String }, // שם האירוע
   entryDate: { type: Date, default: Date.now }, // תאריך הוספת המסמך (ברירת מחדל: תאריך נוכחי)
 });
@@ -29,7 +29,6 @@ const giftSchema = new Schema({
  */
 const giftModel = mongoose.model("gift", giftSchema);
 
-console.log("==> [DEBUG] giftModel הוגדר בהצלחה עם giftSchema.");
 
 /**
  * ייצוא המודל לשימוש בשאר חלקי האפליקציה.
