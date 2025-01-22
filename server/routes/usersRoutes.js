@@ -17,7 +17,6 @@ const userLogic = require("../BL/userLogic"); // לוגיקה עסקית (Busine
  *  4. במידה ויש שגיאה, מטפלים בה בלוג ומחזירים הודעה מתאימה.
  */
 router.post("/login", async (req, res) => {
-  console.log("==> [POST /login] התחלת תהליך התחברות משתמש");
   console.log("נתוני הבקשה (req.body):", req.body);
 
   try {
@@ -48,7 +47,6 @@ router.post("/login", async (req, res) => {
  *  4. במקרה של שגיאה, מדפיס ללוג הודעת שגיאה.
  */
 router.post("/register", async (req, res) => {
-  console.log("==> [POST /register] התחלת תהליך רישום משתמש חדש");
   console.log("נתוני הבקשה (req.body):", req.body);
 
   try {
@@ -62,7 +60,6 @@ router.post("/register", async (req, res) => {
     res.send(newUser);
   } catch (err) {
     // טיפול בשגיאה: הצגת השגיאה בלוג
-    console.log("[ERROR] בשירות register:", err.message, "register error");
 
     // ניתן לשלוח גם err.message או סטטוס 500 בהתאם
     res.status(500).send({ error: err.message });
@@ -78,7 +75,6 @@ router.post("/register", async (req, res) => {
  *  3. מחזיר ללקוח את ה-userId המתאים.
  */
 router.post("/userid", async (req, res) => {
-  console.log("==> [POST /userid] קבלת מזהה משתמש לפי אימייל");
   console.log("נתוני הבקשה (req.body):", req.body);
 
   try {
@@ -92,7 +88,6 @@ router.post("/userid", async (req, res) => {
     res.send(userid);
   } catch (err) {
     // טיפול בשגיאה: הצגת השגיאה בלוג
-    console.log("[ERROR] בשירות userid:", err.message);
 
     // החזרת הודעת שגיאה או סטטוס מתאים
     res.status(500).send({ error: err.message });
@@ -108,7 +103,6 @@ router.post("/userid", async (req, res) => {
  *  3. טיפול בשגיאה במידת הצורך.
  */
 router.get("/", async (req, res) => {
-  console.log("==> [GET /] קבלת רשימת כל המשתמשים");
   console.log("אובייקט הבקשה (req):", req);
 
   try {
@@ -122,7 +116,6 @@ router.get("/", async (req, res) => {
     res.send(users);
   } catch (err) {
     // טיפול בשגיאה: הצגת השגיאה בלוג
-    console.log("[ERROR] בשירות GET all users:", err);
 
     // החזרת שגיאה סטנדרטית
     res.status(500).send({ message: "somthing went wrong" });
@@ -138,7 +131,6 @@ router.get("/", async (req, res) => {
  *  3. מחזיר מערך המתנות כ-Response ללקוח.
  */
 router.post("/giftsById", async (req, res) => {
-  console.log("==> [POST /giftsById] קבלת מתנות לפי מזהה משתמש (או מזהה אחר)");
   console.log("נתוני הבקשה (req.body):", req.body);
 
   try {
@@ -152,7 +144,6 @@ router.post("/giftsById", async (req, res) => {
     res.send(arrGifts);
   } catch (err) {
     // טיפול בשגיאה: הצגת השגיאה בלוג
-    console.log("[ERROR] בשירות giftsById:", err.message);
 
     // החזרת הודעת שגיאה או סטטוס מתאים
     res.status(500).send({ error: err.message });

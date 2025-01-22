@@ -47,10 +47,12 @@ const Manager = () => {
   const [openAddEventDialog, setOpenAddEventDialog] = useState(false);
   const [openEditEventDialog, setOpenEditEventDialog] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [setEvent] = useState(null);
   const [events, setEvents] = useState(null);
   const [formErrors, setFormErrors] = useState({});
   const [loaded, setLoaded] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const { userId, event, setState } = useContext(Context);
 
   const [newEvent, setNewEvent] = useState({
     title: "",
@@ -138,8 +140,7 @@ const Manager = () => {
   const handleAddNewEvent = (e) => {
     e.preventDefault();
     if (!validateForm(newEvent)) return;
-    console.log("e = ", e);
-    console.log("newEvent = ", newEvent);
+
     const eventToAdd = {
       NameOfGroom: newEvent.groomName,
       NameOfBride: newEvent.brideName,
@@ -148,11 +149,12 @@ const Manager = () => {
       NumOfGuests: newEvent.guestCount,
       phone: newEvent.phone,
       DateOfEvent: newEvent.date,
+      userid_event: userId,
     };
     axios
       .post("http://localhost:2001/api/events/addEvent", eventToAdd)
       .then((res) => {
-        setEvents([...events, { ...newEvent, id: Date.now(), gifts: [] }]);
+        setEvent(res.data);
         setShowSuccessAnimation(true);
         setTimeout(() => setShowSuccessAnimation(false), 1000);
         setOpenAddEventDialog(false);

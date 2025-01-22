@@ -15,7 +15,6 @@ const eventRouter = require("./evnetRoutes"); // ראוטר לניהול איר�
 /**
  * הדפסה ללוג לצורך בקרה, התחלת טעינת הראוטים
  */
-console.log("==> [MAIN ROUTER] העלאת ראוטים פנימיים: gift, users, event");
 
 /**
  * הגדרת הניתובים: כל בקשה שתגיע לנתיב "/gift" תועבר לניהול ב-giftRouter
@@ -25,7 +24,6 @@ console.log("==> [MAIN ROUTER] העלאת ראוטים פנימיים: gift, use
 router.use(
   "/gift",
   (req, res, next) => {
-    console.log("==> [MIDDLEWARE] בקשה לנתיב /gift, מפנה ל-giftRouter");
     next();
   },
   giftRouter
@@ -34,7 +32,6 @@ router.use(
 router.use(
   "/users",
   (req, res, next) => {
-    console.log("==> [MIDDLEWARE] בקשה לנתיב /users, מפנה ל-usersRouter");
     next();
   },
   usersRouter
@@ -43,7 +40,6 @@ router.use(
 router.use(
   "/events",
   (req, res, next) => {
-    console.log("==> [MIDDLEWARE] בקשה לנתיב /event, מפנה ל-eventRouter");
     next();
   },
   eventRouter
@@ -54,7 +50,4 @@ router.use(
  * מכאן ואילך, בשרת הראשי (app.js או index.js), ניתן יהיה להשתמש בראוטר זה:
  *   app.use('/', mainRouter);
  */
-console.log(
-  "==> [MAIN ROUTER] מייצא את ראוטר האב (Main Router) עם כל הראוטים הטעונים"
-);
 module.exports = router;
