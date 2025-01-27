@@ -147,7 +147,7 @@ export default function BlessingsPage() {
         ברכות
       </Typography>
       <Container
-        maxWidth="md"
+        maxWidth="lg"
         sx={{
           marginTop: "50px",
           marginBottom: "50px",
@@ -234,6 +234,20 @@ export default function BlessingsPage() {
           </Box>
         </Paper>
       </Container>
+      {/* Footer פשוט בתחתית העמוד */}
+      <Box
+        sx={{
+          marginTop: 5,
+          textAlign: "center",
+          py: 1.5,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          color: "#E0E1DD",
+        }}
+      >
+        <Typography variant="body2" sx={{ fontSize: "0.9rem" }}>
+          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
+        </Typography>
+      </Box>
     </div>
   );
 }

@@ -2,35 +2,42 @@ import {
   Box,
   Button,
   Container,
-  FormControl,
   Grid,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
   Typography,
+  InputAdornment,
+  Link as MuiLink,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Context } from "../App"; // ייבוא הקונטקסט עבור ID של האירוע
+
+// אייקונים מותאמים לכל שדה
+import {
+  Person as PersonIcon,
+  Email as EmailIcon,
+  Phone as PhoneIcon,
+  Info as InfoIcon,
+} from "@mui/icons-material";
+
 const ManagerSignup = () => {
+  const { setEventNumber } = useContext(Context); // נקרא את ערך ה-eventId
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [eventType, setEventType] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [guestCount, setGuestCount] = useState("");
-  const [eventLocation, setEventLocation] = useState("");
-  const [budget, setBudget] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
-  const [cateringService, setCateringService] = useState("");
   const [eventId] = useState(Math.floor(1000 + Math.random() * 9000));
+
   const [errors, setErrors] = useState({});
   const [isValid, setIsValid] = useState({});
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const navigate = useNavigate();
+
+  // בדיקה לדוגמה
   const validateField = (field, value) => {
     const newErrors = { ...errors };
     const newValidState = { ...isValid };
+
     switch (field) {
       case "name":
         if (!value) {
@@ -67,66 +74,6 @@ const ManagerSignup = () => {
           newValidState.phone = true;
         }
         break;
-      case "eventType":
-        if (!value) {
-          newErrors.eventType = "יש לבחור סוג אירוע";
-          newValidState.eventType = false;
-        } else {
-          newErrors.eventType = "תקין";
-          newValidState.eventType = true;
-        }
-        break;
-      case "eventDate":
-        if (!value) {
-          newErrors.eventDate = "יש לבחור תאריך לאירוע";
-          newValidState.eventDate = false;
-        } else {
-          newErrors.eventDate = "תקין";
-          newValidState.eventDate = true;
-        }
-        break;
-      case "guestCount":
-        if (!value) {
-          newErrors.guestCount = "יש להזין מספר מוזמנים";
-          newValidState.guestCount = false;
-        } else if (isNaN(value) || value <= 0) {
-          newErrors.guestCount = "מספר מוזמנים חייב להיות מספר חיובי";
-          newValidState.guestCount = false;
-        } else {
-          newErrors.guestCount = "תקין";
-          newValidState.guestCount = true;
-        }
-        break;
-      case "eventLocation":
-        if (!value) {
-          newErrors.eventLocation = "יש להזין כתובת לאירוע";
-          newValidState.eventLocation = false;
-        } else {
-          newErrors.eventLocation = "תקין";
-          newValidState.eventLocation = true;
-        }
-        break;
-      case "budget":
-        if (!value) {
-          newErrors.budget = "יש להזין תקציב לאירוע";
-          newValidState.budget = false;
-        } else if (isNaN(value) || value <= 0) {
-          newErrors.budget = "תקציב האירוע חייב להיות מספר חיובי";
-          newValidState.budget = false;
-        } else {
-          newErrors.budget = "תקין";
-          newValidState.budget = true;
-        }
-        break;
-      case "cateringService":
-        if (!value) {
-          newErrors.cateringService = "יש להזין שירותי קייטרינג";
-          newValidState.cateringService = false;
-        } else {
-          newErrors.cateringService = "תקין";
-          newValidState.cateringService = true;
-        }
-        break;
       case "additionalInfo":
         if (!value) {
           newErrors.additionalInfo = "יש להזין מידע נוסף";
@@ -142,10 +89,14 @@ const ManagerSignup = () => {
     setErrors(newErrors);
     setIsValid(newValidState);
   };
+
   const handleInputChange = (field, value) => {
     validateField(field, value);
   };
+
   const handleSignup = () => {
+    setEventNumber("");
+    // אם הכל תקין
     const allValid = Object.values(isValid).every((v) => v === true);
     if (allValid) {
       setShowSuccessAnimation(true);
@@ -154,34 +105,69 @@ const ManagerSignup = () => {
       }, 1000);
     }
   };
+
+  // פונקציית עיצוב בסיסית לשדות
+  const createTextFieldSx = (bgColor) => ({
+    width: "600px",
+    maxWidth: "800px",
+    backgroundColor: bgColor,
+    borderRadius: "20px",
+    "& .MuiOutlinedInput-root": {
+      fontWeight: 600,
+      borderRadius: "20px",
+      "& fieldset": { border: "none" },
+      "&:hover fieldset": { border: "none" },
+      "&.Mui-focused fieldset": { border: "none" },
+      "& .MuiOutlinedInput-input": { paddingRight: "0px" },
+    },
+    "& .MuiInputLabel-root": {
+      fontWeight: 600,
+      right: 20,
+      left: "auto",
+    },
+    "& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink": {
+      transformOrigin: "top right",
+      transform: "translate(0, .5px) scale(0.75)",
+    },
+  });
+
   return (
-    <Container
-      maxWidth="md"
+    <Box
       sx={{
-        marginTop: "50px",
-        textAlign: "center",
-        background: "linear-gradient(135deg, #1e3a8a, #e5e7eb)",
-        padding: "30px",
-        borderRadius: "20px",
-        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
+        width: "100%",
+        overscrollBehavior: "none",
         position: "relative",
-        overflow: "hidden",
-        "@keyframes animateBg": {
-          "0%": { backgroundPosition: "0% 50%" },
-          "50%": { backgroundPosition: "100% 50%" },
-          "100%": { backgroundPosition: "0% 50%" },
-        },
-        backgroundSize: "200% 200%",
-        animation: "animateBg 10s ease infinite",
+        minHeight: "100vh",
+        direction: "rtl",
+        paddingTop: "20px",
+        paddingBottom: "10px",
+        fontFamily: "Roboto, sans-serif",
+        overflowX: "hidden",
+        color: "#E0E1DD",
       }}
     >
-      {" "}
+      {/* רקע עם אנימציה זזה */}
+      <Box
+        sx={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: -1,
+          background: "linear-gradient(135deg, #0D1B2A, #1B263B)",
+          backgroundSize: "400% 400%",
+          animation: "animateBg 15s ease infinite",
+        }}
+      />
+
+      {/* כפתור חזרה לדף הבית */}
       <Button
         component={Link}
         to="/Home"
         sx={{
           position: "absolute",
-          top: "10px",
+          top: "15px",
           left: "50%",
           transform: "translateX(-50%)",
           backgroundColor: "#1E90FF",
@@ -194,296 +180,279 @@ const ManagerSignup = () => {
             backgroundColor: "#187bcd",
             boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
           },
+          zIndex: 2,
         }}
       >
-        {" "}
-        חזרה לדף הבית{" "}
-      </Button>{" "}
+        חזרה לדף הבית
+      </Button>
+
+      <Container
+        maxWidth="xl"
+        sx={{
+          mt: 10,
+          mb: 0,
+          backgroundColor: "rgba(255,255,255,0.07)",
+          padding: "30px",
+          paddingTop: "0px",
+          borderRadius: "20px",
+          boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.3)",
+          position: "relative",
+          overflow: "hidden",
+          // כיוון RTL לקונטיינר כולו:
+          direction: "rtl",
+        }}
+      >
+        <Grid container spacing={4} justifyContent="center">
+          {/* טור שמאלי: טקסט שיווקי בלי תמונה */}
+          <Grid item xs={12} md={6}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+                justifyContent: "center",
+              }}
+            >
+              <Box
+                mt={4} // רווח מעל
+                sx={{
+                  backgroundColor: "rgba(255,255,255,0.1)",
+                  borderRadius: "10px",
+                  padding: 3,
+                }}
+              >
+                <Typography
+                  variant="h4"
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#F0F0F0",
+                    mb: 2,
+                  }}
+                >
+                  למה להירשם כמנהל אירוע?
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    width: "100%",
+                    color: "#E0E1DD",
+                    fontSize: "1rem",
+                    lineHeight: 1.8,
+                    textShadow: "1px 1px #000",
+                  }}
+                >
+                  הצטרפו למעגל מנהלי האירועים של Easy Gift ותהנו מכלים חכמים
+                  שחוסכים לכם זמן ומשאבים יקרים. במקום לבזבז שעות בחיפוש ספקים,
+                  תיאומי טלפונים ולו״ז מסורבל – Easy Gift מרכזת עבורכם את כל
+                  הפתרונות במקום אחד. כך תוכלו להקדיש יותר אנרגיה לתכנון חוויות
+                  בלתי־נשכחות ופחות לטיפול בבירוקרטיה מתישה.
+                  <br />
+                  <br />
+                  כשאתם נרשמים כמנהלי אירועים, אתם מקבלים גישה למערכת מתקדמת
+                  המאפשרת ניהול מוזמנים, תשלומים והזמנות בצורה פשוטה ויעילה, מכל
+                  מכשיר ובכל זמן. הפלטפורמה של Easy Gift מותאמת אישית לצורכיכם,
+                  עם דוחות עדכניים שמציגים לכם בדיוק כמה הושקע, איפה ניתן לחסוך,
+                  ואיך למקסם את התקציב. אתם מוזמנים להצטרף אל מאות משתמשים שכבר
+                  גילו את הדרך הקלה לנהל אירועים מוצלחים – ורשמו את עצמכם כמנהלי
+                  אירוע עוד היום!
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+
+          {/* טור ימני - טופס */}
+          <Grid item xs={12} md={6}>
+            <Box sx={{ textAlign: "center", paddingTop: "20px" }}>
+              <Typography
+                variant="h3"
+                gutterBottom
+                sx={{
+                  marginBottom: "30px",
+                  fontWeight: "bold",
+                  color: "#1976D2",
+                  textShadow: "2px 2px #000",
+                }}
+              >
+                רישום מנהל אירוע
+              </Typography>
+            </Box>
+
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap={2}
+              sx={{ width: "100%", maxWidth: "1000px", mx: "auto" }}
+            >
+              {/* שם מלא */}
+              <Grid item xs={12}>
+                <TextField
+                  label="שם מלא"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    handleInputChange("name", e.target.value);
+                  }}
+                  error={errors.name && errors.name !== "תקין"}
+                  helperText={
+                    <Typography
+                      variant="caption"
+                      color={errors.name === "תקין" ? "green" : "error"}
+                    >
+                      {errors.name}
+                    </Typography>
+                  }
+                  sx={createTextFieldSx("#e1f5fe")}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <PersonIcon sx={{ color: "#1976D2" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth
+                />
+              </Grid>
+
+              {/* אימייל */}
+              <Grid item xs={12}>
+                <TextField
+                  label="אימייל"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    handleInputChange("email", e.target.value);
+                  }}
+                  error={errors.email && errors.email !== "תקין"}
+                  helperText={
+                    <Typography
+                      variant="caption"
+                      color={errors.email === "תקין" ? "green" : "error"}
+                    >
+                      {errors.email}
+                    </Typography>
+                  }
+                  sx={createTextFieldSx("#e8f5e9")}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <EmailIcon sx={{ color: "#388E3C" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth
+                />
+              </Grid>
+
+              {/* מספר טלפון */}
+              <Grid item xs={12}>
+                <TextField
+                  label="מספר טלפון"
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    handleInputChange("phone", e.target.value);
+                  }}
+                  error={errors.phone && errors.phone !== "תקין"}
+                  helperText={
+                    <Typography
+                      variant="caption"
+                      color={errors.phone === "תקין" ? "green" : "error"}
+                    >
+                      {errors.phone}
+                    </Typography>
+                  }
+                  sx={createTextFieldSx("#fff3e0")}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <PhoneIcon sx={{ color: "#FB8C00" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth
+                />
+              </Grid>
+
+              {/* מידע נוסף */}
+              <Grid item xs={12}>
+                <TextField
+                  label="מידע נוסף"
+                  value={additionalInfo}
+                  onChange={(e) => {
+                    setAdditionalInfo(e.target.value);
+                    handleInputChange("additionalInfo", e.target.value);
+                  }}
+                  error={
+                    errors.additionalInfo && errors.additionalInfo !== "תקין"
+                  }
+                  helperText={
+                    <Typography
+                      variant="caption"
+                      color={
+                        errors.additionalInfo === "תקין" ? "green" : "error"
+                      }
+                    >
+                      {errors.additionalInfo}
+                    </Typography>
+                  }
+                  sx={createTextFieldSx("#f3e5f5")}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <InfoIcon sx={{ color: "#7B1FA2" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  fullWidth
+                />
+              </Grid>
+
+              {/* כפתור רישום */}
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  onClick={handleSignup}
+                  sx={{
+                    width: "100%",
+                    paddingLeft: "80px",
+                    paddingRight: "80px",
+                    marginTop: "0px",
+                    borderRadius: "30px",
+                    backgroundColor: "#1976D2",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    fontSize: "1.5rem",
+                    py: 0,
+                    "&:hover": {
+                      backgroundColor: "#115293",
+                    },
+                  }}
+                >
+                  רישום
+                </Button>
+              </Grid>
+            </Box>
+          </Grid>
+        </Grid>
+      </Container>
+      {/* Footer פשוט בתחתית העמוד */}
       <Box
         sx={{
-          padding: "30px",
-          backgroundColor: "#ffffffcc",
-          borderRadius: "15px",
-          boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
-          position: "relative",
-          zIndex: 2,
-          marginTop: "70px",
+          marginTop: 5,
+          textAlign: "center",
+          py: 1.5,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          color: "#E0E1DD",
         }}
       >
-        {" "}
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{ marginBottom: "30px", fontWeight: "bold", color: "#1976D2" }}
-        >
-          {" "}
-          רישום מנהל אירוע{" "}
-        </Typography>{" "}
-        <Grid container spacing={2}>
-          {" "}
-          <Grid item xs={12} sm={6}>
-            {" "}
-            <TextField
-              label="שם מלא"
-              fullWidth
-              margin="normal"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                handleInputChange("name", e.target.value);
-              }}
-              variant="outlined"
-              error={errors.name && errors.name !== "תקין"}
-              helperText={
-                <Typography
-                  variant="caption"
-                  color={errors.name === "תקין" ? "green" : "error"}
-                >
-                  {errors.name}
-                </Typography>
-              }
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            {" "}
-            <TextField
-              label="אימייל"
-              fullWidth
-              margin="normal"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                handleInputChange("email", e.target.value);
-              }}
-              variant="outlined"
-              error={errors.email && errors.email !== "תקין"}
-              helperText={
-                <Typography
-                  variant="caption"
-                  color={errors.email === "תקין" ? "green" : "error"}
-                >
-                  {errors.email}
-                </Typography>
-              }
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            {" "}
-            <TextField
-              label="מספר טלפון"
-              fullWidth
-              margin="normal"
-              value={phone}
-              onChange={(e) => {
-                setPhone(e.target.value);
-                handleInputChange("phone", e.target.value);
-              }}
-              variant="outlined"
-              error={errors.phone && errors.phone !== "תקין"}
-              helperText={
-                <Typography
-                  variant="caption"
-                  color={errors.phone === "תקין" ? "green" : "error"}
-                >
-                  {errors.phone}
-                </Typography>
-              }
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            {" "}
-            <FormControl fullWidth margin="normal" error={!!errors.eventType}>
-              {" "}
-              <InputLabel>סוג אירוע</InputLabel>{" "}
-              <Select
-                value={eventType}
-                onChange={(e) => {
-                  setEventType(e.target.value);
-                  handleInputChange("eventType", e.target.value);
-                }}
-                label="סוג אירוע"
-              >
-                {" "}
-                <MenuItem value="חתונה">חתונה</MenuItem>{" "}
-                <MenuItem value="בר מצווה">בר מצווה</MenuItem>{" "}
-                <MenuItem value="ברית/בריתה">ברית/בריתה</MenuItem>{" "}
-                <MenuItem value="אירוע חברה">אירוע חברה</MenuItem>{" "}
-                <MenuItem value="אחר">אחר</MenuItem>{" "}
-              </Select>{" "}
-              {errors.eventType && (
-                <Typography
-                  variant="caption"
-                  color={errors.eventType === "תקין" ? "green" : "error"}
-                >
-                  {errors.eventType}
-                </Typography>
-              )}{" "}
-            </FormControl>{" "}
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            {" "}
-            <TextField
-              label="תאריך האירוע"
-              fullWidth
-              margin="normal"
-              type="date"
-              InputLabelProps={{ shrink: true }}
-              value={eventDate}
-              onChange={(e) => {
-                setEventDate(e.target.value);
-                handleInputChange("eventDate", e.target.value);
-              }}
-              variant="outlined"
-              error={errors.eventDate && errors.eventDate !== "תקין"}
-              helperText={
-                <Typography
-                  variant="caption"
-                  color={errors.eventDate === "תקין" ? "green" : "error"}
-                >
-                  {errors.eventDate}
-                </Typography>
-              }
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12} sm={6}>
-            {" "}
-            <TextField
-              label="מספר מוזמנים"
-              fullWidth
-              margin="normal"
-              value={guestCount}
-              onChange={(e) => {
-                setGuestCount(e.target.value);
-                handleInputChange("guestCount", e.target.value);
-              }}
-              variant="outlined"
-              error={errors.guestCount && errors.guestCount !== "תקין"}
-              helperText={
-                <Typography
-                  variant="caption"
-                  color={errors.guestCount === "תקין" ? "green" : "error"}
-                >
-                  {errors.guestCount}
-                </Typography>
-              }
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12}>
-            {" "}
-            <TextField
-              label="כתובת מקום האירוע"
-              fullWidth
-              margin="normal"
-              value={eventLocation}
-              onChange={(e) => {
-                setEventLocation(e.target.value);
-                handleInputChange("eventLocation", e.target.value);
-              }}
-              variant="outlined"
-              error={errors.eventLocation && errors.eventLocation !== "תקין"}
-              helperText={
-                <Typography
-                  variant="caption"
-                  color={errors.eventLocation === "תקין" ? "green" : "error"}
-                >
-                  {errors.eventLocation}
-                </Typography>
-              }
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12}>
-            {" "}
-            <TextField
-              label="תקציב האירוע"
-              fullWidth
-              margin="normal"
-              value={budget}
-              onChange={(e) => {
-                setBudget(e.target.value);
-                handleInputChange("budget", e.target.value);
-              }}
-              variant="outlined"
-              error={errors.budget && errors.budget !== "תקין"}
-              helperText={
-                <Typography
-                  variant="caption"
-                  color={errors.budget === "תקין" ? "green" : "error"}
-                >
-                  {errors.budget}
-                </Typography>
-              }
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12}>
-            {" "}
-            <TextField
-              label="שירותי קייטרינג"
-              fullWidth
-              margin="normal"
-              value={cateringService}
-              onChange={(e) => {
-                setCateringService(e.target.value);
-                handleInputChange("cateringService", e.target.value);
-              }}
-              variant="outlined"
-              error={
-                errors.cateringService && errors.cateringService !== "תקין"
-              }
-              helperText={
-                <Typography
-                  variant="caption"
-                  color={errors.cateringService === "תקין" ? "green" : "error"}
-                >
-                  {errors.cateringService}
-                </Typography>
-              }
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12}>
-            {" "}
-            <TextField
-              label="מידע נוסף"
-              fullWidth
-              margin="normal"
-              value={additionalInfo}
-              onChange={(e) => {
-                setAdditionalInfo(e.target.value);
-                handleInputChange("additionalInfo", e.target.value);
-              }}
-              variant="outlined"
-              error={errors.additionalInfo && errors.additionalInfo !== "תקין"}
-              helperText={
-                <Typography
-                  variant="caption"
-                  color={errors.additionalInfo === "תקין" ? "green" : "error"}
-                >
-                  {errors.additionalInfo}
-                </Typography>
-              }
-            />{" "}
-          </Grid>{" "}
-          <Grid item xs={12}>
-            {" "}
-            <Typography variant="h6" gutterBottom>
-              {" "}
-              מזהה אירוע: {eventId}{" "}
-            </Typography>{" "}
-          </Grid>{" "}
-          <Grid item xs={12}>
-            {" "}
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={handleSignup}
-              sx={{ padding: "10px 20px", fontSize: "1rem" }}
-            >
-              {" "}
-              רישום{" "}
-            </Button>{" "}
-          </Grid>{" "}
-        </Grid>{" "}
-      </Box>{" "}
+        <Typography variant="body2" sx={{ fontSize: "0.9rem" }}>
+          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
+        </Typography>
+      </Box>
+
+      {/* הצלחה - אנימציית אוברלי */}
       {showSuccessAnimation && (
         <Box
           sx={{
@@ -500,7 +469,6 @@ const ManagerSignup = () => {
             animation: "successAnimation 1s ease-in-out forwards",
           }}
         >
-          {" "}
           <Typography
             variant="h2"
             sx={{
@@ -509,13 +477,31 @@ const ManagerSignup = () => {
               animation: "bounce 1s ease",
             }}
           >
-            {" "}
-            הצלחה!{" "}
-          </Typography>{" "}
+            הצלחה!
+          </Typography>
         </Box>
-      )}{" "}
-      <style>{` @keyframes successAnimation { 0% { opacity: 0; transform: scale(0); } 100% { opacity: 1; transform: scale(1); } } @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } } `}</style>{" "}
-    </Container>
+      )}
+
+      {/* אנימציית הרקע */}
+      <style>
+        {`
+          @keyframes animateBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+          @keyframes successAnimation {
+            0% { opacity: 0; transform: scale(0); }
+            100% { opacity: 1; transform: scale(1); }
+          }
+          @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+          }
+        `}
+      </style>
+    </Box>
   );
 };
+
 export default ManagerSignup;

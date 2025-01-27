@@ -70,11 +70,21 @@ const Manager = () => {
     axios
       .get("http://localhost:2001/api/events/getAll")
       .then((res) => {
-        setEvents(res.data);
+        setEvents(res.data.filter((event) => event.userid_event === userId));
         setLoaded(true);
       })
       .catch((err) => console.error("Error fetching events:", err));
   }, []);
+
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:2001/api/events/getAll")
+  //     .then((res) => {
+  //       setEvents(res.data.filter((event) => event.userid_event === userId));
+  //       setLoaded(true);
+  //     })
+  //     .catch((err) => console.error("Error fetching events:", err));
+  // });
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
@@ -277,7 +287,7 @@ const Manager = () => {
         paddingTop: "120px",
       }}
     >
-      <Navbar />
+      {/* <Navbar /> */}
       <Box
         sx={{
           position: "absolute",

@@ -64,7 +64,7 @@ const Details = () => {
     };
     setState(newGift.amount);
     try {
-      const response =  axios.post(
+      const response = axios.post(
         "http://localhost:2001/api/gift/addGift",
         newGift
       );
@@ -98,7 +98,7 @@ const Details = () => {
         position: "relative",
         minHeight: "100vh",
         direction: "rtl",
-        paddingTop: "64px", // התאמה לבר ניווט קבוע
+        paddingTop: "1px", // התאמה לבר ניווט קבוע
       }}
     >
       <Navbar
@@ -129,8 +129,9 @@ const Details = () => {
       <Container
         maxWidth="md"
         sx={{
-          marginTop: "20px",
-          marginBottom: "50px",
+          marginTop: "0px",
+          marginBottom: "0px",
+          padding: 0,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -152,7 +153,8 @@ const Details = () => {
           sx={{
             fontWeight: "bold",
             color: "#E0E1DD",
-            paddingTop: "100px",
+            paddingTop: "0px",
+            mt: 0,
             marginBottom: 4,
             fontSize: { xs: "2.5rem", sm: "3rem" },
             fontFamily: "Poppins, sans-serif",
@@ -560,6 +562,20 @@ const Details = () => {
           }
         `}
       </style>
+      {/* Footer פשוט בתחתית העמוד */}
+      <Box
+        sx={{
+          marginTop: 5,
+          textAlign: "center",
+          py: 1.5,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          color: "#E0E1DD",
+        }}
+      >
+        <Typography variant="body2" sx={{ fontSize: "0.9rem" }}>
+          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
+        </Typography>
+      </Box>
     </Box>
   );
 };

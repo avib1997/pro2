@@ -17,11 +17,12 @@ import profilePic2 from "../assets/profile2.jpg"; // תמונת מוטי
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
 const Home = () => {
   const navigate = useNavigate();
   const { setEventNumber, setEvent } = useContext(Context); // נעדכן את ה-ID של האירוע בקונטקסט
   const [EventNumber, setEventNumberInput] = useState(""); // ניהול הסטייט של השדה
+  const [errorMessage, setErrorMessage] = useState(""); // סטייט עבור הודעת השגיאה
+
   const { ref: titleRef, inView: titleInView } = useInView({
     triggerOnce: true,
   });
@@ -44,10 +45,19 @@ const Home = () => {
 
   const handleEventIdChange = (e) => {
     setEventNumberInput(e.target.value);
+    // בכל הקלדה חדשה, ננקה את הודעת השגיאה
+    setErrorMessage("");
   };
 
   const handleStartClick = () => {
     console.log("EventNumber:", EventNumber);
+    // אם לא הוזן מספר אירוע, נציג הודעת שגיאה ולא נמשיך
+    if (!EventNumber) {
+      setErrorMessage("חסר מספר אירוע");
+      return;
+    }
+
+    // אם כן הוזן, נבצע את הקריאה לשרת
     axios
       .post(`http://localhost:2001/api/events/EventNumber`, { EventNumber })
       .then((response) => {
@@ -58,14 +68,14 @@ const Home = () => {
           navigate("/LoginPage");
         } else {
           console.log("אירוע לא נמצא");
+          setErrorMessage("אירוע לא נמצא, בדוק את המספר שהוזן");
         }
       })
       .catch((error) => {
         console.log("error in Home:", error);
+        setErrorMessage("אירעה שגיאה בעת התחברות לאירוע");
       });
   };
-  
-
 
   const cardStyles = [
     { backgroundColor: "#FFCDD2", titleColor: "#D32F2F" }, // צבע ראשון
@@ -142,30 +152,87 @@ const Home = () => {
             גלו את הדרך הטובה ביותר לנהל את האירועים והמתנות שלכם. פשוט, יעיל
             ואלגנטי.
           </Typography>
+          <Typography
+            sx={{
+              fontSize: "0.9rem",
+              color: "#fff",
+              marginBottom: "10px",
+              opacity: inputInView ? 1 : 0,
+              transform: inputInView ? "translateY(0)" : "translateY(-50px)",
+              transition: "all 0.7s ease-out",
+            }}
+          >
+            כניסה לאירוע - לחץ כאן:
+          </Typography>
+          {/* הצגת הודעת שגיאה מעל השדה, אם קיימת */}
+          {errorMessage && (
+            <Typography
+              sx={{
+                color: "red",
+                marginBottom: "10px",
+                fontSize: "2rem", // גודל גופן גדול יותר
+                fontWeight: "bold", // טקסט מודגש
+                //textShadow: "1px 1px 2px rgba(0,0,0,0.3)", // צל קטן לטקסט (לא חובה)
+              }}
+            >
+              {errorMessage}
+            </Typography>
+          )}
           <TextField
             ref={inputRef} // אפקט inputInView
-            label="הכנס ID של האירוע"
-            variant="outlined"
+            label="הכנס מספר אירוע"
+            variant="filled" // בוחרים בסגנון Filled
+            InputProps={{
+              disableUnderline: true, // מבטלים את הקו התחתון של ברירת המחדל ב־filled
+            }}
             value={EventNumber}
             onChange={handleEventIdChange}
             sx={{
-              marginBottom: "20px",
+              direction: "rtl",
+              marginBottom: "0px",
               marginLeft: "20px",
-              width: "300px",
+              width: "500px",
+              //height: "50px",
               backgroundColor: "rgba(255, 255, 255, 0.3)", // רקע שקוף למחצה עם מעט חלבי
-              borderRadius: "5px",
+              borderRadius: "15px",
               opacity: inputInView ? 1 : 0,
               transform: inputInView ? "translateY(0)" : "translateY(-50px)",
               transition: "all 0.7s ease-out", // מעבר חלק כמו הכפתור
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "transparent" }, // גבול שקוף
-                "&:hover fieldset": {
-                  borderColor: "#d88d1c",
+              "& .MuiFilledInput-root": {
+                borderRadius: "15px",
+                backgroundColor: "rgba(255, 255, 255, 0.3)", // רקע שקוף למחצה עם מעט חלבי
+                color: "#333", // צבע טקסט כהה
+                boxShadow: "none",
+                padding: "0px", // רווח פנימי
+                // יישור טקסט התוכן לימין, אם רוצים שהמשתמש יקליד מימין לשמאל
+                "& input": {
+                  textAlign: "right",
+                  paddingRight: "12px",
+                },
+
+                "&:hover": {
+                  backgroundColor: "#f4f4f4",
+                  boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.1)", // צל עדין
+                },
+                "&.Mui-focused": {
+                  backgroundColor: "#fff",
                   boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
-                }, // אפקט hover
-                "&.Mui-focused fieldset": { borderColor: "#d88d1c" },
+                },
               },
-              "& .MuiInputBase-input": { color: "#fff" }, // טקסט לבן בשדה
+
+              // עיצוב הלייבל (הטקסט "הכנס מספר אירוע"):
+              "& .MuiInputLabel-root": {
+                right: "20px", // הזזת הלייבל ימינה
+                left: "auto", // ביטול ערך left
+                transformOrigin: "top right",
+                color: "#666",
+                fontSize: "1rem",
+              },
+              "& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink": {
+                right: "20px",
+                transformOrigin: "top right",
+                color: "darkblue",
+              },
             }}
           />
 
@@ -177,8 +244,8 @@ const Home = () => {
               backgroundColor: "#F9A826",
               color: "#fff",
               fontSize: "1.2rem",
-              padding: "15px 30px",
-              borderRadius: "30px",
+              padding: "5px 40px",
+              borderRadius: "15px",
               opacity: buttonInView ? 1 : 0,
               transform: buttonInView ? "translateY(0)" : "translateY(-50px)",
               transition: "all 0.7s ease-out",
@@ -187,10 +254,44 @@ const Home = () => {
                 boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
               },
             }}
-            component={Link}
-            to="/LoginPage"
+            // component={Link}
+            // to="/LoginPage"
           >
             התחלה
+          </Button>
+
+          <Typography
+            sx={{
+              fontSize: "0.9rem",
+              color: "#fff",
+              marginTop: "20px",
+              opacity: inputInView ? 1 : 0,
+              transform: inputInView ? "translateY(0)" : "translateY(-50px)",
+              transition: "all 0.7s ease-out",
+            }}
+          >
+            כניסה כמנהל אירוע - לחץ כאן:
+          </Typography>
+          {/* כפתור חדש לכניסת מנהלי אירועים (בלי מספר אירוע) */}
+          <Button
+            sx={{
+              backgroundColor: "#2196F3",
+              color: "#fff",
+              fontSize: "1rem",
+              padding: "10px 20px",
+              borderRadius: "30px",
+              marginTop: "10px",
+              opacity: inputInView ? 1 : 0,
+              transform: inputInView ? "translateY(0)" : "translateY(-50px)",
+              transition: "all 0.7s ease-out",
+              "&:hover": {
+                backgroundColor: "#1976D2",
+                boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.3)",
+              },
+            }}
+            onClick={() => navigate("/LoginPage?userType=manager")}
+          >
+            כניסת מנהלי אירועים
           </Button>
 
           {/* טקסט קטן מעל קישור לרישום מנהל אירוע */}
@@ -199,6 +300,9 @@ const Home = () => {
               fontSize: "0.9rem",
               color: "#fff",
               marginTop: "20px",
+              opacity: inputInView ? 1 : 0,
+              transform: inputInView ? "translateY(0)" : "translateY(-50px)",
+              transition: "all 0.7s ease-out",
             }}
           >
             רוצה להירשם כמנהל אירוע? לחץ כאן:
@@ -213,9 +317,12 @@ const Home = () => {
               padding: "10px 20px",
               borderRadius: "30px",
               marginTop: "10px",
+              opacity: inputInView ? 1 : 0,
+              transform: inputInView ? "translateY(0)" : "translateY(-50px)",
+              transition: "all 0.7s ease-out",
               "&:hover": {
                 backgroundColor: "#388E3C",
-                boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.2)",
+                boxShadow: "0px 5px 10px rgba(0, 0, 0, 0.3)",
               },
             }}
             component={Link}
@@ -236,6 +343,9 @@ const Home = () => {
           background: "linear-gradient(135deg, #0D1B2A, #1B263B)",
           backgroundSize: "400% 400%",
           animation: "animateBg 15s ease infinite",
+          opacity: inputInView ? 1 : 0,
+          transform: inputInView ? "translateY(0)" : "translateY(-50px)",
+          transition: "all 0.7s ease-out",
         }}
       />
       {/* כרטיסיית המייסדים */}
@@ -366,20 +476,34 @@ const Home = () => {
               {index === 0
                 ? `המערכת Easy Gift נבנתה מתוך הבנה שישנם פערים רבים בתחום ניהול האירועים. אחת הבעיות המרכזיות היא המורכבות שבניהול התשלומים והקשר בין המוזמנים לבין המארגנים. המערכת נועדה לפתור את הבעיה הזו ולהציע פלטפורמה אינטואיטיבית שיכולה לאפשר למארגנים לנהל את כל האספקטים של האירוע בצורה חלקה – החל מניהול המוזמנים ועד תזרים התשלומים. עם Easy Gift, הכל פשוט יותר, וכל מארגן יכול להתמקד באירוע עצמו ולא בפרטים הטכניים.`
                 : index === 1
-                  ? `Easy Gift מציעה מגוון יתרונות שמבליטים אותה בשוק. קודם כל, מדובר במערכת שפותחה עם דגש חזק על אבטחה. כל פרט נשמר באופן מאובטח, כך שהמשתמשים יכולים להרגיש בטוחים כשמשתמשים במערכת. בנוסף, הממשק פשוט מאוד לשימוש, ומאפשר לכל משתמש – גם אם הוא לא טכנולוגי – לנהל את האירוע שלו בצורה מקצועית ומסודרת. ישנם עוד יתרונות רבים במערכת, כגון התאמה אישית של ניהול האירועים, ותמיכה מלאה במכשירים ניידים – כך שניתן לנהל את הכל מכל מקום.`
-                  : index === 2
-                    ? `המערכת Easy Gift מאפשרת תהליך פשוט ומהיר לניהול האירועים שלכם. קודם כל, אתם נרשמים למערכת באמצעות מספר צעדים פשוטים. לאחר מכן, תוכלו ליצור אירוע חדש עם כל הפרטים הנדרשים – כמו שם האירוע, תאריך, שעה ומיקום. לאחר שהאירוע נוצר, תוכלו להוסיף מוזמנים, לנהל את הרשימות, ולשלוח תזכורות ותשלומים. יתרה מכך, המערכת מאפשרת למוזמנים לבצע תשלומים ישירות דרך המערכת, מה שהופך את התהליך להרבה יותר נוח ומהיר עבור כל הצדדים המעורבים.`
-                    : index === 3
-                      ? `Easy Gift הוא המערכת הראשונה בשוק שמציעה פתרון כולל לכל תהליך ניהול האירועים והתשלומים בצורה אינטואיטיבית וחדשנית. המערכת שמה לעצמה למטרה להפוך את חוויית הניהול של אירועים לפשוטה יותר, תוך שמירה על כל הפרטים החשובים בצורה מאובטחת ויעילה. הממשק המודרני והקל לשימוש מבדיל את Easy Gift ממתחרותיה בשוק. הכל נעשה בצורה אוטומטית – ממעקב אחרי התשלומים ועד ניהול המוזמנים, ואין מערכת אחרת שמציעה את אותה רמת נוחות וקלות שימוש.`
-                      : index === 4
-                        ? `Easy Gift מתאימה למגוון רחב של סוגי אירועים – חתונות, בר מצוות, ימי הולדת, מסיבות קהילה ואפילו אירועים עסקיים. כל אירוע שבו יש צורך בניהול משתתפים ותשלומים, Easy Gift מציעה פתרון מושלם לניהול כל ההיבטים של האירוע. אין זה משנה אם האירוע הוא פרטי או ציבורי, המערכת מציעה גמישות מלאה להתאים את הכלים שלה לכל צורך ייחודי של המשתמשים. בנוסף, המערכת מתאימה לכל סוגי המשתמשים – החל ממארגנים קטנים ועד מארגנים גדולים שמנהלים מאות אירועים במקביל.`
-                        : index === 5
-                          ? `שירות הלקוחות של Easy Gift הוא מהטובים בשוק. אנחנו מציעים תמיכה מקוונת 24/7, כך שכל משתמש יכול לפנות אלינו בכל זמן שצריך. צוות התמיכה המקצועי שלנו מתמחה במתן פתרונות לכל שאלה או בעיה שיכולה לעלות במהלך השימוש במערכת. בין אם מדובר בשאלה טכנית או בהתאמה אישית של האירוע – אנחנו כאן כדי לעזור. בנוסף, אנחנו מציעים הדרכות מקוונות וליווי אישי במהלך כל תהליך הקמת האירוע, כך שתמיד תדעו שיש לכם גב.`
-                          : `הסיפור של Easy Gift מתחיל לפני כמה שנים, כאשר אבי ומוטי זיהו את הפער בשוק ניהול האירועים. הם ראו את הצורך במערכת שתפשט את התהליך ותהפוך אותו לנגיש יותר עבור כל אחד, גם ללא ניסיון טכני. עם החזון הזה, הם יצאו לדרך ופיתחו את המערכת החדשה. הסיפור שלהם הוא סיפור של תשוקה לחדשנות וליצירת חוויות משתמש שמנגישות את הכלי למשתמשים. כל פרט במערכת נבנה עם מחשבה עמוקה כדי לתת את הפתרון הטוב ביותר לכל צורך של המשתמשים.`}
+                ? `Easy Gift מציעה מגוון יתרונות שמבליטים אותה בשוק. קודם כל, מדובר במערכת שפותחה עם דגש חזק על אבטחה. כל פרט נשמר באופן מאובטח, כך שהמשתמשים יכולים להרגיש בטוחים כשמשתמשים במערכת. בנוסף, הממשק פשוט מאוד לשימוש, ומאפשר לכל משתמש – גם אם הוא לא טכנולוגי – לנהל את האירוע שלו בצורה מקצועית ומסודרת. ישנם עוד יתרונות רבים במערכת, כגון התאמה אישית של ניהול האירועים, ותמיכה מלאה במכשירים ניידים – כך שניתן לנהל את הכל מכל מקום.`
+                : index === 2
+                ? `המערכת Easy Gift מאפשרת תהליך פשוט ומהיר לניהול האירועים שלכם. קודם כל, אתם נרשמים למערכת באמצעות מספר צעדים פשוטים. לאחר מכן, תוכלו ליצור אירוע חדש עם כל הפרטים הנדרשים – כמו שם האירוע, תאריך, שעה ומיקום. לאחר שהאירוע נוצר, תוכלו להוסיף מוזמנים, לנהל את הרשימות, ולשלוח תזכורות ותשלומים. יתרה מכך, המערכת מאפשרת למוזמנים לבצע תשלומים ישירות דרך המערכת, מה שהופך את התהליך להרבה יותר נוח ומהיר עבור כל הצדדים המעורבים.`
+                : index === 3
+                ? `Easy Gift הוא המערכת הראשונה בשוק שמציעה פתרון כולל לכל תהליך ניהול האירועים והתשלומים בצורה אינטואיטיבית וחדשנית. המערכת שמה לעצמה למטרה להפוך את חוויית הניהול של אירועים לפשוטה יותר, תוך שמירה על כל הפרטים החשובים בצורה מאובטחת ויעילה. הממשק המודרני והקל לשימוש מבדיל את Easy Gift ממתחרותיה בשוק. הכל נעשה בצורה אוטומטית – ממעקב אחרי התשלומים ועד ניהול המוזמנים, ואין מערכת אחרת שמציעה את אותה רמת נוחות וקלות שימוש.`
+                : index === 4
+                ? `Easy Gift מתאימה למגוון רחב של סוגי אירועים – חתונות, בר מצוות, ימי הולדת, מסיבות קהילה ואפילו אירועים עסקיים. כל אירוע שבו יש צורך בניהול משתתפים ותשלומים, Easy Gift מציעה פתרון מושלם לניהול כל ההיבטים של האירוע. אין זה משנה אם האירוע הוא פרטי או ציבורי, המערכת מציעה גמישות מלאה להתאים את הכלים שלה לכל צורך ייחודי של המשתמשים. בנוסף, המערכת מתאימה לכל סוגי המשתמשים – החל ממארגנים קטנים ועד מארגנים גדולים שמנהלים מאות אירועים במקביל.`
+                : index === 5
+                ? `שירות הלקוחות של Easy Gift הוא מהטובים בשוק. אנחנו מציעים תמיכה מקוונת 24/7, כך שכל משתמש יכול לפנות אלינו בכל זמן שצריך. צוות התמיכה המקצועי שלנו מתמחה במתן פתרונות לכל שאלה או בעיה שיכולה לעלות במהלך השימוש במערכת. בין אם מדובר בשאלה טכנית או בהתאמה אישית של האירוע – אנחנו כאן כדי לעזור. בנוסף, אנחנו מציעים הדרכות מקוונות וליווי אישי במהלך כל תהליך הקמת האירוע, כך שתמיד תדעו שיש לכם גב.`
+                : `הסיפור של Easy Gift מתחיל לפני כמה שנים, כאשר אבי ומוטי זיהו את הפער בשוק ניהול האירועים. הם ראו את הצורך במערכת שתפשט את התהליך ותהפוך אותו לנגיש יותר עבור כל אחד, גם ללא ניסיון טכני. עם החזון הזה, הם יצאו לדרך ופיתחו את המערכת החדשה. הסיפור שלהם הוא סיפור של תשוקה לחדשנות וליצירת חוויות משתמש שמנגישות את הכלי למשתמשים. כל פרט במערכת נבנה עם מחשבה עמוקה כדי לתת את הפתרון הטוב ביותר לכל צורך של המשתמשים.`}
             </Typography>
           </Box>
         ))}
       </Container>
+      {/* Footer פשוט בתחתית העמוד */}
+      <Box
+        sx={{
+          marginTop: 5,
+          textAlign: "center",
+          py: 1.5,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          color: "#E0E1DD",
+        }}
+      >
+        <Typography variant="body2" sx={{ fontSize: "0.9rem" }}>
+          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
+        </Typography>
+      </Box>
     </Box>
   );
 };

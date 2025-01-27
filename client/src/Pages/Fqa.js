@@ -243,7 +243,7 @@ export default function FaqPage() {
       <Box
         sx={{
           paddingTop: "100px",
-          position: "absolute",
+          position: "fixed",
           top: 0,
           right: 0,
           width: "100%",
@@ -269,7 +269,7 @@ export default function FaqPage() {
         שאלות ותשובות נפוצות
       </Typography>
       <Container
-        maxWidth="md"
+        maxWidth="lg"
         sx={{
           marginTop: "30px",
           marginBottom: "50px",
@@ -334,6 +334,20 @@ export default function FaqPage() {
           </Box>
         </Paper>
       </Container>
+      {/* Footer פשוט בתחתית העמוד */}
+      <Box
+        sx={{
+          marginTop: 5,
+          textAlign: "center",
+          py: 1.5,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          color: "#E0E1DD",
+        }}
+      >
+        <Typography variant="body2" sx={{ fontSize: "0.9rem" }}>
+          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
+        </Typography>
+      </Box>
     </div>
   );
 }

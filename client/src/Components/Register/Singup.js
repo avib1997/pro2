@@ -9,7 +9,13 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Context } from "../../App";
-import { Email as EmailIcon, Lock as LockIcon } from "@mui/icons-material";
+// אייקונים מתאימים לשדות
+import {
+  Person as PersonIcon,
+  PersonOutline as PersonOutlineIcon,
+  Email as EmailIcon,
+  Lock as LockIcon,
+} from "@mui/icons-material";
 
 const Signup = (props) => {
   const Navigate = useNavigate();
@@ -92,16 +98,52 @@ const Signup = (props) => {
             label="שם"
             sx={{
               width: "300px",
-              backgroundColor: "white", // רקע לבן לשדה הקלט
-              "& .MuiInputLabel-root": { fontWeight: "600" }, // תווית בולטת
-              "& .MuiOutlinedInput-root": { fontWeight: "600" }, // טקסט בולט
+              backgroundColor: "#fff",
+              borderRadius: "20px", // רינוד פינות
+              // עיצוב כללי של השדה
+              "& .MuiOutlinedInput-root": {
+                fontWeight: 600,
+                borderRadius: "20px", // רינוד פינות
+                "& fieldset": {
+                  border: "none", // ביטול המסגרת (outline)
+                },
+                // אפקט רחיפה (hover)
+                "&:hover fieldset": {
+                  border: "none", // הצגת מסגרת בעת רחיפה
+                },
+                // אפקט כשהשדה בפוקוס (focus)
+                "&.Mui-focused fieldset": {
+                  border: "none",
+                },
+                // הוספת פדינג פנימי כדי למנוע חפיפה
+                "& .MuiOutlinedInput-input": {
+                  paddingRight: "0px",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                fontWeight: 600,
+                //transformOrigin: "top right",
+                // אפשר לכוון מיקום לייבל ב-RTL לפי הצורך
+                right: 20,
+                left: "auto",
+                //top: 3,
+                //ransform: "translate(0, 6px) scale(3.75)",
+              },
+              "& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink": {
+                // כאן מתרחש "הציפה" למעלה
+                transformOrigin: "top right", // רק לדוגמה, אם עובדים ב־RTL
+                // אפשר להוריד את ערכי ה-translateY כדי לשחק עם הגובה:
+                transform: "translate(0, .5px) scale(0.75)",
+                //        ↑↑   אתה יכול להגדיל/להקטין את ה"6px" כרצונך
+                // אפשר לשחק גם עם top במקום transform:
+                // top: "8px"
+              },
             }}
             InputProps={{
-              // העברת הסמל לצד השני
               endAdornment: (
                 <InputAdornment position="end">
-                  <EmailIcon sx={{ color: "#1976D2" }} />{" "}
-                  {/* סמל אימייל כחול */}
+                  {/* אייקון אדם לשם פרטי */}
+                  <PersonIcon sx={{ color: "#1976D2" }} />
                 </InputAdornment>
               ),
             }}
@@ -117,16 +159,52 @@ const Signup = (props) => {
             label="שם משפחה"
             sx={{
               width: "300px",
-              backgroundColor: "white", // רקע לבן לשדה הקלט
-              "& .MuiInputLabel-root": { fontWeight: "600" }, // תווית בולטת
-              "& .MuiOutlinedInput-root": { fontWeight: "600" }, // טקסט בולט
+              backgroundColor: "#fff",
+              borderRadius: "20px", // רינוד פינות
+              // עיצוב כללי של השדה
+              "& .MuiOutlinedInput-root": {
+                fontWeight: 600,
+                borderRadius: "20px", // רינוד פינות
+                "& fieldset": {
+                  border: "none", // ביטול המסגרת (outline)
+                },
+                // אפקט רחיפה (hover)
+                "&:hover fieldset": {
+                  border: "none", // הצגת מסגרת בעת רחיפה
+                },
+                // אפקט כשהשדה בפוקוס (focus)
+                "&.Mui-focused fieldset": {
+                  border: "none",
+                },
+                // הוספת פדינג פנימי כדי למנוע חפיפה
+                "& .MuiOutlinedInput-input": {
+                  paddingRight: "0px",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                fontWeight: 600,
+                //transformOrigin: "top right",
+                // אפשר לכוון מיקום לייבל ב-RTL לפי הצורך
+                right: 20,
+                left: "auto",
+                //top: 3,
+                //ransform: "translate(0, 6px) scale(3.75)",
+              },
+              "& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink": {
+                // כאן מתרחש "הציפה" למעלה
+                transformOrigin: "top right", // רק לדוגמה, אם עובדים ב־RTL
+                // אפשר להוריד את ערכי ה-translateY כדי לשחק עם הגובה:
+                transform: "translate(0, .5px) scale(0.75)",
+                //        ↑↑   אתה יכול להגדיל/להקטין את ה"6px" כרצונך
+                // אפשר לשחק גם עם top במקום transform:
+                // top: "8px"
+              },
             }}
             InputProps={{
-              // העברת הסמל לצד השני
               endAdornment: (
                 <InputAdornment position="end">
-                  <LockIcon sx={{ color: "#FF5722" }} />{" "}
-                  {/* סמל מנעול בצבע כתום */}
+                  {/* אייקון אדם אחר לשם משפחה */}
+                  <PersonOutlineIcon sx={{ color: "#1976D2" }} />
                 </InputAdornment>
               ),
             }}
@@ -138,20 +216,56 @@ const Signup = (props) => {
             margin="normal"
             type={"email"}
             variant="outlined"
-            placeholder="Email"
-            label="Email"
+            placeholder="דואר אלקטרוני"
+            label="דואר אלקטרוני"
             sx={{
               width: "300px",
-              backgroundColor: "white", // רקע לבן לשדה הקלט
-              "& .MuiInputLabel-root": { fontWeight: "600" }, // תווית בולטת
-              "& .MuiOutlinedInput-root": { fontWeight: "600" }, // טקסט בולט
+              backgroundColor: "#fff",
+              borderRadius: "20px", // רינוד פינות
+              // עיצוב כללי של השדה
+              "& .MuiOutlinedInput-root": {
+                fontWeight: 600,
+                borderRadius: "20px", // רינוד פינות
+                "& fieldset": {
+                  border: "none", // ביטול המסגרת (outline)
+                },
+                // אפקט רחיפה (hover)
+                "&:hover fieldset": {
+                  border: "none", // הצגת מסגרת בעת רחיפה
+                },
+                // אפקט כשהשדה בפוקוס (focus)
+                "&.Mui-focused fieldset": {
+                  border: "none",
+                },
+                // הוספת פדינג פנימי כדי למנוע חפיפה
+                "& .MuiOutlinedInput-input": {
+                  paddingRight: "0px",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                fontWeight: 600,
+                //transformOrigin: "top right",
+                // אפשר לכוון מיקום לייבל ב-RTL לפי הצורך
+                right: 20,
+                left: "auto",
+                //top: 3,
+                //ransform: "translate(0, 6px) scale(3.75)",
+              },
+              "& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink": {
+                // כאן מתרחש "הציפה" למעלה
+                transformOrigin: "top right", // רק לדוגמה, אם עובדים ב־RTL
+                // אפשר להוריד את ערכי ה-translateY כדי לשחק עם הגובה:
+                transform: "translate(0, .5px) scale(0.75)",
+                //        ↑↑   אתה יכול להגדיל/להקטין את ה"6px" כרצונך
+                // אפשר לשחק גם עם top במקום transform:
+                // top: "8px"
+              },
             }}
             InputProps={{
-              // העברת הסמל לצד השני
               endAdornment: (
                 <InputAdornment position="end">
-                  <LockIcon sx={{ color: "#FF5722" }} />{" "}
-                  {/* סמל מנעול בצבע כתום */}
+                  {/* אייקון אימייל */}
+                  <EmailIcon sx={{ color: "#1976D2" }} />
                 </InputAdornment>
               ),
             }}
@@ -163,20 +277,56 @@ const Signup = (props) => {
             margin="normal"
             type={"password"}
             variant="outlined"
-            placeholder="Password"
-            label="Password"
+            placeholder="סיסמה"
+            label="סיסמה"
             sx={{
               width: "300px",
-              backgroundColor: "white", // רקע לבן לשדה הקלט
-              "& .MuiInputLabel-root": { fontWeight: "600" }, // תווית בולטת
-              "& .MuiOutlinedInput-root": { fontWeight: "600" }, // טקסט בולט
+              backgroundColor: "#fff",
+              borderRadius: "20px", // רינוד פינות
+              // עיצוב כללי של השדה
+              "& .MuiOutlinedInput-root": {
+                fontWeight: 600,
+                borderRadius: "20px", // רינוד פינות
+                "& fieldset": {
+                  border: "none", // ביטול המסגרת (outline)
+                },
+                // אפקט רחיפה (hover)
+                "&:hover fieldset": {
+                  border: "none", // הצגת מסגרת בעת רחיפה
+                },
+                // אפקט כשהשדה בפוקוס (focus)
+                "&.Mui-focused fieldset": {
+                  border: "none",
+                },
+                // הוספת פדינג פנימי כדי למנוע חפיפה
+                "& .MuiOutlinedInput-input": {
+                  paddingRight: "0px",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                fontWeight: 600,
+                //transformOrigin: "top right",
+                // אפשר לכוון מיקום לייבל ב-RTL לפי הצורך
+                right: 20,
+                left: "auto",
+                //top: 3,
+                //ransform: "translate(0, 6px) scale(3.75)",
+              },
+              "& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink": {
+                // כאן מתרחש "הציפה" למעלה
+                transformOrigin: "top right", // רק לדוגמה, אם עובדים ב־RTL
+                // אפשר להוריד את ערכי ה-translateY כדי לשחק עם הגובה:
+                transform: "translate(0, .5px) scale(0.75)",
+                //        ↑↑   אתה יכול להגדיל/להקטין את ה"6px" כרצונך
+                // אפשר לשחק גם עם top במקום transform:
+                // top: "8px"
+              },
             }}
             InputProps={{
-              // העברת הסמל לצד השני
               endAdornment: (
                 <InputAdornment position="end">
-                  <LockIcon sx={{ color: "#FF5722" }} />{" "}
-                  {/* סמל מנעול בצבע כתום */}
+                  {/* אייקון מנעול בצבע כתום */}
+                  <LockIcon sx={{ color: "#FF5722" }} />
                 </InputAdornment>
               ),
             }}
@@ -185,11 +335,21 @@ const Signup = (props) => {
           <Button
             onClick={handeClick}
             type="submit"
-            sx={{ margin: 3, borderRadius: 3 }}
+            sx={{
+              margin: 3,
+              borderRadius: 3,
+              fontWeight: "600", // פונט בולט
+              fontFamily: "Roboto, sans-serif",
+              backgroundColor: "#1976D2", // צבע רקע כחול לכפתור
+              color: "white", // צבע טקסט לבן לכפתור
+              "&:hover": {
+                backgroundColor: "#115293", // גוון כחול כהה יותר בעת ריחוף
+              },
+            }}
             variant="contained"
             size="large"
           >
-            Signup
+            הרשמה
           </Button>
         </Box>
       </form>

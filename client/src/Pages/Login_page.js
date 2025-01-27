@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
   Button,
@@ -6,10 +7,9 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import localImage from "../assets/ben-white-vJz7tkHncFk-unsplash.jpg";
 import { Context } from "../App"; // או היכן שהקונטקסט מיוצא
-// אייקונים לדוגמה (לא לשכוח להתקין: npm install @mui/icons-material)
 import StarIcon from "@mui/icons-material/Star";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
@@ -19,13 +19,31 @@ import Login from "../Components/Register/Login";
 import Signup from "../Components/Register/Singup";
 
 const LoginPage = () => {
+  const location = useLocation();
   const navigate = useNavigate();
-  const { eventId } = useContext(Context); // נקרא את ערך ה-eventId
+  const { eventId, setEventNumber } = useContext(Context); // נקרא את ערך ה-eventId
   const [IsLogin, setIsLogin] = useState(true);
   const [IsSignup, setIsSignup] = useState(false);
   const [IsManager, setIsManager] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // מצב לשגיאות
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const userType = params.get("userType");
+
+    if (userType === "manager") {
+      setIsLogin(false);
+      setIsSignup(false);
+      setIsManager(true);
+    }
+  }, [location.search]);
+
+  const handleBackHome = () => {
+    setEventNumber("");
+  };
 
   const handleChange = (e) => {
+    setErrorMessage("");
     setIsLogin(false);
     setIsSignup(false);
     setIsManager(false);
@@ -44,6 +62,24 @@ const LoginPage = () => {
     }
   };
 
+  const handleGuestContinue = () => {
+    if (!eventId) {
+      setErrorMessage(
+        "מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע."
+      );
+      return;
+    }
+    navigate("/Details");
+  };
+  // שימוש ב-useEffect לשמירה על ההודעה
+  React.useEffect(() => {
+    if (!eventId) {
+      setErrorMessage(
+        "מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע."
+      );
+    }
+  }, [eventId]);
+
   return (
     <Box
       sx={{
@@ -59,7 +95,7 @@ const LoginPage = () => {
       {/* רקע עם אנימציה זזה */}
       <Box
         sx={{
-          position: "absolute",
+          position: "fixed",
           top: 0,
           right: 0,
           width: "100%",
@@ -70,7 +106,31 @@ const LoginPage = () => {
           animation: "animateBg 15s ease infinite",
         }}
       />
-
+      {/* כפתור חזרה לדף הבית */}
+      <Button
+        onClick={handleBackHome}
+        component={Link}
+        to="/Home"
+        sx={{
+          position: "absolute",
+          top: "15px",
+          left: "85%",
+          //transform: "translateX(100%)",
+          backgroundColor: "#1E90FF",
+          color: "#fff",
+          padding: "10px 20px",
+          borderRadius: "30px",
+          fontSize: "1.2rem",
+          fontWeight: "bold",
+          "&:hover": {
+            backgroundColor: "#187bcd",
+            boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.3)",
+          },
+          zIndex: 2,
+        }}
+      >
+        חזרה לדף הבית
+      </Button>
       {/* כותרת */}
       <Box
         sx={{
@@ -103,7 +163,6 @@ const LoginPage = () => {
           דף התחברות ורישום ל-EASY GIFT
         </Typography>
       </Box>
-
       {/* בלוק "למה לבחור ב-EASY GIFT?" מעל הטופס */}
       <Box
         sx={{
@@ -220,9 +279,7 @@ const LoginPage = () => {
           </Box>
         </Box>
       </Box>
-
       <Divider sx={{ maxWidth: 700, margin: "auto", my: 3 }} />
-
       {/* במקום "קובייה אחת" גדולה רק לטופס, ניצור 2 עמודות: 
           מצד אחד תוכן ויזואלי/תדמיתי, ומצד שני הטופס */}
       <form>
@@ -415,9 +472,30 @@ const LoginPage = () => {
                   textShadow: "1px 1px #000",
                 }}
               >
+                {errorMessage && (
+                  <Typography
+                    sx={{
+                      width: "330px",
+                      lineHeight: 1,
+                      color: "red",
+                      marginBottom: "10px",
+                      fontSize: "20px", // גודל גופן גדול יותר
+                      fontWeight: "bold", // טקסט מודגש
+                      //textShadow: "1px 1px 2px rgba(0,0,0,0.3)", // צל קטן לטקסט (לא חובה)
+                    }}
+                  >
+                    {errorMessage}
+                  </Typography>
+                )}
+                <Typography
+                  variant="body1"
+                  sx={{ color: "#FFF", fontWeight: "bold", mb: 2 }}
+                >
+                  מספר אירוע: {eventId || "לא הוזן"}
+                </Typography>
                 <MuiLink
                   component="button"
-                  onClick={() => navigate("/Details")}
+                  onClick={handleGuestContinue}
                   underline="hover"
                   sx={{
                     color: "#F0A500",
@@ -454,7 +532,6 @@ const LoginPage = () => {
           &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
         </Typography>
       </Box>
-
       {/* סגנון CSS לאנימציית הרקע */}
       <style>
         {`
