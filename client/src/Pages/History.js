@@ -14,11 +14,30 @@ import {
   VideoLibrary as VideoIcon,
   AccountBalanceWallet as WalletIcon
 } from '@mui/icons-material'
-import { Alert, Box, Collapse, Container, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Collapse,
+  Container,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography
+} from '@mui/material'
 import axios from 'axios'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import React, { useContext, useEffect, useState } from 'react'
+import React, {
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 import { Context } from '../App'
 import Navbar from '../Components/Navbar/Navbar'
 
@@ -31,30 +50,77 @@ function CollapsibleRow(props) {
     let name
     switch (method) {
       case 'PayPal':
-        icon = <PaymentIcon sx={{ color: '#3b7bbf', marginRight: 0.5, paddingLeft: 1 }} />
+        icon = (
+          <PaymentIcon
+            sx={{
+              color: '#3b7bbf',
+              marginRight: 0.5,
+              paddingLeft: 1
+            }}
+          />
+        )
         name = 'PayPal'
         break
       case 'PayBox':
-        icon = <WalletIcon sx={{ color: '#d81b60', marginRight: 0.5, paddingLeft: 1 }} />
+        icon = (
+          <WalletIcon
+            sx={{
+              color: '#d81b60',
+              marginRight: 0.5,
+              paddingLeft: 1
+            }}
+          />
+        )
         name = 'PayBox'
         break
       case 'Bit':
-        icon = <AtmIcon sx={{ color: '#4caf50', marginRight: 0.5, paddingLeft: 1 }} />
+        icon = (
+          <AtmIcon
+            sx={{
+              color: '#4caf50',
+              marginRight: 0.5,
+              paddingLeft: 1
+            }}
+          />
+        )
         name = 'Bit'
         break
       case 'אשראי':
-        icon = <CreditCardIcon sx={{ color: '#F0A500', marginRight: 0.5, paddingLeft: 1 }} />
+        icon = (
+          <CreditCardIcon
+            sx={{
+              color: '#F0A500',
+              marginRight: 0.5,
+              paddingLeft: 1
+            }}
+          />
+        )
         name = 'אשראי'
         break
       default:
-        icon = <MoneyIcon sx={{ color: '#F0A500', marginRight: 0.5, paddingLeft: 1 }} />
+        icon = (
+          <MoneyIcon
+            sx={{
+              color: '#F0A500',
+              marginRight: 0.5,
+              paddingLeft: 1
+            }}
+          />
+        )
         name = 'מזומן'
         break
     }
     return (
-      <Box display="flex" alignItems="center" justifyContent="center">
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
         {icon}
-        <Typography variant="body2" sx={{ color: '#E0E1DD' }}>
+        <Typography
+          variant="body2"
+          sx={{ color: '#E0E1DD' }}
+        >
           {name}
         </Typography>
       </Box>
@@ -65,13 +131,28 @@ function CollapsibleRow(props) {
   const getAttachmentIcons = attachments => {
     const icons = []
     if (attachments.includes('תמונה')) {
-      icons.push(<ImageIcon key="image" sx={{ color: '#F0A500', marginLeft: 1 }} />)
+      icons.push(
+        <ImageIcon
+          key="image"
+          sx={{ color: '#F0A500', marginLeft: 1 }}
+        />
+      )
     }
     if (attachments.includes('וידאו')) {
-      icons.push(<VideoIcon key="video" sx={{ color: '#F0A500', marginLeft: 1 }} />)
+      icons.push(
+        <VideoIcon
+          key="video"
+          sx={{ color: '#F0A500', marginLeft: 1 }}
+        />
+      )
     }
     if (attachments.includes('הקלטה')) {
-      icons.push(<AudioIcon key="audio" sx={{ color: '#F0A500', marginLeft: 1 }} />)
+      icons.push(
+        <AudioIcon
+          key="audio"
+          sx={{ color: '#F0A500', marginLeft: 1 }}
+        />
+      )
     }
     return icons
   }
@@ -85,7 +166,8 @@ function CollapsibleRow(props) {
           cursor: 'pointer',
           '&:hover': {
             backgroundColor: '#2E3B55',
-            backgroundImage: 'linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(192, 192, 192, 0.1))',
+            backgroundImage:
+              'linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(192, 192, 192, 0.1))',
             transition: 'background 0.5s ease'
           }
         }}
@@ -110,8 +192,14 @@ function CollapsibleRow(props) {
         >
           {row.gift} ₪
         </TableCell>
-        <TableCell align="center">{getPaymentIconAndName(row.paymentMethod)}</TableCell>
-        <TableCell align="center">{getAttachmentIcons(row.attachments)}</TableCell>
+        <TableCell align="center">
+          {getPaymentIconAndName(
+            row.paymentMethod
+          )}
+        </TableCell>
+        <TableCell align="center">
+          {getAttachmentIcons(row.attachments)}
+        </TableCell>
         <TableCell
           align="center"
           sx={{
@@ -131,25 +219,51 @@ function CollapsibleRow(props) {
             }}
             sx={{
               color: '#F0A500',
-              transition: 'transform 0.3s, color 0.3s',
+              transition:
+                'transform 0.3s, color 0.3s',
               '&:hover': {
                 transform: 'scale(1.2)',
                 color: '#FFD700'
               }
             }}
           >
-            {isOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            {isOpen ? (
+              <KeyboardArrowUpIcon />
+            ) : (
+              <KeyboardArrowDownIcon />
+            )}
           </IconButton>
         </TableCell>
       </TableRow>
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6} sx={{ backgroundColor: '#1B263B' }}>
-          <Collapse in={isOpen} timeout="auto" unmountOnExit>
+        <TableCell
+          style={{
+            paddingBottom: 0,
+            paddingTop: 0
+          }}
+          colSpan={6}
+          sx={{ backgroundColor: '#1B263B' }}
+        >
+          <Collapse
+            in={isOpen}
+            timeout="auto"
+            unmountOnExit
+          >
             <Box margin={2} textAlign="center">
-              <Typography variant="subtitle1" gutterBottom sx={{ color: '#E0E1DD', fontWeight: 'bold' }}>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                sx={{
+                  color: '#E0E1DD',
+                  fontWeight: 'bold'
+                }}
+              >
                 ברכה:
               </Typography>
-              <Typography variant="body1" sx={{ color: '#E0E1DD' }}>
+              <Typography
+                variant="body1"
+                sx={{ color: '#E0E1DD' }}
+              >
                 {row.blessing}
               </Typography>
             </Box>
@@ -161,9 +275,11 @@ function CollapsibleRow(props) {
 }
 
 export default function History() {
-  const { userId, detailsId, event } = useContext(Context)
+  const { userId, detailsId, event } =
+    useContext(Context)
   const [gifts, setGifts] = useState([])
-  const [errorMessage, setErrorMessage] = useState('')
+  const [errorMessage, setErrorMessage] =
+    useState('')
   const [openRowId, setOpenRowId] = useState(null)
 
   // יצירת 100 מתנות פיקטיביות
@@ -202,23 +318,56 @@ export default function History() {
       'שיהיה במזל!',
       'המון אושר ואהבה!'
     ]
-    const paymentMethods = ['PayPal', 'PayBox', 'Bit', 'אשראי']
-    const attachmentsOptions = ['הקלטה', 'וידאו', 'תמונה']
+    const paymentMethods = [
+      'PayPal',
+      'PayBox',
+      'Bit',
+      'אשראי'
+    ]
+    const attachmentsOptions = [
+      'הקלטה',
+      'וידאו',
+      'תמונה'
+    ]
 
     const fakeGifts = []
 
     for (let i = 1; i <= 100; i++) {
-      const name = names[Math.floor(Math.random() * names.length)]
-      const gift = Math.floor(Math.random() * 500) + 50
-      const date = new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toLocaleDateString('he-IL')
-      const blessing = blessings[Math.floor(Math.random() * blessings.length)]
+      const name =
+        names[
+          Math.floor(Math.random() * names.length)
+        ]
+      const gift =
+        Math.floor(Math.random() * 500) + 50
+      const date = new Date(
+        Date.now() -
+          Math.floor(Math.random() * 10000000000)
+      ).toLocaleDateString('he-IL')
+      const blessing =
+        blessings[
+          Math.floor(
+            Math.random() * blessings.length
+          )
+        ]
 
-      const paymentMethod = paymentMethods[Math.floor(Math.random() * paymentMethods.length)]
+      const paymentMethod =
+        paymentMethods[
+          Math.floor(
+            Math.random() * paymentMethods.length
+          )
+        ]
 
       const attachments = []
-      const numAttachments = Math.floor(Math.random() * 3) + 1
+      const numAttachments =
+        Math.floor(Math.random() * 3) + 1
       for (let j = 0; j < numAttachments; j++) {
-        const attachment = attachmentsOptions[Math.floor(Math.random() * attachmentsOptions.length)]
+        const attachment =
+          attachmentsOptions[
+            Math.floor(
+              Math.random() *
+                attachmentsOptions.length
+            )
+          ]
         if (!attachments.includes(attachment)) {
           attachments.push(attachment)
         }
@@ -241,16 +390,24 @@ export default function History() {
   useEffect(() => {
     const fetchGifts = async () => {
       try {
-        const response = await axios.post('http://localhost:2001/api/gift/getgift', { giftsId: detailsId })
+        const response = await axios.post(
+          'http://localhost:2001/api/gift/getgift',
+          { giftsId: detailsId }
+        )
 
-        if (response.data && response.data.length > 0) {
+        if (
+          response.data &&
+          response.data.length > 0
+        ) {
           setGifts(response.data)
         } else {
           setGifts(generateFakeData())
         }
       } catch (error) {
         setGifts(generateFakeData())
-        setErrorMessage('שגיאה בטעינת הנתונים מהשרת. מוצגים נתונים פיקטיביים.')
+        setErrorMessage(
+          'שגיאה בטעינת הנתונים מהשרת. מוצגים נתונים פיקטיביים.'
+        )
       }
     }
 
@@ -268,8 +425,24 @@ export default function History() {
     doc.text(`היסטוריית מתנות`, 10, 10)
     autoTable(doc, {
       startY: 20,
-      head: [['שם', 'סכום', 'תאריך', 'אמצעי תשלום', 'מצורפים', 'ברכה']],
-      body: gifts.map(gift => [gift.name, `${gift.gift} ₪`, gift.date, gift.paymentMethod, gift.attachments.join(', '), gift.blessing])
+      head: [
+        [
+          'שם',
+          'סכום',
+          'תאריך',
+          'אמצעי תשלום',
+          'מצורפים',
+          'ברכה'
+        ]
+      ],
+      body: gifts.map(gift => [
+        gift.name,
+        `${gift.gift} ₪`,
+        gift.date,
+        gift.paymentMethod,
+        gift.attachments.join(', '),
+        gift.blessing
+      ])
     })
 
     doc.save('gifts_history.pdf')
@@ -303,7 +476,8 @@ export default function History() {
           width: '100%',
           height: '100%',
           zIndex: -1,
-          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
+          background:
+            'linear-gradient(135deg, #0D1B2A, #1B263B)',
           backgroundSize: '400% 400%',
           animation: 'animateBg 15s ease infinite'
         }}
@@ -343,26 +517,42 @@ export default function History() {
             marginBottom: '20px',
             textShadow: '2px 2px silver',
             color: '#E0E1DD',
-            animation: 'textGlow 2s ease-in-out infinite'
+            animation:
+              'textGlow 2s ease-in-out infinite'
           }}
         >
           היסטוריית מתנות
         </Typography>
 
         {errorMessage && (
-          <Alert severity="warning" sx={{ marginBottom: '20px' }}>
+          <Alert
+            severity="warning"
+            sx={{ marginBottom: '20px' }}
+          >
             {errorMessage}
           </Alert>
         )}
 
-        <Box sx={{ width: '100%', position: 'relative' }}>
-          <Box sx={{ position: 'absolute', left: 0, top: -50 }}>
+        <Box
+          sx={{
+            width: '100%',
+            position: 'relative'
+          }}
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              left: 0,
+              top: -50
+            }}
+          >
             <Tooltip title="הדפס">
               <IconButton
                 onClick={handlePrint}
                 sx={{
                   color: '#F0A500',
-                  transition: 'transform 0.3s, color 0.3s',
+                  transition:
+                    'transform 0.3s, color 0.3s',
                   '&:hover': {
                     transform: 'scale(1.2)',
                     color: '#FFD700'
@@ -377,7 +567,8 @@ export default function History() {
                 onClick={handleDownloadPDF}
                 sx={{
                   color: '#F0A500',
-                  transition: 'transform 0.3s, color 0.3s',
+                  transition:
+                    'transform 0.3s, color 0.3s',
                   '&:hover': {
                     transform: 'scale(1.2)',
                     color: '#FFD700'
@@ -394,14 +585,19 @@ export default function History() {
             sx={{
               borderRadius: '15px',
               backgroundColor: '#1B263B',
-              boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.5)',
+              boxShadow:
+                '0px 8px 24px rgba(0, 0, 0, 0.5)',
               overflow: 'hidden',
               animation: 'fadeIn 1s ease'
             }}
           >
             <Table dir="rtl">
               <TableHead>
-                <TableRow sx={{ backgroundColor: '#0D1B2A' }}>
+                <TableRow
+                  sx={{
+                    backgroundColor: '#0D1B2A'
+                  }}
+                >
                   <TableCell
                     sx={{
                       color: '#F0A500',
@@ -457,10 +653,29 @@ export default function History() {
               </TableHead>
               <TableBody>
                 {gifts.length > 0 ? (
-                  gifts.map(row => <CollapsibleRow key={row._id} row={row} isOpen={openRowId === row._id} onToggle={() => setOpenRowId(openRowId === row._id ? null : row._id)} />)
+                  gifts.map(row => (
+                    <CollapsibleRow
+                      key={row._id}
+                      row={row}
+                      isOpen={
+                        openRowId === row._id
+                      }
+                      onToggle={() =>
+                        setOpenRowId(
+                          openRowId === row._id
+                            ? null
+                            : row._id
+                        )
+                      }
+                    />
+                  ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ color: '#E0E1DD' }}>
+                    <TableCell
+                      colSpan={6}
+                      align="center"
+                      sx={{ color: '#E0E1DD' }}
+                    >
                       אין נתונים להצגה
                     </TableCell>
                   </TableRow>
@@ -514,8 +729,12 @@ export default function History() {
           color: '#E0E1DD'
         }}
       >
-        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
+        <Typography
+          variant="body2"
+          sx={{ fontSize: '0.9rem' }}
+        >
+          &copy; {new Date().getFullYear()} EASY
+          GIFT | כל הזכויות שמורות
         </Typography>
       </Box>
     </Box>

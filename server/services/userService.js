@@ -2,8 +2,8 @@ const userController = require('../controllers/userController')
 const jwtFn = require('../middleware/jwtMiddleware')
 
 async function getGiftsById(userId) {
-  const arrGifts = await userController.readOne({ ObjectId: userId })
-  return { arrGifts: arrGifts }
+  const userDetails = await userController.readOne(userId)
+  return userDetails.giftsId
 }
 
 async function getIdByEmail(email) {
