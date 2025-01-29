@@ -1,58 +1,44 @@
-// קובץ: src/Pages/Details.js
-
-import React, { useContext, useState } from "react";
-// ייבוא הלוגואים (וודא שהנתיב נכון בהתאם למבנה הפרויקט שלך)
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // אייקון לסימון העלאה
-import KeyboardVoiceIcon from "@mui/icons-material/KeyboardVoice";
-import TheatersIcon from "@mui/icons-material/Theaters";
-import {
-  Box,
-  Button,
-  Container,
-  IconButton,
-  Link,
-  Slide,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { Context } from "../App";
-import BitIcon from "../assets/bit.png";
-import PayPalIcon from "../assets/buy-logo-small-il.png";
-import PayBoxIcon from "../assets/paybox.png";
-import Navbar from "../Components/Navbar/Navbar";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+//src/Pages/Details.js
+import React, { useContext, useState } from 'react'
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle' // אייקון לסימון העלאה
+import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice'
+import TheatersIcon from '@mui/icons-material/Theaters'
+import { Box, Button, Container, IconButton, Link, Slide, TextField, Tooltip, Typography } from '@mui/material'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { Context } from '../App'
+import BitIcon from '../assets/bit.png'
+import PayPalIcon from '../assets/buy-logo-small-il.png'
+import PayBoxIcon from '../assets/paybox.png'
+import Navbar from '../Components/Navbar/Navbar'
 
 const Details = () => {
-  const navigate = useNavigate();
-  const { userId, event, setState } = useContext(Context);
+  const navigate = useNavigate()
+  const { userId, event, setState } = useContext(Context)
   const [inputs, setInputs] = useState({
-    name: "",
-    phone: "",
-    blessing: "",
-    amount: "",
-  });
+    name: '',
+    phone: '',
+    blessing: '',
+    amount: ''
+  })
 
   // מצבים עבור הקבצים שהועלו
-  const [uploadedImage, setUploadedImage] = useState(false);
-  const [uploadedVideo, setUploadedVideo] = useState(false);
-  const [uploadedAudio, setUploadedAudio] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState(false)
+  const [uploadedVideo, setUploadedVideo] = useState(false)
+  const [uploadedAudio, setUploadedAudio] = useState(false)
 
-  const handleChange = (e) => {
-    setInputs((prevState) => ({
+  const handleChange = e => {
+    setInputs(prevState => ({
       ...prevState,
-      [e.target.name]: e.target.value,
-    }));
-  };
+      [e.target.name]: e.target.value
+    }))
+  }
 
-  const handleClick = async (e) => {
-    e.preventDefault();
+  const handleClick = async e => {
+    e.preventDefault()
+    console.log('📌 event object:', event) // ✅ נבדוק אם event מוגדר
+
     const newGift = {
       name: inputs.name,
       phone: inputs.phone,
@@ -60,82 +46,77 @@ const Details = () => {
       amount: inputs.amount,
       userid_gift: userId,
       EventId: event,
-      toEventName: event.NameOfGroom + " & " + event.NameOfBride,
-    };
-    setState(newGift.amount);
-    try {
-      const response = axios.post(
-        "http://localhost:2001/api/gift/addGift",
-        newGift
-      );
-      console.log("Gift added successfully:", response.data);
-    } catch (error) {
-      console.error("Error adding gift:", error);
+      toEventName: event?.NameOfGroom + ' & ' + event?.NameOfBride // ✅ שימוש ב- "?" למניעת שגיאות
     }
-
-    navigate("/Payment");
-  };
+    try {
+      const response = await axios.post('http://localhost:2001/api/gift/addGift', newGift)
+      console.log('✅ מתנה נוספה בהצלחה:', response.data)
+    } catch (error) {
+      console.error('❌ שגיאה בהוספת המתנה:', error.response?.data || error.message)
+    }
+    navigate('/Payment')
+  }
 
   // פונקציות לטיפול בהעלאת קבצים
-  const handleImageUpload = (e) => {
+  const handleImageUpload = e => {
     // לוגיקה להעלאת תמונה
-    setUploadedImage(true);
-  };
+    setUploadedImage(true)
+  }
 
-  const handleVideoUpload = (e) => {
+  const handleVideoUpload = e => {
     // לוגיקה להעלאת וידאו
-    setUploadedVideo(true);
-  };
+    setUploadedVideo(true)
+  }
 
-  const handleAudioUpload = (e) => {
+  const handleAudioUpload = e => {
     // לוגיקה להעלאת אודיו
-    setUploadedAudio(true);
-  };
+    setUploadedAudio(true)
+  }
 
   return (
     <Box
       sx={{
-        position: "relative",
-        minHeight: "100vh",
-        direction: "rtl",
-        paddingTop: "1px", // התאמה לבר ניווט קבוע
+        position: 'relative',
+        minHeight: '100vh',
+        direction: 'rtl',
+        paddingTop: '1px' // התאמה לבר ניווט קבוע
       }}
     >
       <Navbar
         sx={{
-          position: "fixed",
+          position: 'fixed',
           top: 0,
           left: 0,
-          width: "100%",
-          zIndex: 1000,
+          width: '100%',
+          zIndex: 1000
         }}
       />
 
       {/* רקע עם אנימציה זזה */}
       <Box
         sx={{
-          position: "fixed",
+          position: 'fixed',
           top: 0,
           right: 0,
-          width: "100%",
-          height: "100%",
+          width: '100%',
+          height: '100%',
           zIndex: -1,
-          background: "linear-gradient(135deg, #0D1B2A, #1B263B)",
-          backgroundSize: "400% 400%",
-          animation: "animateBg 15s ease infinite",
+          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
+          backgroundSize: '400% 400%',
+          animation: 'animateBg 15s ease infinite'
         }}
       />
 
       <Container
         maxWidth="md"
         sx={{
-          marginTop: "0px",
-          marginBottom: "0px",
+          marginTop: '0px',
+          marginBottom: '0px',
           padding: 0,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          fontFamily: "Roboto, sans-serif",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          fontFamily: 'Roboto, sans-serif'
         }}
       >
         {/* כותרת עם רכיב HeadLine
@@ -151,14 +132,14 @@ const Details = () => {
           gutterBottom
           align="center"
           sx={{
-            fontWeight: "bold",
-            color: "#E0E1DD",
-            paddingTop: "0px",
+            fontWeight: 'bold',
+            color: '#E0E1DD',
+            paddingTop: '0px',
             mt: 0,
             marginBottom: 4,
-            fontSize: { xs: "2.5rem", sm: "3rem" },
-            fontFamily: "Poppins, sans-serif",
-            textShadow: "2px 2px #000",
+            fontSize: { xs: '2.5rem', sm: '3rem' },
+            fontFamily: 'Poppins, sans-serif',
+            textShadow: '2px 2px #000'
           }}
         >
           פרטי המתנה
@@ -166,17 +147,17 @@ const Details = () => {
 
         <Box
           sx={{
-            width: "100%",
-            background: "linear-gradient(135deg, #1B263B, #415A77)",
-            padding: "40px",
-            borderRadius: "20px",
-            boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.1)",
-            transition: "transform 0.3s ease, box-shadow 0.3s ease",
-            "&:hover": {
-              transform: "translateY(-5px)",
-              boxShadow: "0px 15px 20px rgba(0, 0, 0, 0.2)",
+            width: '100%',
+            background: 'linear-gradient(135deg, #1B263B, #415A77)',
+            padding: '40px',
+            borderRadius: '20px',
+            boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
+            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-5px)',
+              boxShadow: '0px 15px 20px rgba(0, 0, 0, 0.2)'
             },
-            marginBottom: "30px",
+            marginBottom: '30px'
           }}
         >
           <form>
@@ -185,8 +166,8 @@ const Details = () => {
               flexDirection="column"
               alignItems="center"
               sx={{
-                fontFamily: "Poppins, sans-serif",
-                color: "#E0E1DD",
+                fontFamily: 'Poppins, sans-serif',
+                color: '#E0E1DD'
               }}
             >
               <TextField
@@ -198,35 +179,35 @@ const Details = () => {
                 margin="normal"
                 fullWidth
                 sx={{
-                  backgroundColor: "#22303C",
-                  borderRadius: "15px",
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "15px",
-                    "& fieldset": {
-                      borderColor: "#E0E1DD",
-                      borderWidth: "1px",
+                  backgroundColor: '#22303C',
+                  borderRadius: '15px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '15px',
+                    '& fieldset': {
+                      borderColor: '#E0E1DD',
+                      borderWidth: '1px'
                     },
-                    "&:hover fieldset": {
-                      borderColor: "#F0A500",
-                      borderWidth: "2px",
+                    '&:hover fieldset': {
+                      borderColor: '#F0A500',
+                      borderWidth: '2px'
                     },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#F0A500",
-                      borderWidth: "2px",
-                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#F0A500',
+                      borderWidth: '2px'
+                    }
                   },
-                  "& .MuiInputLabel-root": {
-                    color: "#E0E1DD",
+                  '& .MuiInputLabel-root': {
+                    color: '#E0E1DD'
                   },
-                  "& .MuiInputBase-input": {
-                    color: "#E0E1DD",
-                  },
+                  '& .MuiInputBase-input': {
+                    color: '#E0E1DD'
+                  }
                 }}
                 InputProps={{
-                  style: { textAlign: "right" },
+                  style: { textAlign: 'right' }
                 }}
                 InputLabelProps={{
-                  style: { textAlign: "right" },
+                  style: { textAlign: 'right' }
                 }}
               />
               <TextField
@@ -238,35 +219,35 @@ const Details = () => {
                 margin="normal"
                 fullWidth
                 sx={{
-                  backgroundColor: "#22303C",
-                  borderRadius: "15px",
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "15px",
-                    "& fieldset": {
-                      borderColor: "#E0E1DD",
-                      borderWidth: "1px",
+                  backgroundColor: '#22303C',
+                  borderRadius: '15px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '15px',
+                    '& fieldset': {
+                      borderColor: '#E0E1DD',
+                      borderWidth: '1px'
                     },
-                    "&:hover fieldset": {
-                      borderColor: "#F0A500",
-                      borderWidth: "2px",
+                    '&:hover fieldset': {
+                      borderColor: '#F0A500',
+                      borderWidth: '2px'
                     },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#F0A500",
-                      borderWidth: "2px",
-                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#F0A500',
+                      borderWidth: '2px'
+                    }
                   },
-                  "& .MuiInputLabel-root": {
-                    color: "#E0E1DD",
+                  '& .MuiInputLabel-root': {
+                    color: '#E0E1DD'
                   },
-                  "& .MuiInputBase-input": {
-                    color: "#E0E1DD",
-                  },
+                  '& .MuiInputBase-input': {
+                    color: '#E0E1DD'
+                  }
                 }}
                 InputProps={{
-                  style: { textAlign: "right" },
+                  style: { textAlign: 'right' }
                 }}
                 InputLabelProps={{
-                  style: { textAlign: "right" },
+                  style: { textAlign: 'right' }
                 }}
               />
               <TextField
@@ -280,35 +261,35 @@ const Details = () => {
                 margin="normal"
                 fullWidth
                 sx={{
-                  backgroundColor: "#22303C",
-                  borderRadius: "15px",
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "15px",
-                    "& fieldset": {
-                      borderColor: "#E0E1DD",
-                      borderWidth: "1px",
+                  backgroundColor: '#22303C',
+                  borderRadius: '15px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '15px',
+                    '& fieldset': {
+                      borderColor: '#E0E1DD',
+                      borderWidth: '1px'
                     },
-                    "&:hover fieldset": {
-                      borderColor: "#F0A500",
-                      borderWidth: "2px",
+                    '&:hover fieldset': {
+                      borderColor: '#F0A500',
+                      borderWidth: '2px'
                     },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#F0A500",
-                      borderWidth: "2px",
-                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#F0A500',
+                      borderWidth: '2px'
+                    }
                   },
-                  "& .MuiInputLabel-root": {
-                    color: "#E0E1DD",
+                  '& .MuiInputLabel-root': {
+                    color: '#E0E1DD'
                   },
-                  "& .MuiInputBase-input": {
-                    color: "#E0E1DD",
-                  },
+                  '& .MuiInputBase-input': {
+                    color: '#E0E1DD'
+                  }
                 }}
                 InputProps={{
-                  style: { textAlign: "right" },
+                  style: { textAlign: 'right' }
                 }}
                 InputLabelProps={{
-                  style: { textAlign: "right" },
+                  style: { textAlign: 'right' }
                 }}
               />
               <Button
@@ -316,40 +297,30 @@ const Details = () => {
                   marginTop: 2,
                   marginBottom: 2,
                   borderRadius: 2,
-                  color: "#F0A500",
-                  "&:hover": {
-                    backgroundColor: "#F0A500",
-                    color: "#1B263B",
-                  },
+                  color: '#F0A500',
+                  '&:hover': {
+                    backgroundColor: '#F0A500',
+                    color: '#1B263B'
+                  }
                 }}
                 size="small"
               >
-                <Link
-                  href="https://greetier.com/wedding/wedding-greeting/"
-                  style={{ textDecoration: "none" }}
-                  target="_blank"
-                  color="inherit"
-                >
+                <Link href="https://greetier.com/wedding/wedding-greeting/" style={{ textDecoration: 'none' }} target="_blank" color="inherit">
                   רשימת ברכות כתובות
                 </Link>
               </Button>
               <Box display="flex" alignItems="center" mb={2}>
                 {/* כפתור העלאת תמונה */}
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  mr={2}
-                >
+                <Box display="flex" flexDirection="column" alignItems="center" mr={2}>
                   <Tooltip title="העלה תמונה">
                     <IconButton
                       sx={{
                         marginBottom: 1,
                         borderRadius: 3,
-                        color: "#F0A500",
-                        "&:hover": {
-                          color: "#FFD700",
-                        },
+                        color: '#F0A500',
+                        '&:hover': {
+                          color: '#FFD700'
+                        }
                       }}
                       component="label"
                     >
@@ -357,29 +328,20 @@ const Details = () => {
                       <input type="file" hidden onChange={handleImageUpload} />
                     </IconButton>
                   </Tooltip>
-                  {uploadedImage && (
-                    <CheckCircleIcon
-                      sx={{ color: "green", fontSize: 20, marginTop: -1 }}
-                    />
-                  )}
+                  {uploadedImage && <CheckCircleIcon sx={{ color: 'green', fontSize: 20, marginTop: -1 }} />}
                 </Box>
 
                 {/* כפתור העלאת וידאו */}
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  mr={2}
-                >
+                <Box display="flex" flexDirection="column" alignItems="center" mr={2}>
                   <Tooltip title="העלה וידאו">
                     <IconButton
                       sx={{
                         marginBottom: 1,
                         borderRadius: 3,
-                        color: "#F0A500",
-                        "&:hover": {
-                          color: "#FFD700",
-                        },
+                        color: '#F0A500',
+                        '&:hover': {
+                          color: '#FFD700'
+                        }
                       }}
                       component="label"
                     >
@@ -387,11 +349,7 @@ const Details = () => {
                       <input type="file" hidden onChange={handleVideoUpload} />
                     </IconButton>
                   </Tooltip>
-                  {uploadedVideo && (
-                    <CheckCircleIcon
-                      sx={{ color: "green", fontSize: 20, marginTop: -1 }}
-                    />
-                  )}
+                  {uploadedVideo && <CheckCircleIcon sx={{ color: 'green', fontSize: 20, marginTop: -1 }} />}
                 </Box>
 
                 {/* כפתור העלאת הקלטה */}
@@ -401,10 +359,10 @@ const Details = () => {
                       sx={{
                         marginBottom: 1,
                         borderRadius: 3,
-                        color: "#F0A500",
-                        "&:hover": {
-                          color: "#FFD700",
-                        },
+                        color: '#F0A500',
+                        '&:hover': {
+                          color: '#FFD700'
+                        }
                       }}
                       component="label"
                     >
@@ -412,11 +370,7 @@ const Details = () => {
                       <input type="file" hidden onChange={handleAudioUpload} />
                     </IconButton>
                   </Tooltip>
-                  {uploadedAudio && (
-                    <CheckCircleIcon
-                      sx={{ color: "green", fontSize: 20, marginTop: -1 }}
-                    />
-                  )}
+                  {uploadedAudio && <CheckCircleIcon sx={{ color: 'green', fontSize: 20, marginTop: -1 }} />}
                 </Box>
               </Box>
               <TextField
@@ -428,44 +382,38 @@ const Details = () => {
                 margin="normal"
                 fullWidth
                 sx={{
-                  backgroundColor: "#22303C",
-                  borderRadius: "15px",
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "15px",
-                    "& fieldset": {
-                      borderColor: "#E0E1DD",
-                      borderWidth: "1px",
+                  backgroundColor: '#22303C',
+                  borderRadius: '15px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '15px',
+                    '& fieldset': {
+                      borderColor: '#E0E1DD',
+                      borderWidth: '1px'
                     },
-                    "&:hover fieldset": {
-                      borderColor: "#F0A500",
-                      borderWidth: "2px",
+                    '&:hover fieldset': {
+                      borderColor: '#F0A500',
+                      borderWidth: '2px'
                     },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#F0A500",
-                      borderWidth: "2px",
-                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#F0A500',
+                      borderWidth: '2px'
+                    }
                   },
-                  "& .MuiInputLabel-root": {
-                    color: "#E0E1DD",
+                  '& .MuiInputLabel-root': {
+                    color: '#E0E1DD'
                   },
-                  "& .MuiInputBase-input": {
-                    color: "#E0E1DD",
-                  },
+                  '& .MuiInputBase-input': {
+                    color: '#E0E1DD'
+                  }
                 }}
                 InputProps={{
-                  style: { textAlign: "right" },
+                  style: { textAlign: 'right' }
                 }}
                 InputLabelProps={{
-                  style: { textAlign: "right" },
+                  style: { textAlign: 'right' }
                 }}
               />
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                mt={2}
-                mb={3}
-              >
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2} mb={3}>
                 <Button
                   onClick={handleClick}
                   sx={{
@@ -473,25 +421,19 @@ const Details = () => {
                     height: 50,
                     margin: 1,
                     borderRadius: 3,
-                    backgroundColor: "#F0A500",
-                    ":hover": {
-                      backgroundColor: "#FFD700",
+                    backgroundColor: '#F0A500',
+                    ':hover': {
+                      backgroundColor: '#FFD700'
                     },
-                    color: "#1B263B",
-                    padding: "10px 20px",
-                    fontSize: "1.2rem",
-                    fontWeight: "bold",
-                    boxShadow: "0px 5px 15px rgba(240, 165, 0, 0.4)",
-                    transition: "0.3s",
+                    color: '#1B263B',
+                    padding: '10px 20px',
+                    fontSize: '1.2rem',
+                    fontWeight: 'bold',
+                    boxShadow: '0px 5px 15px rgba(240, 165, 0, 0.4)',
+                    transition: '0.3s'
                   }}
                   variant="contained"
-                  startIcon={
-                    <img
-                      src={PayPalIcon}
-                      alt="PayPal"
-                      style={{ width: 100, height: 40 }}
-                    />
-                  }
+                  startIcon={<img src={PayPalIcon} alt="PayPal" style={{ width: 100, height: 40 }} />}
                 ></Button>
                 <Button
                   onClick={handleClick}
@@ -500,25 +442,19 @@ const Details = () => {
                     height: 50,
                     margin: 1,
                     borderRadius: 3,
-                    backgroundColor: "#F0A500",
-                    ":hover": {
-                      backgroundColor: "#FFD700",
+                    backgroundColor: '#F0A500',
+                    ':hover': {
+                      backgroundColor: '#FFD700'
                     },
-                    color: "#1B263B",
-                    padding: "10px 20px",
-                    fontSize: "1.2rem",
-                    fontWeight: "bold",
-                    boxShadow: "0px 5px 15px rgba(240, 165, 0, 0.4)",
-                    transition: "0.3s",
+                    color: '#1B263B',
+                    padding: '10px 20px',
+                    fontSize: '1.2rem',
+                    fontWeight: 'bold',
+                    boxShadow: '0px 5px 15px rgba(240, 165, 0, 0.4)',
+                    transition: '0.3s'
                   }}
                   variant="contained"
-                  startIcon={
-                    <img
-                      src={PayBoxIcon}
-                      alt="PayBox"
-                      style={{ width: 100, height: 40 }}
-                    />
-                  }
+                  startIcon={<img src={PayBoxIcon} alt="PayBox" style={{ width: 100, height: 40 }} />}
                 ></Button>
                 <Button
                   onClick={handleClick}
@@ -527,25 +463,19 @@ const Details = () => {
                     height: 50,
                     margin: 1,
                     borderRadius: 3,
-                    backgroundColor: "#F0A500",
-                    ":hover": {
-                      backgroundColor: "#FFD700",
+                    backgroundColor: '#F0A500',
+                    ':hover': {
+                      backgroundColor: '#FFD700'
                     },
-                    color: "#1B263B",
-                    padding: "10px 20px",
-                    fontSize: "1.2rem",
-                    fontWeight: "bold",
-                    boxShadow: "0px 5px 15px rgba(240, 165, 0, 0.4)",
-                    transition: "0.3s",
+                    color: '#1B263B',
+                    padding: '10px 20px',
+                    fontSize: '1.2rem',
+                    fontWeight: 'bold',
+                    boxShadow: '0px 5px 15px rgba(240, 165, 0, 0.4)',
+                    transition: '0.3s'
                   }}
                   variant="contained"
-                  startIcon={
-                    <img
-                      src={BitIcon}
-                      alt="Bit"
-                      style={{ width: 100, height: 40 }}
-                    />
-                  }
+                  startIcon={<img src={BitIcon} alt="Bit" style={{ width: 100, height: 40 }} />}
                 ></Button>
               </Box>
             </Box>
@@ -566,18 +496,18 @@ const Details = () => {
       <Box
         sx={{
           marginTop: 5,
-          textAlign: "center",
+          textAlign: 'center',
           py: 1.5,
-          backgroundColor: "rgba(0,0,0,0.3)",
-          color: "#E0E1DD",
+          backgroundColor: 'rgba(0,0,0,0.3)',
+          color: '#E0E1DD'
         }}
       >
-        <Typography variant="body2" sx={{ fontSize: "0.9rem" }}>
+        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
           &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
         </Typography>
       </Box>
     </Box>
-  );
-};
+  )
+}
 
-export default Details;
+export default Details

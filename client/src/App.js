@@ -1,23 +1,23 @@
-import { createContext, useState } from "react";
-import React from "react";
-import { BrowserRouter } from "react-router-dom";
-import MainRouter from "./MainRouter"; // או הנתיב למקום ששמרת את הקובץ
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import { Box, IconButton } from "@mui/material";
+import { createContext, useState } from 'react'
+import React from 'react'
+import { BrowserRouter } from 'react-router-dom'
+import MainRouter from './routes/MainRouter' // או הנתיב למקום ששמרת את הקובץ
+import WhatsAppIcon from '@mui/icons-material/WhatsApp'
+import { Box, IconButton } from '@mui/material'
 
-export const Context = createContext();
+export const Context = createContext()
 
 function App() {
-  const whatsappGroupLink = "https://chat.whatsapp.com/KN1etpCLloyD1wbunuEwdX";
-  const [IsEvent, setIsEvent] = useState(true);
-  const [eventId, setEventNumber] = useState(""); // סטייט עבור ה-ID של האירוע
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  const [userId, setUserId] = useState("");
-  const [detailsId, setDetailsId] = useState([]);
-  const [isEventManager, setIsEventManager] = useState(false); // הוספת סטייט למנהל אירועים
-  const [state, setState] = useState();
-  const [event, setEvent] = useState("");
+  const whatsappGroupLink = 'https://chat.whatsapp.com/KN1etpCLloyD1wbunuEwdX'
+  const [IsEvent, setIsEvent] = useState(true)
+  const [eventId, setEventNumber] = useState('') // סטייט עבור ה-ID של האירוע
+  const [userName, setUserName] = useState('')
+  const [userEmail, setUserEmail] = useState('')
+  const [userId, setUserId] = useState('')
+  const [detailsId, setDetailsId] = useState([])
+  const [isEventManager, setIsEventManager] = useState(false) // הוספת סטייט למנהל אירועים
+  const [state, setState] = useState()
+  const [event, setEvent] = useState('')
 
   return (
     <Context.Provider
@@ -39,7 +39,7 @@ function App() {
         userName,
         setUserName,
         userEmail,
-        setUserEmail,
+        setUserEmail
       }}
     >
       <BrowserRouter>
@@ -48,10 +48,10 @@ function App() {
 
       <Box
         sx={{
-          position: "fixed",
+          position: 'fixed',
           bottom: 36,
           right: 36,
-          zIndex: 9999, // מעל כל האלמנטים
+          zIndex: 9999 // מעל כל האלמנטים
         }}
       >
         <IconButton
@@ -60,22 +60,22 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
           sx={{
-            backgroundColor: "#25D366", // צבע וואצאפ
-            color: "#fff",
-            "&:hover": {
-              backgroundColor: "#20b558",
+            backgroundColor: '#25D366', // צבע וואצאפ
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#20b558'
             },
             width: 76,
             height: 76,
-            borderRadius: "50%",
-            boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+            borderRadius: '50%',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
           }}
         >
           <WhatsAppIcon fontSize="large" />
         </IconButton>
       </Box>
     </Context.Provider>
-  );
+  )
 }
 
-export default App;
+export default App

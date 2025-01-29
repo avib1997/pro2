@@ -1,3 +1,4 @@
+//client/src/Components/Navbar/Navbar.js
 import React, { useContext, useState } from 'react'
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, MenuItem, Container, Button, Avatar, Tooltip, Divider, styled } from '@mui/material'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'

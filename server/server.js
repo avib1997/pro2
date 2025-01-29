@@ -1,41 +1,40 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const mongoose = require("mongoose");
-require("dotenv/config");
-const app = express();
-const router = require("./routes");
+//server/server.js
+const express = require('express')
+const mongoose = require('mongoose')
+const cors = require('cors')
+const morgan = require('morgan') // לוודא שהתקנת עם npm install morgan
+const dotenv = require('dotenv')
+const router = require('./routes')
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(cors());
+dotenv.config()
+
+const app = express()
+
+// Middlewares
+app.use(express.json())
+app.use(cors())
+app.use(morgan('dev'))
 
 // DB Connection
-const connect = async () => {
+const connectDB = async () => {
   try {
-    await mongoose
-      .connect(process.env.DB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      })
-      .then(() => {
-        console.log("DB Connected");
-      });
+    await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    console.log('✅ MongoDB Connected Successfully')
   } catch (error) {
-    console.error(err);
+    console.error('❌ Error Connecting to MongoDB:', error)
+    process.exit(1)
   }
-};
+}
+connectDB()
 
-connect();
-module.exports = { connect };
+// Routes - חיבור כל הנתיבים
+app.use('/api', router)
 
-//routes
-// app.use("/", routesHandler);
-// app.use("/", routesAuth);
-// app.use("/", routesGift);
-app.use("/api", router);
+// דף שגיאה לנתיבים לא מוכרים
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' })
+})
 
-const PORT = process.env.PORT || 2001; // backend routing port
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+// הפעלת השרת
+const PORT = process.env.PORT || 2001
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`))

@@ -1,46 +1,33 @@
-const express = require("express");
-const router = express.Router();
-const giftLogic = require("../BL/giftLogic");
-const auth = require("../middlewere/auth");
+//server/routes/giftRoutes.js
+const express = require('express')
+const router = express.Router()
+const giftService = require('../services/giftService')
 
-/**
- * [POST] /addGift
- * תפקיד: להוסיף מתנה חדשה. במידה וקיים userid_gift ב-req.body, יקרא לפונקציה addgift,
- * אחרת addgiftG.
- */
-router.post("/addGift", async (req, res) => {
-
-  if (req.body.userid_gift) {
-    try {
-      await giftLogic.addgift(req.body);
-      return res
-        .status(200)
-        .send({ message: "מתנה נוספה בהצלחה (עם userid_gift)" });
-    } catch (error) {
-      return res.status(500).send({ error: "שגיאה בהוספת המתנה (addgift)" });
-    }
-  } else {
-    try {
-      await giftLogic.addgiftG(req.body);
-      return res.status(200).send({ message: "מתנה נוספה בהצלחה (addgiftG)" });
-    } catch (error) {
-      return res.status(500).send({ error: "שגיאה בהוספת המתנה (addgiftG)" });
-    }
-  }
-});
-
-/**
- * [POST] /getgift
- * תפקיד: להחזיר רשימת מתנות לפי הנתונים המתקבלים ב-req.body.
- */
-router.post("/getgift", async (req, res) => {
-
+router.post('/addGift', async (req, res) => {
+  console.log('📩 נתונים שהתקבלו:', req.body) // ✅ הדפסת הנתונים שהתקבלו
   try {
-    const gifts = await giftLogic.getgift(req.body);
-    return res.status(200).send(gifts);
+    if (req.body.userid_gift) {
+      const newGift = await giftService.addgift(req.body)
+      console.log('✅ מתנה נשמרה:', newGift) // ✅ הדפסת המתנה שנשמרה
+      return res.status(200).send({ message: '✅ מתנה נוספה בהצלחה', gift: newGift })
+    } else {
+      const newGift = await giftService.addgiftG(req.body)
+      console.log('✅ מתנה כללית נשמרה:', newGift) // ✅ הדפסת המתנה שנשמרה
+      return res.status(200).send({ message: '✅ מתנה כללית נוספה בהצלחה', gift: newGift })
+    }
   } catch (error) {
-    return res.status(500).send({ error: "שגיאה בעת בקשת המתנות" });
+    console.error('❌ שגיאה בהוספת המתנה:', error) // ✅ הדפסת השגיאה
+    return res.status(500).send({ error: `❌ שגיאה בהוספת המתנה: ${error.message}` })
   }
-});
+})
 
-module.exports = router;
+router.post('/getgift', async (req, res) => {
+  try {
+    const gifts = await giftService.getgift(req.body)
+    return res.status(200).send(gifts)
+  } catch (error) {
+    return res.status(500).send({ error: 'שגיאה בעת בקשת המתנות' })
+  }
+})
+
+module.exports = router
