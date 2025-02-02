@@ -4,9 +4,7 @@ const eventController = require('../controllers/eventController')
 const userController = require('../controllers/userController') // ייבוא נדרש
 const mongoose = require('mongoose')
 
-function fixHebrewText(text, icon = '') {
-  return `${icon} ${text.split('').reverse().join('')}`
-}
+const { fixHebrewText } = require('../fixHebrew.js')
 
 module.exports.addgift = async giftFields => {
   console.log(fixHebrewText('נתוני מתנה:', '📥'), giftFields)

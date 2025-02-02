@@ -36,7 +36,8 @@ function MainRouter() {
         <Route element={<History />} path="/History"></Route>
         <Route element={<CoupleNames />} path="/CoupleNames"></Route>
         <Route element={<Manager />} path="/EventManager"></Route>
-        <Route element={<ManagerSignup />} path="/ManagerSignup" /> <Route element={<AddEvent />} path="/AddEvent"></Route>
+        <Route element={<ManagerSignup />} path="/ManagerSignup" /> 
+        <Route element={<AddEvent />} path="/AddEvent"></Route>
         <Route element={<Blessing />} path="/Blessing"></Route>
         <Route element={<Fqa />} path="/Fqa"></Route>
         <Route element={<ContactPage />} path="/contact" />

@@ -1,86 +1,81 @@
-import { Box, TextField, Typography } from '@mui/material'
-import { PayPalButtons, PayPalScriptProvider } from '@paypal/react-paypal-js'
-import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Context } from '../App'
+import React, { useState, useContext, useEffect } from "react";
+import { useLocation } from "react-router-dom"; // 
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { Container, TextField, Button, Box, Typography } from "@mui/material";
 
-const Pay = () => {
-  const { state, setState } = useContext(Context)
-  const Navigate = useNavigate()
+const PayPalPayment = () => {
+  const [amount, setAmount] = useState(0);
+  const [showPayPal, setShowPayPal] = useState(false);
+  const { userId, enent } = useContext(Context);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.amount) {
+      setAmount(location.state.amount);
+    }
+  }, [location.state]);
+
+
+ // פה מעדכנים את המתנה בדאטה בייס עם הפרטים של התשלום
+
+   const handlePaymentSuccess = async (details) => {
+  //   console.log("✅ תשלום הצליח!", details);
+  //   alert("✅ העסקה הושלמה בהצלחה על ידי " + details.payer.name.given_name);
+
+  //   // **שליחת הנתונים לשרת כדי לעדכן את מסד הנתונים**
+  //   try {
+  //     await axios.post("http://localhost:2001/api/payments/success", {
+  //       transactionId: details.id,
+  //       amount: details.purchase_units[0].amount.value,
+  //       payerEmail: details.payer.email_address,
+  //     });
+  //     console.log("📌 הנתונים נשמרו במסד הנתונים.");
+  //   } catch (error) {
+  //     console.error("❌ שגיאה בעדכון מסד הנתונים:", error);
+  //   }
+   };
+
+  const handlePaymentError = (error) => {
+    console.error("❌ תשלום נכשל:", error);
+    alert("❌ התשלום נכשל, אנא נסה שוב.");
+  };
 
   return (
-    <div>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'left',
-          '& > *': {
-            m: 1
-          }
-        }}
-      ></Box>
-      <Typography variant="h2" padding={3} textAlign="center">
-        Eazy Gift
-      </Typography>
-      <form>
-        <Box
-          display="flex"
-          flexDirection={'column'}
-          maxWidth={500}
-          alignItems="center"
-          justifyContent={'center'}
-          margin="auto"
-          marginTop={5}
-          padding={3}
-          borderRadius={5}
-          boxShadow={'5px 5px 10px #ccc'}
-          sx={{
-            ':hover': {
-              boxShadow: '10px 10px 20px #ccc'
-              //   "& button": { m: 1 },
-            }
-          }}
-        >
-          <Typography variant="h4" padding={3} textAlign="center">
-            Payment page
-          </Typography>
-
-          <div style={{ margin: '20px' }}>
-            <TextField name="amount" id="outlined-basic" label="Amount to pay" variant="outlined" margin="normal" type="number" value={state} onChange={e => setState(e.target.value)} />
-            <PayPalScriptProvider
-              options={{
-                'client-id': 'test',
-                components: 'buttons',
-                currency: 'NIS'
+    <Container maxWidth="sm" sx={{ textAlign: "center", mt: 20 }}> {/* הגדל את ה-margin-top */}
+      <Typography variant="h4" gutterBottom>תשלום באמצעות PayPal</Typography>
+      <Typography variant="h6">סכום לתשלום: {amount} ₪</Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        fullWidth
+        onClick={() => setShowPayPal(true)}
+      >
+        המשך לתשלום
+      </Button>
+      {showPayPal && (
+        <Box mt={5}> {/* הגדל את ה-margin-top של PayPal */}
+          <PayPalScriptProvider options={{ "client-id": "YOUR_PAYPAL_CLIENT_ID" }}>
+            <PayPalButtons
+              createOrder={(data, actions) => {
+                return actions.order.create({
+                  purchase_units: [{
+                    amount: { value: amount },
+                    payee: { email_address: "receiver@example.com" } // כתובת האימייל של חשבון ה-PayPal שמקבל את הכסף
+                  }]
+                });
               }}
-            >
-              <PayPalButtons
-                createOrder={(data, actions) => {
-                  return actions.order.create({
-                    purchase_units: [
-                      {
-                        amount: {
-                          value: state
-                        }
-                      }
-                    ]
-                  })
-                }}
-                amount={state}
-                onApprove={function (data, actions) {
-                  return actions.order.capture().then(function (details) {
-                    alert('Transaction completed successfully by' + details.payer.given_name)
-                    console.log({ details, data })
-                  })
-                }}
-              />
-            </PayPalScriptProvider>
-          </div>
+              onApprove={(data, actions) => {
+                return actions.order.capture().then(handlePaymentSuccess);
+              }}
+              onError={handlePaymentError} // 📌 הוספת טיפול במקרה של שגיאה
+            />
+          </PayPalScriptProvider>
         </Box>
-      </form>
-    </div>
-  )
-}
+      )}
+    </Container>
+  );
+};
 
-export default Pay
+export default PayPalPayment;

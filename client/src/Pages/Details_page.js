@@ -1,5 +1,5 @@
 //src/Pages/Details.js
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle' // אייקון לסימון העלאה
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice'
@@ -13,22 +13,31 @@ import PayPalIcon from '../assets/buy-logo-small-il.png'
 import PayBoxIcon from '../assets/paybox.png'
 import Navbar from '../Components/Navbar/Navbar'
 
+
+
 const Details = () => {
   const navigate = useNavigate()
-  const { userId, event, setState } = useContext(Context)
+  const { userId, event, eventId , setState, setEvent } = useContext(Context)
   const [inputs, setInputs] = useState({
     name: '',
     phone: '',
     blessing: '',
     amount: ''
   })
+  const [amount, setAmount] = useState(0);
+
 
   // מצבים עבור הקבצים שהועלו
   const [uploadedImage, setUploadedImage] = useState(false)
   const [uploadedVideo, setUploadedVideo] = useState(false)
   const [uploadedAudio, setUploadedAudio] = useState(false)
 
+  useEffect(() => {
+    console.log('🎉 מזהה האירוע:', eventId)
+  }, [eventId])
+
   const handleChange = e => {
+    setAmount(e.target.value);
     setInputs(prevState => ({
       ...prevState,
       [e.target.name]: e.target.value
@@ -36,6 +45,14 @@ const Details = () => {
   }
 
   const handleClick = async e => {
+    await axios.get(`http://localhost:2001/api/events/${event}`)
+      .then(res => {
+        setEvent(res.data)
+      })
+      .catch(err => {
+        console.log('error in Details page in handleClick get event by id: ', err)
+      })
+
     e.preventDefault()
     console.log('📌 event object:', event) // ✅ נבדוק אם event מוגדר
 
@@ -45,7 +62,7 @@ const Details = () => {
       blessing: inputs.blessing,
       amount: inputs.amount,
       userid_gift: userId,
-      EventId: event,
+      EventId: event._id,
       toEventName: event?.NameOfGroom + ' & ' + event?.NameOfBride // ✅ שימוש ב- "?" למניעת שגיאות
     }
     try {
@@ -54,7 +71,8 @@ const Details = () => {
     } catch (error) {
       console.error('❌ שגיאה בהוספת המתנה:', error.response?.data || error.message)
     }
-    navigate('/Payment')
+    navigate("/Payment", { state: { amount } }); // שולח את הסכום לעמוד PayPalPayment
+
   }
 
   // פונקציות לטיפול בהעלאת קבצים
@@ -82,15 +100,6 @@ const Details = () => {
         paddingTop: '1px' // התאמה לבר ניווט קבוע
       }}
     >
-      <Navbar
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          zIndex: 1000
-        }}
-      />
 
       {/* רקע עם אנימציה זזה */}
       <Box

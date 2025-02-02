@@ -2,24 +2,26 @@
 const express = require('express')
 const router = express.Router()
 const userService = require('../services/userService')
+const { fixHebrewText } = require('../fixHebrew.js')
+
 
 router.post('/login', async (req, res) => {
-  console.log('נתוני הבקשה (req.body):', req.body)
+  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const token = await userService.login(req.body)
-    console.log('טוקן נוצר בהצלחה:', token)
+    console.log(fixHebrewText('טוקן נוצר בהצלחה:'), token)
     res.send({ token: token })
   } catch (err) {
-    console.log('[ERROR] בשירות login:', err.message)
+    console.log(fixHebrewText('[ERROR] בשירות login:'), err.message)
     res.send(err.message)
   }
 })
 
 router.post('/register', async (req, res) => {
-  console.log('נתוני הבקשה (req.body):', req.body)
+  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const newUser = await userService.register(req.body)
-    console.log('משתמש חדש נוצר בהצלחה:', newUser)
+    console.log(fixHebrewText('משתמש חדש נוצר בהצלחה:'), newUser)
     res.send(newUser)
   } catch (err) {
     res.status(500).send({ error: err.message })
@@ -27,10 +29,10 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/userid', async (req, res) => {
-  console.log('נתוני הבקשה (req.body):', req.body)
+  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const userid = await userService.getIdByEmail(req.body.email)
-    console.log('מזהה המשתמש שהוחזר:', userid)
+    console.log(fixHebrewText('מזהה המשתמש שהוחזר:'), userid)
     res.send(userid)
   } catch (err) {
     res.status(500).send({ error: err.message })
@@ -38,10 +40,10 @@ router.post('/userid', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-  console.log('אובייקט הבקשה (req):', req)
+  console.log(fixHebrewText('אובייקט הבקשה (req):'), req)
   try {
     const users = await userService.getAllUsers()
-    console.log('מספר המשתמשים שהוחזרו:', users.length)
+    console.log(fixHebrewText('מספר המשתמשים שהוחזרו:'), users.length)
     res.send(users)
   } catch (err) {
     res.status(500).send({ message: 'somthing went wrong' })
@@ -49,7 +51,7 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/giftsById', async (req, res) => {
-  console.log('נתוני הבקשה (req.body):', req.body)
+  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const arrGifts = await userService.getGiftsById(req.body)
     console.log('arrgifts in user Routes:', arrGifts)

@@ -95,7 +95,7 @@ function Navbar() {
   const handleOpenNavMenu = event => {
     setAnchorNav(event.currentTarget)
   }
-  const handleCloseNavMenu = () => {
+  const handleBackToHome = () => {
     setEventNumber('')
     setAnchorNav(null)
   }
@@ -129,7 +129,7 @@ function Navbar() {
             >
               {/* כפתור "מתנה" */}
               {/* <Button
-                onClick={handleCloseNavMenu}
+                onClick={handleBackToHome}
                 component={Link}
                 to="/Details"
                 sx={{
@@ -150,7 +150,7 @@ function Navbar() {
 
               {/* כפתור "דף הבית" */}
               <Button
-                onClick={handleCloseNavMenu}
+                onClick={handleBackToHome}
                 component={Link}
                 to="/Home"
                 sx={{
@@ -174,7 +174,6 @@ function Navbar() {
               {navigationPages.map(page => (
                 <Button
                   key={page.name}
-                  onClick={handleCloseNavMenu}
                   component={Link}
                   to={page.path}
                   sx={{
@@ -194,7 +193,7 @@ function Navbar() {
               ))}
               {/* כפתור בולט להוספה */}
               <Button
-                onClick={handleCloseNavMenu}
+                onClick={handleBackToHome}
                 component={Link}
                 to="/LoginPage"
                 sx={{
@@ -220,7 +219,7 @@ function Navbar() {
               {/* כפתור למנהלי אירועים */}
               {isEventManager && (
                 <Button
-                  onClick={handleCloseNavMenu}
+                  onClick={handleBackToHome}
                   component={Link}
                   to="/EventManager"
                   sx={{
@@ -292,7 +291,7 @@ function Navbar() {
                 id="menu-appbar"
                 anchorEl={anchorElNav}
                 open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
+                onClose={handleBackToHome}
                 anchorOrigin={{
                   vertical: "bottom",
                   horizontal: "right",
@@ -307,7 +306,7 @@ function Navbar() {
                   },
                 }}
               >
-                <MenuItem onClick={handleCloseNavMenu}>
+                <MenuItem onClick={handleBackToHome}>
                   <Link
                     to="/Details"
                     style={{ textDecoration: "none", color: "#fff" }}
@@ -315,7 +314,7 @@ function Navbar() {
                     מתנה
                   </Link>
                 </MenuItem>
-                <MenuItem onClick={handleCloseNavMenu}>
+                <MenuItem onClick={handleBackToHome}>
                   <Link
                     to="/Home"
                     style={{ textDecoration: "none", color: "#FFC107" }}
@@ -324,7 +323,7 @@ function Navbar() {
                   </Link>
                 </MenuItem>
                 {navigationPages.map((page) => (
-                  <MenuItem key={page.name} onClick={handleCloseNavMenu}>
+                  <MenuItem key={page.name} onClick={handleBackToHome}>
                     <Link
                       to={page.path}
                       style={{ textDecoration: "none", color: "#fff" }}
@@ -334,7 +333,7 @@ function Navbar() {
                   </MenuItem>
                 ))}
                 {isEventManager && (
-                  <MenuItem onClick={handleCloseNavMenu}>
+                  <MenuItem onClick={handleBackToHome}>
                     <Link
                       to="/EventManager"
                       style={{ textDecoration: "none", color: "#fff" }}
