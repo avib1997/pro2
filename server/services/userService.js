@@ -68,7 +68,7 @@ module.exports.register = async userFields => {
     throw { code: 400, message: 'missing data' }
   }
   const email = userFields.email
-  const existUser = await userController.readOne({ email })
+  const existUser = await userController.readOne({ email: email })
   if (existUser) {
     throw { code: 405, message: 'duplicated email' }
   }
@@ -77,8 +77,34 @@ module.exports.register = async userFields => {
   return { token: token, user: user }
 }
 
+//getIsManeger
+const getIsManeger = async (userId) => {
+  if (!userId) throw new Error("❌ Missing userId");
+  const user = await userController.readOne({ _id: userId });
+  if (!user) throw new Error("❌ User not found");
+  return user.isManeger;
+}
+
+const updateManagerStatus = async (userId, isManeger) => {
+  if (!userId) throw new Error("❌ Missing userId");
+  console.log('userId updateManagerStatus:', userId)
+  console.log('isManeger updateManagerStatus:', isManeger)
+
+  
+  const updatedUser = await userController.updateOne(
+    { _id: userId }, // Find user by ID
+    { isManeger } // Update field
+  );
+
+  if (!updatedUser) throw new Error("❌ User not found");
+
+  return { message: "✅ Manager status updated successfully", user: updatedUser };
+};
+
 module.exports = {
   ...module.exports,
+  getIsManeger,
+  updateManagerStatus,
   login,
   getIdByEmail,
   getGiftsById

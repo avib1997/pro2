@@ -28,6 +28,7 @@ router.post('/register', async (req, res) => {
   }
 })
 
+// Get user id by email
 router.post('/userid', async (req, res) => {
   console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
@@ -38,6 +39,20 @@ router.post('/userid', async (req, res) => {
     res.status(500).send({ error: err.message })
   }
 })
+
+
+// Update the isManeger field by userId
+router.put('/update-manager', async (req, res) => {
+
+  try {
+    const updatedUser = await userService.updateManagerStatus(req.body.userId, req.body.isManeger);
+    console.log("✅ Manager status updated:", updatedUser);
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 router.get('/', async (req, res) => {
   console.log(fixHebrewText('אובייקט הבקשה (req):'), req)
@@ -56,6 +71,18 @@ router.post('/giftsById', async (req, res) => {
     const arrGifts = await userService.getGiftsById(req.body)
     console.log('arrgifts in user Routes:', arrGifts)
     res.send(arrGifts)
+  } catch (err) {
+    res.status(500).send({ error: err.message })
+  }
+})
+
+//get isManeger by userId
+router.post('/isManeger', async (req, res) => {
+  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
+  try {
+    const isManeger = await userService.getIsManeger(req.body)
+    console.log('isManeger in user Routes:', isManeger)
+    res.send(isManeger)
   } catch (err) {
     res.status(500).send({ error: err.message })
   }

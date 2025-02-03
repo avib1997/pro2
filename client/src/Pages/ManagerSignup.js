@@ -3,6 +3,7 @@ import { Box, Button, Container, Grid, TextField, Typography, InputAdornment, Li
 import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Context } from '../App' // ייבוא הקונטקסט עבור ID של האירוע
+import axios from 'axios' // ייבוא האקסיוס לפני שימוש בו
 
 // אייקונים מותאמים לכל שדה
 import { Person as PersonIcon, Email as EmailIcon, Phone as PhoneIcon, Info as InfoIcon } from '@mui/icons-material'
@@ -14,11 +15,12 @@ const ManagerSignup = () => {
   const [phone, setPhone] = useState('')
   const [additionalInfo, setAdditionalInfo] = useState('')
   const [eventId] = useState(Math.floor(1000 + Math.random() * 9000))
-
+  const [submitError, setSubmitError] = useState('')
   const [errors, setErrors] = useState({})
   const [isValid, setIsValid] = useState({})
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false)
   const navigate = useNavigate()
+  const [emailUser, setEmailUser] = useState('')
 
   // בדיקה לדוגמה
   const validateField = (field, value) => {
@@ -46,6 +48,7 @@ const ManagerSignup = () => {
         } else {
           newErrors.email = 'תקין'
           newValidState.email = true
+          setEmailUser(value)
         }
         break
       case 'phone':
@@ -81,17 +84,69 @@ const ManagerSignup = () => {
     validateField(field, value)
   }
 
-  const handleSignup = () => {
+  const ifExistEmail = async () => {
+    try {
+      const response = await axios.post('http://localhost:2001/api/users/userid', { email: emailUser })
+      console.log('response.data in ManegerSignup ifExistEmail:', response.data.userid[0]._id)
+      if (response.data.userid[0]._id) {
+        return response.data.userid[0]._id
+      } else {
+        return null
+      }
+    } catch (error) {
+      console.log('error in ManegerSignup ifExistEmail:', error)
+    }
+  }
+
+  const setAsManeger = async userId => {
+    if (!userId) {
+      console.log('userId is not exist')
+      return
+    } else {
+      try {
+        console.log('userId in setAsManeger:', userId)
+        const response = await axios.put('http://localhost:2001/api/users/update-manager', {
+          userId,
+          isManeger: true, // זה הערך החדש
+        });
+        console.log("✅ סטטוס מנהל עודכן:", response.data);
+      }
+      catch (error) {
+        console.error("❌ עדכון סטטוס מנהל נכשל:", error);
+      }
+    }
+  }
+
+
+  const handleSignup = async () => {
     setEventNumber('')
     // אם הכל תקין
     const allValid = Object.values(isValid).every(v => v === true)
+
     if (allValid) {
-      setShowSuccessAnimation(true)
-      setTimeout(() => {
-        navigate('/LoginPage')
-      }, 1000)
+      setSubmitError('')
+      try {
+        const userId = await ifExistEmail(); // ✅ Ensure we wait for the function to return
+
+        if (userId) {
+          setAsManeger(userId);
+        } else {
+          console.log('❌ Email does not exist');
+          // TODO: Add a user notification here
+        }
+      } catch (error) {
+        console.error("❌ Error in ifExistEmail():", error);
+      }
+    } else {
+      setSubmitError('יש למלא את כל השדות החובה')
     }
+
+    setShowSuccessAnimation(true)
+    setTimeout(() => {
+      navigate('/LoginPage')
+    }, 1000)
   }
+
 
   // פונקציית עיצוב בסיסית לשדות
   const createTextFieldSx = bgColor => ({
@@ -391,6 +446,18 @@ const ManagerSignup = () => {
                   רישום
                 </Button>
               </Grid>
+              {submitError && (
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: 'red',
+                    mt: 1,
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {submitError}
+                </Typography>
+              )}
             </Box>
           </Grid>
         </Grid>

@@ -65,19 +65,26 @@ const Login = props => {
         const userResponse = await axios.post('http://localhost:2001/api/users/userid', { email })
         console.log('response.data in Login:', userResponse.data)
 
-        if (userResponse.data && userResponse.data.userid && userResponse.data.userid.length > 0) {
+        if (userResponse.data && userResponse.data.userid) {
           const user = userResponse.data.userid[0]
           setUserName(`${user.fname} ${user.lname}`)
           setUserEmail(user.email)
-          setUserId(user._id)
+          await setUserId(user._id)
           setDetailsId(user.giftsId)
         }
-
+        
         // ניווט לפי סוג המשתמש
         if (props.a === 'manager') {
-          setIsEventManager(true)
-          setEventNumber('')
-          navigate('/EventManager')
+          //בודק אם המנהל מוגדר ב database כמנהל
+          
+          const managerResponse = await axios.post('http://localhost:2001/api/users/isManeger', { _id: userResponse.data.userid[0]._id })
+          if (managerResponse.data) {
+            setIsEventManager(true)
+            setEventNumber('')
+            navigate('/EventManager')
+          } else {
+            setErrorMessage('אין הרשאה לכניסה כמנהל.')
+          }
         } else {
           setIsEventManager(false)
           navigate('/Details')

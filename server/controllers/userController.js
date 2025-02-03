@@ -1,5 +1,5 @@
 //server/controllers/userController.js
-const { userModel } = require('../models/userModel')
+const userModel = require('../models/userModel')
 
 async function create(data) {
   try {
@@ -37,6 +37,24 @@ async function update(filter, newData) {
   }
 }
 
+// Update the isManeger field by userId
+const updateOne = async (filter, updateData) => {
+  try {
+    const updatedUser = await userModel.findOneAndUpdate(
+      filter, // Find user by filter
+      updateData, // Update fields
+      { new: true } // Return updated document
+    );
+
+    return updatedUser;
+  } catch (error) {
+    console.error("❌ Error updating user:", error);
+    throw new Error("❌ Failed to update user");
+  }
+};
+
+
+
 async function del(filter) {
   try {
     const result = await update(filter, { isActive: false })
@@ -46,4 +64,4 @@ async function del(filter) {
   }
 }
 
-module.exports = { create, readOne, read, update, del }
+module.exports = { create, readOne, read, update, del, updateOne }
