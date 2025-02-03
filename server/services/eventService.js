@@ -15,16 +15,7 @@ async function getEventNumber(reqNum) {
 }
 
 async function addevent(eventFields) {
-  if (
-    !eventFields.NameOfGroom ||
-    !eventFields.NameOfBride ||
-    !eventFields.NameOfManager ||
-    !eventFields.TypeOfEvent ||
-    !eventFields.NumOfGuests ||
-    !eventFields.phone ||
-    !eventFields.DateOfEvent ||
-    !eventFields.userid_event
-  ) {
+  if (!eventFields.NameOfGroom || !eventFields.NameOfManager || !eventFields.TypeOfEvent || !eventFields.phone || !eventFields.DateOfEvent || !eventFields.userid_event) {
     throw { code: 400, message: 'missing data' }
   }
   let number = Math.floor(Math.random() * (999 - 10 + 1)) + 10 // טווח המספרים: 10 עד 999;

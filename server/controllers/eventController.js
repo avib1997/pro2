@@ -34,7 +34,7 @@ const readById = async id => {
 
 const create = async data => {
   try {
-    const requiredFields = ['NameOfGroom', 'NameOfBride', 'NameOfManager', 'TypeOfEvent', 'phone', 'DateOfEvent', 'userid_event']
+    const requiredFields = ['NameOfGroom', 'NameOfManager', 'TypeOfEvent', 'phone', 'DateOfEvent', 'userid_event']
     if (requiredFields.some(field => !data[field])) throw new Error('Missing required event fields')
     let isUnique = false
     let eventNumber

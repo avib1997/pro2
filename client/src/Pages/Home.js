@@ -342,7 +342,7 @@ const Home = () => {
               transition: 'all 0.7s ease-out'
             }}
           >
-            כניסה כמנהל אירוע - לחץ כאן:
+            כניסה ללא אירוע - לחץ כאן:{' '}
           </Typography>
           {/* כפתור חדש לכניסת מנהלי אירועים (בלי מספר אירוע) */}
           <Button
@@ -364,13 +364,9 @@ const Home = () => {
                   '0px 5px 10px rgba(0, 0, 0, 0.3)'
               }
             }}
-            onClick={() =>
-              navigate(
-                '/LoginPage?userType=manager'
-              )
-            }
+            onClick={() => navigate('/LoginPage')}
           >
-            כניסת מנהלי אירועים
+            כניסה ללא אירוע{' '}
           </Button>
 
           {/* טקסט קטן מעל קישור לרישום מנהל אירוע */}

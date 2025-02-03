@@ -1,6 +1,18 @@
-import React, { useState, useContext } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { Box, Button, Link as MuiLink, Typography, Divider } from '@mui/material'
+import React, {
+  useState,
+  useContext
+} from 'react'
+import {
+  useNavigate,
+  useLocation
+} from 'react-router-dom'
+import {
+  Box,
+  Button,
+  Link as MuiLink,
+  Typography,
+  Divider
+} from '@mui/material'
 import { Link } from 'react-router-dom'
 import localImage from '../assets/ben-white-vJz7tkHncFk-unsplash.jpg'
 import { Context } from '../App' // או היכן שהקונטקסט מיוצא
@@ -15,14 +27,19 @@ import Signup from '../Components/Register/Singup'
 const LoginPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { eventId, setEventNumber } = useContext(Context) // נקרא את ערך ה-eventId
+  const { eventId, setEventNumber } =
+    useContext(Context) // נקרא את ערך ה-eventId
   const [IsLogin, setIsLogin] = useState(true)
   const [IsSignup, setIsSignup] = useState(false)
-  const [IsManager, setIsManager] = useState(false)
-  const [errorMessage, setErrorMessage] = useState('') // מצב לשגיאות
+  const [IsManager, setIsManager] =
+    useState(false)
+  const [errorMessage, setErrorMessage] =
+    useState('') // מצב לשגיאות
 
   React.useEffect(() => {
-    const params = new URLSearchParams(location.search)
+    const params = new URLSearchParams(
+      location.search
+    )
     const userType = params.get('userType')
 
     if (userType === 'manager') {
@@ -58,15 +75,19 @@ const LoginPage = () => {
 
   const handleGuestContinue = () => {
     if (!eventId) {
-      setErrorMessage('מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע.')
+      setErrorMessage(
+        'מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע.'
+      )
       return
     }
-    navigate('/Details')
+    navigate('/Details_page')
   }
   // שימוש ב-useEffect לשמירה על ההודעה
   React.useEffect(() => {
     if (!eventId) {
-      setErrorMessage('מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע.')
+      setErrorMessage(
+        'מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע.'
+      )
     }
   }, [eventId])
 
@@ -91,7 +112,8 @@ const LoginPage = () => {
           width: '100%',
           height: '100%',
           zIndex: -1,
-          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
+          background:
+            'linear-gradient(135deg, #0D1B2A, #1B263B)',
           backgroundSize: '400% 400%',
           animation: 'animateBg 15s ease infinite'
         }}
@@ -114,7 +136,8 @@ const LoginPage = () => {
           fontWeight: 'bold',
           '&:hover': {
             backgroundColor: '#187bcd',
-            boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)'
+            boxShadow:
+              '0px 8px 15px rgba(0, 0, 0, 0.3)'
           },
           zIndex: 2
         }}
@@ -165,10 +188,19 @@ const LoginPage = () => {
           color: '#E0E1DD'
         }}
       >
-        <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
+        <Typography
+          variant="h5"
+          sx={{ mb: 2, fontWeight: 'bold' }}
+        >
           למה לבחור ב-EASY GIFT?
         </Typography>
-        <Typography variant="h6" sx={{ color: '#FFF', marginBottom: '20px' }}>
+        <Typography
+          variant="h6"
+          sx={{
+            color: '#FFF',
+            marginBottom: '20px'
+          }}
+        >
           מספר אירוע: {eventId}
         </Typography>
         {/* <Typography
@@ -183,88 +215,157 @@ const LoginPage = () => {
         >
           ברוכים הבאים - אירוע #{eventId}
         </Typography> */}
-        <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} justifyContent="space-around" alignItems="center" gap={2}>
+        <Box
+          display="flex"
+          flexDirection={{
+            xs: 'column',
+            sm: 'row'
+          }}
+          justifyContent="space-around"
+          alignItems="center"
+          gap={2}
+        >
           {/* כרטיסון ראשון */}
           <Box
             sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backgroundColor:
+                'rgba(255, 255, 255, 0.1)',
               padding: 2,
               borderRadius: 4,
               width: { xs: '100%', sm: '30%' },
               transition: '0.3s',
               '&:hover': {
                 transform: 'scale(1.05)',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                backgroundColor:
+                  'rgba(255, 255, 255, 0.2)'
               }
             }}
           >
-            <StarIcon sx={{ fontSize: 40, color: '#FFD700' }} />
-            <Typography variant="h6" sx={{ mt: 1, mb: 0.5, fontWeight: 'bold' }}>
+            <StarIcon
+              sx={{
+                fontSize: 40,
+                color: '#FFD700'
+              }}
+            />
+            <Typography
+              variant="h6"
+              sx={{
+                mt: 1,
+                mb: 0.5,
+                fontWeight: 'bold'
+              }}
+            >
               קל לשימוש
             </Typography>
-            <Typography variant="body1">ממשק פשוט ונוח שמאפשר לך להתחבר, להירשם ולנהל אירועים בקלות.</Typography>
+            <Typography variant="body1">
+              ממשק פשוט ונוח שמאפשר לך להתחבר,
+              להירשם ולנהל אירועים בקלות.
+            </Typography>
           </Box>
 
           {/* כרטיסון שני */}
           <Box
             sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backgroundColor:
+                'rgba(255, 255, 255, 0.1)',
               padding: 2,
               borderRadius: 4,
               width: { xs: '100%', sm: '30%' },
               transition: '0.3s',
               '&:hover': {
                 transform: 'scale(1.05)',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                backgroundColor:
+                  'rgba(255, 255, 255, 0.2)'
               }
             }}
           >
-            <FavoriteIcon sx={{ fontSize: 40, color: 'red' }} />
-            <Typography variant="h6" sx={{ mt: 1, mb: 0.5, fontWeight: 'bold' }}>
+            <FavoriteIcon
+              sx={{ fontSize: 40, color: 'red' }}
+            />
+            <Typography
+              variant="h6"
+              sx={{
+                mt: 1,
+                mb: 0.5,
+                fontWeight: 'bold'
+              }}
+            >
               חוויה אישית
             </Typography>
-            <Typography variant="body1">אפליקציה בנויה בקפידה, מעניקה חוויה מותאמת אישית לכל משתמש.</Typography>
+            <Typography variant="body1">
+              אפליקציה בנויה בקפידה, מעניקה חוויה
+              מותאמת אישית לכל משתמש.
+            </Typography>
           </Box>
 
           {/* כרטיסון שלישי */}
           <Box
             sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backgroundColor:
+                'rgba(255, 255, 255, 0.1)',
               padding: 2,
               borderRadius: 4,
               width: { xs: '100%', sm: '30%' },
               transition: '0.3s',
               '&:hover': {
                 transform: 'scale(1.05)',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                backgroundColor:
+                  'rgba(255, 255, 255, 0.2)'
               }
             }}
           >
-            <EmojiEventsIcon sx={{ fontSize: 40, color: '#FFC107' }} />
-            <Typography variant="h6" sx={{ mt: 1, mb: 0.5, fontWeight: 'bold' }}>
+            <EmojiEventsIcon
+              sx={{
+                fontSize: 40,
+                color: '#FFC107'
+              }}
+            />
+            <Typography
+              variant="h6"
+              sx={{
+                mt: 1,
+                mb: 0.5,
+                fontWeight: 'bold'
+              }}
+            >
               ניהול אירועים
             </Typography>
-            <Typography variant="body1">מערכת חכמה לניהול האירועים שלך, שעובדת ביעילות ומקצרת תהליכים.</Typography>
+            <Typography variant="body1">
+              מערכת חכמה לניהול האירועים שלך,
+              שעובדת ביעילות ומקצרת תהליכים.
+            </Typography>
           </Box>
         </Box>
       </Box>
-      <Divider sx={{ maxWidth: 700, margin: 'auto', my: 3 }} />
+      <Divider
+        sx={{
+          maxWidth: 700,
+          margin: 'auto',
+          my: 3
+        }}
+      />
       {/* במקום "קובייה אחת" גדולה רק לטופס, ניצור 2 עמודות: 
           מצד אחד תוכן ויזואלי/תדמיתי, ומצד שני הטופס */}
       <form>
         <Box
           display="flex"
-          flexDirection={{ xs: 'column', md: 'row' }}
+          flexDirection={{
+            xs: 'column',
+            md: 'row'
+          }}
           width={{ xs: '90%', md: '80%' }}
           margin="auto"
           borderRadius={2}
           boxShadow="0px 8px 16px rgba(0, 0, 0, 0.5)"
           sx={{
-            background: 'linear-gradient(135deg, #1B263B, #415A77)',
-            transition: 'transform 0.3s, box-shadow 0.3s',
+            background:
+              'linear-gradient(135deg, #1B263B, #415A77)',
+            transition:
+              'transform 0.3s, box-shadow 0.3s',
             '&:hover': {
               transform: 'scale(1.02)',
-              boxShadow: '0px 12px 24px rgba(0, 0, 0, 0.7)'
+              boxShadow:
+                '0px 12px 24px rgba(0, 0, 0, 0.7)'
             }
           }}
         >
@@ -276,8 +377,12 @@ const LoginPage = () => {
               flexDirection: 'column',
               justifyContent: 'center',
               p: { xs: 2, md: 4 },
-              backgroundColor: 'rgba(255, 255, 255, 0.07)',
-              borderRadius: { xs: '0px', md: '2px 0 0 2px' }
+              backgroundColor:
+                'rgba(255, 255, 255, 0.07)',
+              borderRadius: {
+                xs: '0px',
+                md: '2px 0 0 2px'
+              }
             }}
           >
             <Typography
@@ -301,8 +406,12 @@ const LoginPage = () => {
                 lineHeight: 1.8
               }}
             >
-              הצטרפו לאלפי משתמשים שכבר נהנים מניהול אירועים פשוט, ברור ומפנק! <br />
-              בין אם אתם מתכננים מסיבה קטנה או אירוע גדול, EASY GIFT כאן להפוך את החוויה לקלה ונוחה.
+              הצטרפו לאלפי משתמשים שכבר נהנים
+              מניהול אירועים פשוט, ברור ומפנק!{' '}
+              <br />
+              בין אם אתם מתכננים מסיבה קטנה או
+              אירוע גדול, EASY GIFT כאן להפוך את
+              החוויה לקלה ונוחה.
             </Typography>
             {/* אפשר להחליף את ה-"תוכן" כאן בתמונה או כל דבר אחר */}
             <Box
@@ -318,16 +427,30 @@ const LoginPage = () => {
                 style={{
                   maxWidth: '100%',
                   borderRadius: '8px',
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
+                  boxShadow:
+                    '0 4px 8px rgba(0,0,0,0.3)'
                 }}
               />
             </Box>
           </Box>
 
           {/* עמודה 2: טופס ההתחברות/הרשמה */}
-          <Box flex={1} display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={{ xs: 2, md: 4 }}>
+          <Box
+            flex={1}
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            p={{ xs: 2, md: 4 }}
+          >
             {/* כפתורי ניווט ראשיים */}
-            <Box display="flex" flexDirection="row" justifyContent="space-between" width="100%" marginBottom={3}>
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="space-between"
+              width="100%"
+              marginBottom={3}
+            >
               <Button
                 onClick={handleChange}
                 name="Login"
@@ -400,7 +523,10 @@ const LoginPage = () => {
                 מנהל אירועים
               </Button>
             </Box>
-            <Typography variant="h8" sx={{ color: '#FFF' }}>
+            <Typography
+              variant="h8"
+              sx={{ color: '#FFF' }}
+            >
               מספר אירוע: {eventId}
             </Typography>
             {/* הצגת הטפסים בהתאם לבחירה */}
@@ -409,7 +535,13 @@ const LoginPage = () => {
             {IsManager && <Manager />}
 
             {/* קישור "המשך כאורח" בתחתית העמודה */}
-            <Box display="flex" flexDirection="column" alignItems="center" marginTop={2} width="100%">
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              marginTop={2}
+              width="100%"
+            >
               <Typography
                 align="center"
                 sx={{
@@ -435,8 +567,16 @@ const LoginPage = () => {
                     {errorMessage}
                   </Typography>
                 )}
-                <Typography variant="body1" sx={{ color: '#FFF', fontWeight: 'bold', mb: 2 }}>
-                  מספר אירוע: {eventId || 'לא הוזן'}
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: '#FFF',
+                    fontWeight: 'bold',
+                    mb: 2
+                  }}
+                >
+                  מספר אירוע:{' '}
+                  {eventId || 'לא הוזן'}
                 </Typography>
                 <MuiLink
                   component="button"
@@ -473,8 +613,12 @@ const LoginPage = () => {
           color: '#E0E1DD'
         }}
       >
-        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
+        <Typography
+          variant="body2"
+          sx={{ fontSize: '0.9rem' }}
+        >
+          &copy; {new Date().getFullYear()} EASY
+          GIFT | כל הזכויות שמורות
         </Typography>
       </Box>
       {/* סגנון CSS לאנימציית הרקע */}
