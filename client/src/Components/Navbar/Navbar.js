@@ -1,6 +1,23 @@
 //client/src/Components/Navbar/Navbar.js
-import React, { useContext, useState } from 'react'
-import { AppBar, Box, Toolbar, IconButton, Typography, Menu, MenuItem, Container, Button, Avatar, Tooltip, Divider, styled } from '@mui/material'
+import React, {
+  useContext,
+  useState
+} from 'react'
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  IconButton,
+  Typography,
+  Menu,
+  MenuItem,
+  Container,
+  Button,
+  Avatar,
+  Tooltip,
+  Divider,
+  styled
+} from '@mui/material'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -10,7 +27,8 @@ import { Link } from 'react-router-dom'
 import { Context } from '../../App'
 
 // פלטות צבע לדוגמה
-const mainGradient = 'linear-gradient(90deg, #141E30, #243B55)' // AppBar
+const mainGradient =
+  'linear-gradient(90deg, #141E30, #243B55)' // AppBar
 const menuBgColor = '#2B3A47' // רקע תפריט אווטאר
 const highlightColor = '#FFC107'
 
@@ -32,7 +50,10 @@ const pagesRegistered = [
 const pagesManger = [
   { name: 'ברכות', path: '/Blessing' },
   { name: 'שאלות ותשובות', path: '/Fqa' },
-  { name: 'ניהול אירועים', path: '/EventManager' },
+  {
+    name: 'ניהול אירועים',
+    path: '/EventManager'
+  },
   { name: 'היסטוריה', path: '/History' }
   //{ name: 'התחברות ורישום', path: '/Login_page' }
 ]
@@ -43,11 +64,20 @@ const NavButton = styled(Button)(({ theme }) => ({
   fontWeight: 'bold',
   marginRight: theme.spacing(2),
   transition: '0.3s',
-  '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' }
+  '&:hover': {
+    backgroundColor: 'rgba(255,255,255,0.1)'
+  }
 }))
 
 function Navbar() {
-  const { userId, eventId, isEventManager, setEventNumber, userName, userEmail } = useContext(Context)
+  const {
+    userId,
+    eventId,
+    isEventManager,
+    setEventNumber,
+    userName,
+    userEmail
+  } = useContext(Context)
 
   // הגדרת הדרגה
   let userRank = 'אורח'
@@ -90,7 +120,8 @@ function Navbar() {
   }
 
   const [anchorNav, setAnchorNav] = useState(null)
-  const [anchorUser, setAnchorUser] = useState(null)
+  const [anchorUser, setAnchorUser] =
+    useState(null)
 
   const handleOpenNavMenu = event => {
     setAnchorNav(event.currentTarget)
@@ -113,8 +144,10 @@ function Navbar() {
         position="fixed"
         sx={{
           // גרדיאנט כהה אופקי
-          background: 'linear-gradient(90deg, #141E30, #243B55)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.7)'
+          background:
+            'linear-gradient(90deg, #141E30, #243B55)',
+          boxShadow:
+            '0 2px 8px rgba(0, 0, 0, 0.7)'
         }}
       >
         <Container maxWidth="xxl">
@@ -123,31 +156,13 @@ function Navbar() {
             <Box
               sx={{
                 flexGrow: 1,
-                display: { xs: 'none', md: 'flex' },
+                display: {
+                  xs: 'none',
+                  md: 'flex'
+                },
                 alignItems: 'center'
               }}
             >
-              {/* כפתור "מתנה" */}
-              {/* <Button
-                onClick={handleBackToHome}
-                component={Link}
-                to="/Details"
-                sx={{
-                  my: 2,
-                  color: '#ECEFF1',
-                  fontSize: '1.1rem',
-                  fontWeight: 'bold',
-                  mr: 1.5,
-                  transition: '0.3s',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.1)'
-                    //boxShadow: "0 0 8px rgba(236, 239, 241, 0.4)",
-                  }
-                }}
-              >
-                מתנה
-              </Button> */}
-
               {/* כפתור "דף הבית" */}
               <Button
                 onClick={handleBackToHome}
@@ -162,7 +177,8 @@ function Navbar() {
                   mr: 1.5,
                   transition: '0.3s',
                   '&:hover': {
-                    backgroundColor: 'rgba(255,193,7,0.15)'
+                    backgroundColor:
+                      'rgba(255,193,7,0.15)'
                     //boxShadow: "0 0 8px rgba(255,193,7,0.5)",
                   }
                 }}
@@ -183,7 +199,8 @@ function Navbar() {
                     color: '#ECEFF1',
                     transition: '0.3s',
                     '&:hover': {
-                      backgroundColor: 'rgba(255,255,255,0.1)'
+                      backgroundColor:
+                        'rgba(255,255,255,0.1)'
                       //boxShadow: "0 0 8px rgba(236,239,241,0.4)",
                     }
                   }}
@@ -200,7 +217,8 @@ function Navbar() {
                   my: 2,
                   mr: 1.5,
                   color: '#fff',
-                  backgroundColor: 'rgba(255,255,255,0.1)', // צבע כתום בולט
+                  backgroundColor:
+                    'rgba(255,255,255,0.1)', // צבע כתום בולט
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
                   borderRadius: '20px',
@@ -208,7 +226,8 @@ function Navbar() {
                   py: 1,
                   transition: '0.3s',
                   '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    backgroundColor:
+                      'rgba(255, 255, 255, 0.2)',
                     transform: 'scale(1.1)'
                   }
                 }}
@@ -228,7 +247,8 @@ function Navbar() {
                     mr: 1.5,
                     transition: '0.3s',
                     '&:hover': {
-                      backgroundColor: 'rgba(255,255,255,0.1)'
+                      backgroundColor:
+                        'rgba(255,255,255,0.1)'
                       //boxShadow: "0 0 8px rgba(236,239,241,0.4)",
                     }
                   }}
@@ -240,7 +260,13 @@ function Navbar() {
                 <>
                   {/* אם אין eventId */}
                   {!eventId && (
-                    <Box sx={{ width: '20%', mr: 5, textAlign: 'center' }}>
+                    <Box
+                      sx={{
+                        width: '20%',
+                        mr: 5,
+                        textAlign: 'center'
+                      }}
+                    >
                       <Typography
                         variant="caption"
                         sx={{
@@ -308,7 +334,7 @@ function Navbar() {
               >
                 <MenuItem onClick={handleBackToHome}>
                   <Link
-                    to="/Details"
+                    to="/Details_page"
                     style={{ textDecoration: "none", color: "#fff" }}
                   >
                     מתנה
@@ -368,7 +394,14 @@ function Navbar() {
               }}
             >
               <Tooltip title="פרופיל המשתמש">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, scale: 2.5, color: '#fff' }}>
+                <IconButton
+                  onClick={handleOpenUserMenu}
+                  sx={{
+                    p: 0,
+                    scale: 2.5,
+                    color: '#fff'
+                  }}
+                >
                   {/* אם יש תמונת פרופיל: src='url...' אחרת יופיע default */}
                   <AccountCircleIcon
                     //sx={{ color: "white" }}
@@ -381,15 +414,22 @@ function Navbar() {
                 anchorEl={anchorUser}
                 open={Boolean(anchorUser)}
                 onClose={handleCloseUserMenu}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right'
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right'
+                }}
                 PaperProps={{
                   sx: {
                     mt: '45px',
                     backgroundColor: menuBgColor,
                     color: '#fff',
                     minWidth: 220,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                    boxShadow:
+                      '0 4px 12px rgba(0,0,0,0.3)',
                     borderRadius: 2,
                     textAlign: 'center',
                     alignItems: 'center',
@@ -406,25 +446,50 @@ function Navbar() {
                     alignItems: 'center' // יישור אנכי
                   }}
                 >
-                  <Typography variant="subtitle1" sx={{ justifyContent: 'center', fontWeight: 'bold' }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      justifyContent: 'center',
+                      fontWeight: 'bold'
+                    }}
+                  >
                     {userName || 'אורח'}
                   </Typography>
                   {userEmail && (
-                    <Typography variant="caption" sx={{ justifyContent: 'center', color: '#ccc' }}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        justifyContent: 'center',
+                        color: '#ccc'
+                      }}
+                    >
                       {userEmail}
                     </Typography>
                   )}
-                  <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: 'block',
+                      mt: 1
+                    }}
+                  >
                     דרגה: {userRank}
                   </Typography>
                 </Box>
-                <Divider sx={{ borderColor: 'rgba(255,255,255,0.2)' }} />
+                <Divider
+                  sx={{
+                    borderColor:
+                      'rgba(255,255,255,0.2)'
+                  }}
+                />
 
                 {/* אפשרות 1: הגדרות פרופיל, התנתקות וכו' */}
                 {userId && (
                   <>
                     <MenuItem
-                      onClick={handleCloseUserMenu}
+                      onClick={
+                        handleCloseUserMenu
+                      }
                       sx={{
                         color: '#ECEFF1',
                         fontWeight: 'bold',
@@ -437,7 +502,9 @@ function Navbar() {
                       הגדרות חשבון
                     </MenuItem>
                     <MenuItem
-                      onClick={handleCloseUserMenu}
+                      onClick={
+                        handleCloseUserMenu
+                      }
                       sx={{
                         color: '#ECEFF1',
                         fontWeight: 'bold',
@@ -486,8 +553,24 @@ function Navbar() {
             </Box> */}
 
             {/* לוגו בצד שמאל */}
-            <CardGiftcardIcon fontSize="large" sx={{ display: { xs: 'none', md: 'flex' }, ml: 2, mr: 10 }} />
-            <Typography variant="h6" noWrap component={Link} to="/" sx={logoStyle}>
+            <CardGiftcardIcon
+              fontSize="large"
+              sx={{
+                display: {
+                  xs: 'none',
+                  md: 'flex'
+                },
+                ml: 2,
+                mr: 10
+              }}
+            />
+            <Typography
+              variant="h6"
+              noWrap
+              component={Link}
+              to="/"
+              sx={logoStyle}
+            >
               Easy Gift
             </Typography>
           </Toolbar>
