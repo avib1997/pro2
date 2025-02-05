@@ -1,17 +1,19 @@
 //server/models/eventModel.js
 const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-
-const eventSchema = new Schema({
+//server/controllers/eventcontroller/create
+//server/services/eventservice/addevent
+//client/src/Components/events/AddEvent/handleAddEventClick
+//client/src/Components/events/AddEventDialog/handleAddEventClick
+const eventSchema = new mongoose.Schema({
   NameOfGroom: { type: String, required: false },
   NameOfBride: { type: String, required: false },
   NameOfManager: { type: String, required: false },
   TypeOfEvent: { type: String, required: false },
   Event_number: { type: Number, required: true, unique: true },
   phone: { type: String, required: false },
-  userid_event: { type: mongoose.Schema.Types.ObjectId, ref: 'users', required: true },
+  userid_event: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
   DateOfEvent: { type: Date, required: false },
-  giftsId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gifts' }],
+  giftsId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gift' }],
   isActive: { type: Boolean, default: true }
 })
 

@@ -1,8 +1,7 @@
 //server/models/giftModel.js
 const mongoose = require('mongoose')
-const Schema = mongoose.Schema
 
-const giftSchema = new Schema({
+const giftSchema = new mongoose.Schema({
   name: { type: String, required: true }, // ✅ חובה לוודא ששדה זה מתקבל
   phone: { type: String, required: true }, // ✅ ודא שזו מחרוזת (אם נשלח מספר זה יגרום לשגיאה)
   blessing: { type: String },
@@ -12,5 +11,6 @@ const giftSchema = new Schema({
   toEventName: { type: String },
   entryDate: { type: Date, default: Date.now }
 })
+
 
 module.exports = mongoose.model('gift', giftSchema)
