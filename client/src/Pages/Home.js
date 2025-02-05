@@ -623,7 +623,7 @@ const Home = () => {
         ))}
       </Container>
       {/* Footer פשוט בתחתית העמוד */}
-      <Box
+      {/* <Box
         sx={{
           marginTop: 5,
           textAlign: 'center',
@@ -639,7 +639,7 @@ const Home = () => {
           &copy; {new Date().getFullYear()} EASY
           GIFT | כל הזכויות שמורות
         </Typography>
-      </Box>
+      </Box> */}
     </Box>
   )
 }

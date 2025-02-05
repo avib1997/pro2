@@ -5,6 +5,7 @@ const cors = require('cors')
 const morgan = require('morgan') // לוודא שהתקנת עם npm install morgan
 const dotenv = require('dotenv')
 const router = require('./routes')
+const jwt = require('jsonwebtoken')
 
 dotenv.config()
 

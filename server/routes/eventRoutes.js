@@ -4,6 +4,7 @@ const router = express.Router()
 const giftService = require('../services/giftService')
 const eventService = require('../services/eventService')
 const eventController = require('../controllers/eventController')
+const { authJWT } = require('../middleware/authMiddleware')
 
 router.post('/getGiftsByEvent', async (req, res) => {
   try {
@@ -47,6 +48,7 @@ router.get('/:eventId', async (req, res) => {
   }
 })
 
+//router.post('/addEvent', authJWT, async (req, res) => {
 router.post('/addEvent', async (req, res) => {
   try {
     const event = await eventService.addevent(req.body)
@@ -75,6 +77,11 @@ router.delete('/:eventId', async (req, res) => {
     console.error('❌ Error deleting event:', error)
     res.status(500).json({ error: 'Failed to delete event' })
   }
+})
+
+// ראוט בדיקה
+router.get('/test', (req, res) => {
+  res.json({ message: 'Events routes are working!' })
 })
 
 module.exports = router

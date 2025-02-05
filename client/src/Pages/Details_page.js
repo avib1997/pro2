@@ -159,13 +159,6 @@ const Details = () => {
           fontFamily: 'Roboto, sans-serif'
         }}
       >
-        {/* כותרת עם רכיב HeadLine
-        <HeadLine
-          groom={event ? event.NameOfGroom : "מוטי"}
-          bride={event ? event.NameOfBride : "איילת"}
-          sx={{ marginBottom: "20px" }}
-        /> */}
-
         {/* כותרת מעל הפירוט */}
         <Typography
           variant="h3"
@@ -174,8 +167,7 @@ const Details = () => {
           sx={{
             fontWeight: 'bold',
             color: '#E0E1DD',
-            paddingTop: '0px',
-            mt: 0,
+            mt: '140px',
             marginBottom: 4,
             fontSize: {
               xs: '2.5rem',
@@ -643,7 +635,7 @@ const Details = () => {
         `}
       </style>
       {/* Footer פשוט בתחתית העמוד */}
-      <Box
+      {/* <Box
         sx={{
           marginTop: 5,
           textAlign: 'center',
@@ -659,7 +651,10 @@ const Details = () => {
           &copy; {new Date().getFullYear()} EASY
           GIFT | כל הזכויות שמורות
         </Typography>
-      </Box>
+        <Typography>
+          פיתוח על ידי אבי ברודצקי ומוטי ברודצקי
+        </Typography>
+      </Box> */}
     </Box>
   )
 }

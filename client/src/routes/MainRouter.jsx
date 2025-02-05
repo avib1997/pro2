@@ -4,7 +4,7 @@ import {
   Route,
   Routes
 } from 'react-router-dom'
-import CoupleNames from '../Components/Details/Couple_names'
+//import CoupleNames from '../Components/Details/Couple_names'
 import AddEvent from '../Components/events/AddEvent'
 import Admin from '../Pages/Admin'
 import Blessing from '../Pages/Blessing_page'
@@ -67,10 +67,10 @@ function MainRouter() {
           element={<History />}
           path="/History"
         ></Route>
-        <Route
+        {/* <Route
           element={<CoupleNames />}
           path="/CoupleNames"
-        ></Route>
+        ></Route> */}
         <Route
           element={<Manager />}
           path="/EventManager"

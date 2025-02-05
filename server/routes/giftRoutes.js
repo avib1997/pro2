@@ -4,6 +4,7 @@ const router = express.Router()
 const giftService = require('../services/giftService')
 const { fixHebrewText } = require('../fixHebrew.js')
 
+//router.post('/addGift', authJWT, async (req, res) => {
 router.post('/addGift', async (req, res) => {
   console.log(fixHebrewText('📩 נתונים שהתקבלו:'), req.body) // ✅ הדפסת הנתונים שהתקבלו
   try {
@@ -29,6 +30,11 @@ router.post('/getgift', async (req, res) => {
   } catch (error) {
     return res.status(500).send({ error: fixHebrewText('שגיאה בעת בקשת המתנות') })
   }
+})
+
+// ראוט בדיקה
+router.get('/test', (req, res) => {
+  res.json({ message: 'Gift routes are working!' })
 })
 
 module.exports = router

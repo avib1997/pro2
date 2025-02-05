@@ -1,24 +1,28 @@
 //server/routes/usersRoutes.js
+
 const express = require('express')
 const router = express.Router()
 const userService = require('../services/userService')
 const { fixHebrewText } = require('../fixHebrew.js')
-
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt') // אם אתה מצפין סיסמה
 
 router.post('/login', async (req, res) => {
-  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
+  console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const token = await userService.login(req.body)
     console.log(fixHebrewText('טוקן נוצר בהצלחה:'), token)
     res.send({ token: token })
+    // res.json({ token })
   } catch (err) {
     console.log(fixHebrewText('[ERROR] בשירות login:'), err.message)
     res.send(err.message)
+    // res.status(401).json({ error: err.message })
   }
 })
 
 router.post('/register', async (req, res) => {
-  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
+  console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const newUser = await userService.register(req.body)
     console.log(fixHebrewText('משתמש חדש נוצר בהצלחה:'), newUser)
@@ -29,7 +33,7 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/userid', async (req, res) => {
-  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
+  console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const userid = await userService.getIdByEmail(req.body.email)
     console.log(fixHebrewText('מזהה המשתמש שהוחזר:'), userid)
@@ -39,6 +43,7 @@ router.post('/userid', async (req, res) => {
   }
 })
 
+//router.get('/', authJWT, async (req, res) => {
 router.get('/', async (req, res) => {
   console.log(fixHebrewText('אובייקט הבקשה (req):'), req)
   try {
@@ -51,7 +56,7 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/giftsById', async (req, res) => {
-  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
+  console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const arrGifts = await userService.getGiftsById(req.body)
     console.log('arrgifts in user Routes:', arrGifts)
@@ -59,6 +64,11 @@ router.post('/giftsById', async (req, res) => {
   } catch (err) {
     res.status(500).send({ error: err.message })
   }
+})
+
+// ראוט בדיקה
+router.get('/test', (req, res) => {
+  res.json({ message: 'Users routes are working!' })
 })
 
 module.exports = router

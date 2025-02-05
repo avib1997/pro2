@@ -1,7 +1,8 @@
 //server/models/eventModel.js
 const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-const eventSchema = new mongoose.Schema({
+const eventSchema = new Schema({
   NameOfGroom: { type: String, required: false },
   NameOfBride: { type: String, required: false },
   NameOfManager: { type: String, required: false },

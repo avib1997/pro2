@@ -13,6 +13,4 @@ const giftSchema = new Schema({
   entryDate: { type: Date, default: Date.now }
 })
 
-const giftModel = mongoose.model('gift', giftSchema)
-
-module.exports = { giftModel }
+module.exports = mongoose.model('gift', giftSchema)

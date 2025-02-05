@@ -236,7 +236,7 @@ function Navbar() {
               </Button>
 
               {/* כפתור למנהלי אירועים */}
-              {isEventManager && (
+              {/* {isEventManager && (
                 <Button
                   onClick={handleBackToHome}
                   component={Link}
@@ -255,7 +255,7 @@ function Navbar() {
                 >
                   ניהול אירועים
                 </Button>
-              )}
+              )} */}
               {!isEventManager && ( // הצגת האלמנטים הקשורים ל-eventId רק אם isEventManager הוא false
                 <>
                   {/* אם אין eventId */}

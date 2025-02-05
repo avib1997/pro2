@@ -12,6 +12,4 @@ const userSchema = new Schema({
   eventId: [String] // מערך של מזהי אירועים
 })
 
-const userModel = mongoose.model('user', userSchema)
-
-module.exports = { userModel }
+module.exports = mongoose.model('user', userSchema)

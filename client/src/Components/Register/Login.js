@@ -1,16 +1,37 @@
-import React, { useState, useContext } from 'react'
-import { Box, Button, TextField, Typography, InputAdornment } from '@mui/material'
-import { Email as EmailIcon, Lock as LockIcon } from '@mui/icons-material'
+import React, {
+  useState,
+  useContext
+} from 'react'
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  InputAdornment
+} from '@mui/material'
+import {
+  Email as EmailIcon,
+  Lock as LockIcon
+} from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Context } from '../../App'
 
 const Login = props => {
-  const { setUserId, setDetailsId, setIsEventManager, setUserName, setUserEmail, setEventNumber } = useContext(Context)
+  const {
+    setUserId,
+    setDetailsId,
+    setIsEventManager,
+    setUserName,
+    setUserEmail,
+    setEventNumber
+  } = useContext(Context)
 
-  const [errorMessage, setErrorMessage] = useState('')
+  const [errorMessage, setErrorMessage] =
+    useState('')
   const navigate = useNavigate()
-  const [isSubmitting, setIsSubmitting] = useState(false) // מצב טעינה
+  const [isSubmitting, setIsSubmitting] =
+    useState(false) // מצב טעינה
 
   const [input, setInput] = useState({
     email: '',
@@ -50,10 +71,13 @@ const Login = props => {
     setErrorMessage('') // איפוס הודעות שגיאה
 
     try {
-      const response = await axios.post('http://localhost:2001/api/users/login', {
-        email,
-        password
-      })
+      const response = await axios.post(
+        'http://localhost:2001/api/users/login',
+        {
+          email,
+          password
+        }
+      )
 
       console.log('res:', response)
 
@@ -62,12 +86,24 @@ const Login = props => {
         setErrorMessage('')
 
         // קבלת נתוני המשתמש
-        const userResponse = await axios.post('http://localhost:2001/api/users/userid', { email })
-        console.log('response.data in Login:', userResponse.data)
+        const userResponse = await axios.post(
+          'http://localhost:2001/api/users/userid',
+          { email }
+        )
+        console.log(
+          'response.data in Login:',
+          userResponse.data
+        )
 
-        if (userResponse.data && userResponse.data.userid && userResponse.data.userid.length > 0) {
+        if (
+          userResponse.data &&
+          userResponse.data.userid &&
+          userResponse.data.userid.length > 0
+        ) {
           const user = userResponse.data.userid[0]
-          setUserName(`${user.fname} ${user.lname}`)
+          setUserName(
+            `${user.fname} ${user.lname}`
+          )
           setUserEmail(user.email)
           setUserId(user._id)
           setDetailsId(user.giftsId)
@@ -80,31 +116,47 @@ const Login = props => {
           navigate('/EventManager')
         } else {
           setIsEventManager(false)
-          navigate('/Details')
+          navigate('/Details_page')
         }
       } else {
         // טיפול במקרה של שגיאה מהשרת
         if (response.data === 'not exist') {
           setErrorMessage('המייל לא קיים במערכת.')
-        } else if (response.data === 'password not correct') {
+        } else if (
+          response.data === 'password not correct'
+        ) {
           setErrorMessage('הסיסמה שגויה.')
         } else {
-          setErrorMessage(response.data || 'התחברות נכשלה. נסה שוב.')
+          setErrorMessage(
+            response.data ||
+              'התחברות נכשלה. נסה שוב.'
+          )
         }
-        console.log('התחברות נכשלה:', response.data)
+        console.log(
+          'התחברות נכשלה:',
+          response.data
+        )
       }
     } catch (error) {
       // טיפול בשגיאות רשת או שגיאות בלתי צפויות
       if (error.response) {
         if (error.response.data === 'not exist') {
           setErrorMessage('המייל לא קיים במערכת.')
-        } else if (error.response.data === 'password not correct') {
+        } else if (
+          error.response.data ===
+          'password not correct'
+        ) {
           setErrorMessage('הסיסמה שגויה.')
         } else {
-          setErrorMessage(error.response.data || 'אירעה שגיאה. אנא נסה שוב.')
+          setErrorMessage(
+            error.response.data ||
+              'אירעה שגיאה. אנא נסה שוב.'
+          )
         }
       } else {
-        setErrorMessage('אירעה שגיאה. אנא נסה שוב.')
+        setErrorMessage(
+          'אירעה שגיאה. אנא נסה שוב.'
+        )
       }
       console.error('Error during login:', error)
     } finally {
@@ -131,7 +183,10 @@ const Login = props => {
               variant="h2"
               padding={3}
               textAlign="center"
-              sx={{ fontWeight: '600', color: '#1976D2' }} // טקסט כחול ובולט
+              sx={{
+                fontWeight: '600',
+                color: '#1976D2'
+              }} // טקסט כחול ובולט
             >
               התחבר כמנהל
             </Typography>
@@ -140,7 +195,10 @@ const Login = props => {
               variant="h2"
               padding={3}
               textAlign="center"
-              sx={{ fontWeight: '600', color: '#1976D2' }} // טקסט כחול ובולט
+              sx={{
+                fontWeight: '600',
+                color: '#1976D2'
+              }} // טקסט כחול ובולט
             >
               התחברות
             </Typography>
@@ -159,49 +217,43 @@ const Login = props => {
               width: '300px',
               backgroundColor: '#fff',
               borderRadius: '20px', // רינוד פינות
-              // עיצוב כללי של השדה
               '& .MuiOutlinedInput-root': {
                 fontWeight: 600,
                 borderRadius: '20px', // רינוד פינות
                 '& fieldset': {
                   border: 'none' // ביטול המסגרת (outline)
                 },
-                // אפקט רחיפה (hover)
                 '&:hover fieldset': {
                   border: 'none' // הצגת מסגרת בעת רחיפה
                 },
-                // אפקט כשהשדה בפוקוס (focus)
                 '&.Mui-focused fieldset': {
                   border: 'none'
                 },
-                // הוספת פדינג פנימי כדי למנוע חפיפה
                 '& .MuiOutlinedInput-input': {
                   paddingRight: '0px'
                 }
               },
               '& .MuiInputLabel-root': {
                 fontWeight: 600,
-                //transformOrigin: "top right",
-                // אפשר לכוון מיקום לייבל ב-RTL לפי הצורך
                 right: 20,
                 left: 'auto'
-                //top: 3,
-                //ransform: "translate(0, 6px) scale(3.75)",
               },
-              '& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink': {
-                // כאן מתרחש "הציפה" למעלה
-                transformOrigin: 'top right', // רק לדוגמה, אם עובדים ב־RTL
-                // אפשר להוריד את ערכי ה-translateY כדי לשחק עם הגובה:
-                transform: 'translate(0, .5px) scale(0.75)'
-                //        ↑↑   אתה יכול להגדיל/להקטין את ה"6px" כרצונך
-                // אפשר לשחק גם עם top במקום transform:
-                // top: "8px"
-              }
+              '& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink':
+                {
+                  transformOrigin: 'top right', // רק לדוגמה, אם עובדים ב־RTL
+                  transform:
+                    'translate(0, .5px) scale(0.75)'
+                }
             }}
             InputProps={{
               endAdornment: (
-                <InputAdornment position="end" sx={{ mr: 1 }}>
-                  <EmailIcon sx={{ color: '#1976D2' }} />
+                <InputAdornment
+                  position="end"
+                  sx={{ mr: 1 }}
+                >
+                  <EmailIcon
+                    sx={{ color: '#1976D2' }}
+                  />
                 </InputAdornment>
               )
             }}
@@ -220,22 +272,18 @@ const Login = props => {
               width: '300px',
               backgroundColor: '#fff',
               borderRadius: '20px', // רינוד פינות
-              // עיצוב כללי של השדה
               '& .MuiOutlinedInput-root': {
                 fontWeight: 600,
                 borderRadius: '20px', // רינוד פינות
                 '& fieldset': {
                   border: 'none' // ביטול המסגרת (outline)
                 },
-                // אפקט רחיפה (hover)
                 '&:hover fieldset': {
                   border: 'none' // הצגת מסגרת בעת רחיפה
                 },
-                // אפקט כשהשדה בפוקוס (focus)
                 '&.Mui-focused fieldset': {
                   border: 'none'
                 },
-                // הוספת פדינג פנימי כדי למנוע חפיפה
                 '& .MuiOutlinedInput-input': {
                   paddingRight: '0px'
                 }
@@ -245,23 +293,32 @@ const Login = props => {
                 right: 20,
                 left: 'auto'
               },
-              '& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink': {
-                transformOrigin: 'top right',
-                transform: 'translate(0, .5px) scale(0.75)'
-              }
+              '& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink':
+                {
+                  transformOrigin: 'top right',
+                  transform:
+                    'translate(0, .5px) scale(0.75)'
+                }
             }}
             InputProps={{
-              // העברת הסמל לצד השני
               endAdornment: (
                 <InputAdornment position="end">
-                  <LockIcon sx={{ color: '#FF5722' }} /> {/* סמל מנעול בצבע כתום */}
+                  <LockIcon
+                    sx={{ color: '#FF5722' }}
+                  />{' '}
                 </InputAdornment>
               )
             }}
           />
           {/* הצגת הודעת השגיאה אם קיימת */}
           {errorMessage && (
-            <Typography variant="body2" color="error" sx={{ mb: 2 }} textAlign="center" role="alert">
+            <Typography
+              variant="body2"
+              color="error"
+              sx={{ mb: 2 }}
+              textAlign="center"
+              role="alert"
+            >
               {errorMessage}
             </Typography>
           )}
@@ -270,7 +327,9 @@ const Login = props => {
             onClick={handleSubmit} // הוספת onClick
             disabled={isSubmitting}
             sx={{
-              cursor: isSubmitting ? 'not-allowed' : 'pointer', // שינוי סמן העכבר בזמן טעינה
+              cursor: isSubmitting
+                ? 'not-allowed'
+                : 'pointer', // שינוי סמן העכבר בזמן טעינה
               margin: 3,
               borderRadius: 3,
               fontWeight: '600', // פונט בולט
@@ -284,7 +343,10 @@ const Login = props => {
             variant="contained"
             size="large"
           >
-            {isSubmitting ? 'מתבצע...' : 'התחברות'} {/* הצגת טקסט בזמן טעינה */}
+            {isSubmitting
+              ? 'מתבצע...'
+              : 'התחברות'}{' '}
+            {/* הצגת טקסט בזמן טעינה */}
           </Button>
         </Box>
       </form>

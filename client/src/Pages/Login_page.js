@@ -82,14 +82,15 @@ const LoginPage = () => {
     }
     navigate('/Details_page')
   }
+
   // שימוש ב-useEffect לשמירה על ההודעה
-  React.useEffect(() => {
-    if (!eventId) {
-      setErrorMessage(
-        'מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע.'
-      )
-    }
-  }, [eventId])
+  // React.useEffect(() => {
+  //   if (!eventId) {
+  //     setErrorMessage(
+  //       'מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע.'
+  //     )
+  //   }
+  // }, [eventId])
 
   return (
     <Box
@@ -201,7 +202,7 @@ const LoginPage = () => {
             marginBottom: '20px'
           }}
         >
-          מספר אירוע: {eventId}
+          מספר אירוע: {eventId || 'לא הוזן'}{' '}
         </Typography>
         {/* <Typography
           variant="h3"
@@ -527,7 +528,7 @@ const LoginPage = () => {
               variant="h8"
               sx={{ color: '#FFF' }}
             >
-              מספר אירוע: {eventId}
+              מספר אירוע: {eventId || 'לא הוזן'}{' '}
             </Typography>
             {/* הצגת הטפסים בהתאם לבחירה */}
             {IsLogin && <Login />}
@@ -582,6 +583,7 @@ const LoginPage = () => {
                   component="button"
                   onClick={handleGuestContinue}
                   underline="hover"
+                  type="button"
                   sx={{
                     color: '#F0A500',
                     cursor: 'pointer',
@@ -601,7 +603,7 @@ const LoginPage = () => {
       </form>
 
       {/* Footer פשוט בתחתית העמוד */}
-      <Box
+      {/* <Box
         sx={{
           position: 'absolute',
           bottom: 0,
@@ -620,7 +622,7 @@ const LoginPage = () => {
           &copy; {new Date().getFullYear()} EASY
           GIFT | כל הזכויות שמורות
         </Typography>
-      </Box>
+      </Box> */}
       {/* סגנון CSS לאנימציית הרקע */}
       <style>
         {`

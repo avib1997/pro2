@@ -4,8 +4,8 @@ import { Box, Typography, Grid, Button } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import { Context } from '../App'
 import axios from 'axios'
-import EventCard from '../Components/EventCard'
-import EventDialog from '../Components/EventDialog'
+import EventCard from '../Components/events/EventCard'
+import EventDialog from '../Components/events/EventDialog'
 import AddEventDialog from '../Components/events/AddEventDialog' // דיאלוג חדש להוספת אירוע
 
 const EventManager = () => {
