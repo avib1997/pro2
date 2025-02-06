@@ -37,4 +37,13 @@ router.get('/test', (req, res) => {
   res.json({ message: 'Gift routes are working!' })
 })
 
+router.get('/getAllGifts', async (req, res) => {
+  try {
+    const gifts = await giftService.getAllGifts(req.body)
+    return res.status(200).send(gifts)
+  } catch (error) {
+    return res.status(500).send({ error: fixHebrewText('שגיאה בעת בקשת המתנות') })
+  }
+})
+
 module.exports = router

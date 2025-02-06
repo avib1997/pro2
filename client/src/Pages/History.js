@@ -1,59 +1,27 @@
-import React, {
-  useEffect,
-  useState,
-  useContext
-} from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { Context } from '../App'
 import axios from 'axios'
-import {
-  Box,
-  Container,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Collapse,
-  IconButton,
-  CircularProgress
-} from '@mui/material'
+import { Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Collapse, IconButton, CircularProgress } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 const GiftHistory = () => {
   const { userId, eventId } = useContext(Context)
   const [gifts, setGifts] = useState([])
-  const [errorMessage, setErrorMessage] =
-    useState('')
-  const [expandedRows, setExpandedRows] =
-    useState({})
+  const [errorMessage, setErrorMessage] = useState('')
+  const [expandedRows, setExpandedRows] = useState({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    console.log(
-      'event idddddddddddddddddd:',
-      eventId
-    )
     const fetchGifts = async () => {
       setLoading(true)
       try {
-        const response = await axios.post(
-          'http://localhost:2001/api/users/giftsById',
-          { _id: userId }
-        )
-        const res = await axios.post(
-          'http://localhost:2001/api/gift/getgift',
-          { _id: response.data }
-        )
+        const response = await axios.post('http://localhost:2001/api/users/giftsById', { _id: userId })
+        const res = await axios.post('http://localhost:2001/api/gift/getgift', { _id: response.data })
         if (res.data && res.data.length > 0) {
           setGifts(res.data)
         }
       } catch (error) {
-        setErrorMessage(
-          'שגיאה בטעינת הנתונים מהשרת.'
-        )
+        setErrorMessage('שגיאה בטעינת הנתונים מהשרת.')
       } finally {
         setLoading(false)
       }
@@ -79,8 +47,7 @@ const GiftHistory = () => {
         direction: 'rtl',
         paddingTop: '1px',
         textAlign: 'center',
-        background:
-          'linear-gradient(135deg, #0D1B2A, #1B263B)',
+        background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
         backgroundSize: '400% 400%',
         animation: 'animateBg 15s ease infinite'
       }}
@@ -135,14 +102,9 @@ const GiftHistory = () => {
           </Box>
         ) : (
           <>
-            {errorMessage && (
-              <Typography sx={{ color: 'red' }}>
-                {errorMessage}
-              </Typography>
-            )}
+            {errorMessage && <Typography sx={{ color: 'red' }}>{errorMessage}</Typography>}
             {/* אם אין מתנות להצגה */}
-            {!errorMessage &&
-            gifts.length === 0 ? (
+            {!errorMessage && gifts.length === 0 ? (
               <Typography
                 variant="h6"
                 sx={{
@@ -153,8 +115,7 @@ const GiftHistory = () => {
                   fontSize: { xs: '1.5rem', sm: '2rem' }
                 }}
               >
-                אופס, נראה שהמתנות לקחו הפסקת
-                קפה!  ☕  
+                אופס, נראה שהמתנות לקחו הפסקת קפה! ☕
                 <br />
                 או לא הגיעו לעבודה היום!
                 <br />
@@ -218,16 +179,11 @@ const GiftHistory = () => {
                   </TableHead>
                   <TableBody>
                     {gifts.map((gift, index) => (
-                      <React.Fragment
-                        key={gift._id}
-                      >
+                      <React.Fragment key={gift._id}>
                         <TableRow
-                          onClick={() =>
-                            toggleRow(gift._id)
-                          }
+                          onClick={() => toggleRow(gift._id)}
                           sx={{
-                            borderBottom:
-                              '2px solid rgba(255, 255, 255, 0.2)'
+                            borderBottom: '2px solid rgba(255, 255, 255, 0.2)'
                           }}
                         >
                           <TableCell
@@ -266,9 +222,7 @@ const GiftHistory = () => {
                               color: '#E0E1DD'
                             }}
                           >
-                            {new Date(
-                              gift.entryDate
-                            ).toLocaleDateString()}
+                            {new Date(gift.entryDate).toLocaleDateString()}
                           </TableCell>
                         </TableRow>
                         <TableRow>
@@ -279,30 +233,16 @@ const GiftHistory = () => {
                               paddingTop: 0
                             }}
                           >
-                            <Collapse
-                              in={
-                                expandedRows[
-                                  gift._id
-                                ]
-                              }
-                              timeout="auto"
-                              unmountOnExit
-                            >
+                            <Collapse in={expandedRows[gift._id]} timeout="auto" unmountOnExit>
                               <Box
                                 margin={1}
                                 sx={{
-                                  color:
-                                    '#E0E1DD',
-                                  textAlign:
-                                    'center',
-                                  paddingTop:
-                                    '10px'
+                                  color: '#E0E1DD',
+                                  textAlign: 'center',
+                                  paddingTop: '10px'
                                 }}
                               >
-                                <Typography variant="body1">
-                                  ברכה:{' '}
-                                  {gift.blessing}
-                                </Typography>
+                                <Typography variant="body1">ברכה: {gift.blessing}</Typography>
                               </Box>
                             </Collapse>
                           </TableCell>

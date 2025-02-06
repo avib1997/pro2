@@ -74,6 +74,8 @@ module.exports.addgiftG = async giftFields => {
   let newGift
   try {
     newGift = await giftController.create(giftFields)
+    const updatedEvent = await eventController.update(giftFields.EventId, { $push: { giftsId: newGift._id.toString() } }, { new: true })
+    return { message: '✅ מתנה נוספה בהצלחה', gift: newGift }
   } catch (error) {
     throw error
   }
@@ -97,5 +99,14 @@ module.exports.getGiftsByEvent = async eventID => {
     return gifts
   } catch (error) {
     return { error: 'Failed to get gifts by event' }
+  }
+}
+
+module.exports.getAllGifts = async () => {
+  try {
+    const gifts = await giftController.read({})
+    return gifts
+  } catch (error) {
+    return { error: 'Failed to get all gifts' }
   }
 }

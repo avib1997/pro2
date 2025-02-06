@@ -1,24 +1,10 @@
 //src/Pages/Details.js
-import React, {
-  useContext,
-  useState,
-  useEffect
-} from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle' // אייקון לסימון העלאה
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice'
 import TheatersIcon from '@mui/icons-material/Theaters'
-import {
-  Box,
-  Button,
-  Container,
-  IconButton,
-  Link,
-  Slide,
-  TextField,
-  Tooltip,
-  Typography
-} from '@mui/material'
+import { Box, Button, Container, IconButton, Link, Slide, TextField, Tooltip, Typography } from '@mui/material'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { Context } from '../App'
@@ -28,8 +14,7 @@ import PayBoxIcon from '../assets/paybox.png'
 
 const Details = () => {
   const navigate = useNavigate()
-  const { userId, event, eventId, setEvent } =
-    useContext(Context)
+  const { userId, event, eventId, setEvent, eventNumber } = useContext(Context)
   const [inputs, setInputs] = useState({
     name: '',
     phone: '',
@@ -39,16 +24,13 @@ const Details = () => {
   const [amount, setAmount] = useState(0)
 
   // מצבים עבור הקבצים שהועלו
-  const [uploadedImage, setUploadedImage] =
-    useState(false)
-  const [uploadedVideo, setUploadedVideo] =
-    useState(false)
-  const [uploadedAudio, setUploadedAudio] =
-    useState(false)
+  const [uploadedImage, setUploadedImage] = useState(false)
+  const [uploadedVideo, setUploadedVideo] = useState(false)
+  const [uploadedAudio, setUploadedAudio] = useState(false)
 
-  // useEffect(() => {
-  //   console.log('🎉 מזהה האירוע:', eventId)
-  // }, [eventId])
+  useEffect(() => {
+    console.log('🎉 מזהה האירוע:', eventNumber)
+  }, [eventNumber])
 
   const handleChange = e => {
     setAmount(e.target.value)
@@ -59,20 +41,6 @@ const Details = () => {
   }
 
   const handleClick = async e => {
-    await axios
-      .get(
-        `http://localhost:2001/api/events/${event}`
-      )
-      .then(res => {
-        setEvent(res.data)
-      })
-      .catch(err => {
-        console.log(
-          'error in Details page in handleClick get event by id: ',
-          err
-        )
-      })
-
     e.preventDefault()
     console.log('📌 event object:', event) // ✅ נבדוק אם event מוגדר
 
@@ -82,28 +50,15 @@ const Details = () => {
       blessing: inputs.blessing,
       amount: inputs.amount,
       userid_gift: userId,
-      EventId: event._id,
-      toEventName:
-        event?.NameOfGroom +
-        ' & ' +
-        event?.NameOfBride // ✅ שימוש ב- "?" למניעת שגיאות
+      EventId: eventId,
+      toEventName: event.NameOfGroom
     }
-    try {
-      const response = await axios.post(
-        'http://localhost:2001/api/gift/addGift',
-        newGift
-      )
-      console.log(
-        '✅ מתנה נוספה בהצלחה:',
-        response.data
-      )
-    } catch (error) {
-      console.error(
-        '❌ שגיאה בהוספת המתנה:',
-        error.response?.data || error.message
-      )
+    if (!newGift.amount || newGift.name === '' || newGift.phone === '') {
+      console.log('אנא הכנס')
+      return
+    } else {
+      navigate('/Payment', { state: { newGift } }) // שולח את הסכום לעמוד PayPalPayment
     }
-    navigate('/Payment', { state: { amount } }) // שולח את הסכום לעמוד PayPalPayment
   }
 
   // פונקציות לטיפול בהעלאת קבצים
@@ -140,8 +95,7 @@ const Details = () => {
           width: '100%',
           height: '100%',
           zIndex: -1,
-          background:
-            'linear-gradient(135deg, #0D1B2A, #1B263B)',
+          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
           backgroundSize: '400% 400%',
           animation: 'animateBg 15s ease infinite'
         }}
@@ -183,18 +137,14 @@ const Details = () => {
         <Box
           sx={{
             width: '100%',
-            background:
-              'linear-gradient(135deg, #1B263B, #415A77)',
+            background: 'linear-gradient(135deg, #1B263B, #415A77)',
             padding: '40px',
             borderRadius: '20px',
-            boxShadow:
-              '0px 8px 15px rgba(0, 0, 0, 0.1)',
-            transition:
-              'transform 0.3s ease, box-shadow 0.3s ease',
+            boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
+            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
             '&:hover': {
               transform: 'translateY(-5px)',
-              boxShadow:
-                '0px 15px 20px rgba(0, 0, 0, 0.2)'
+              boxShadow: '0px 15px 20px rgba(0, 0, 0, 0.2)'
             },
             marginBottom: '30px'
           }}
@@ -355,18 +305,9 @@ const Details = () => {
                   רשימת ברכות כתובות
                 </Link>
               </Button>
-              <Box
-                display="flex"
-                alignItems="center"
-                mb={2}
-              >
+              <Box display="flex" alignItems="center" mb={2}>
                 {/* כפתור העלאת תמונה */}
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  mr={2}
-                >
+                <Box display="flex" flexDirection="column" alignItems="center" mr={2}>
                   <Tooltip title="העלה תמונה">
                     <IconButton
                       sx={{
@@ -380,13 +321,7 @@ const Details = () => {
                       component="label"
                     >
                       <AddPhotoAlternateIcon />
-                      <input
-                        type="file"
-                        hidden
-                        onChange={
-                          handleImageUpload
-                        }
-                      />
+                      <input type="file" hidden onChange={handleImageUpload} />
                     </IconButton>
                   </Tooltip>
                   {uploadedImage && (
@@ -401,12 +336,7 @@ const Details = () => {
                 </Box>
 
                 {/* כפתור העלאת וידאו */}
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                  mr={2}
-                >
+                <Box display="flex" flexDirection="column" alignItems="center" mr={2}>
                   <Tooltip title="העלה וידאו">
                     <IconButton
                       sx={{
@@ -420,13 +350,7 @@ const Details = () => {
                       component="label"
                     >
                       <TheatersIcon />
-                      <input
-                        type="file"
-                        hidden
-                        onChange={
-                          handleVideoUpload
-                        }
-                      />
+                      <input type="file" hidden onChange={handleVideoUpload} />
                     </IconButton>
                   </Tooltip>
                   {uploadedVideo && (
@@ -441,11 +365,7 @@ const Details = () => {
                 </Box>
 
                 {/* כפתור העלאת הקלטה */}
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                >
+                <Box display="flex" flexDirection="column" alignItems="center">
                   <Tooltip title="העלה הקלטה">
                     <IconButton
                       sx={{
@@ -459,13 +379,7 @@ const Details = () => {
                       component="label"
                     >
                       <KeyboardVoiceIcon />
-                      <input
-                        type="file"
-                        hidden
-                        onChange={
-                          handleAudioUpload
-                        }
-                      />
+                      <input type="file" hidden onChange={handleAudioUpload} />
                     </IconButton>
                   </Tooltip>
                   {uploadedAudio && (
@@ -519,13 +433,7 @@ const Details = () => {
                   style: { textAlign: 'right' }
                 }}
               />
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                mt={2}
-                mb={3}
-              >
+              <Box display="flex" justifyContent="center" alignItems="center" mt={2} mb={3}>
                 <Button
                   onClick={handleClick}
                   sx={{
@@ -541,8 +449,7 @@ const Details = () => {
                     padding: '10px 20px',
                     fontSize: '1.2rem',
                     fontWeight: 'bold',
-                    boxShadow:
-                      '0px 5px 15px rgba(240, 165, 0, 0.4)',
+                    boxShadow: '0px 5px 15px rgba(240, 165, 0, 0.4)',
                     transition: '0.3s'
                   }}
                   variant="contained"
@@ -572,8 +479,7 @@ const Details = () => {
                     padding: '10px 20px',
                     fontSize: '1.2rem',
                     fontWeight: 'bold',
-                    boxShadow:
-                      '0px 5px 15px rgba(240, 165, 0, 0.4)',
+                    boxShadow: '0px 5px 15px rgba(240, 165, 0, 0.4)',
                     transition: '0.3s'
                   }}
                   variant="contained"
@@ -603,8 +509,7 @@ const Details = () => {
                     padding: '10px 20px',
                     fontSize: '1.2rem',
                     fontWeight: 'bold',
-                    boxShadow:
-                      '0px 5px 15px rgba(240, 165, 0, 0.4)',
+                    boxShadow: '0px 5px 15px rgba(240, 165, 0, 0.4)',
                     transition: '0.3s'
                   }}
                   variant="contained"

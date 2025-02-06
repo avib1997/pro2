@@ -1,23 +1,6 @@
 //client/src/Components/Navbar/Navbar.js
-import React, {
-  useContext,
-  useState
-} from 'react'
-import {
-  AppBar,
-  Box,
-  Toolbar,
-  IconButton,
-  Typography,
-  Menu,
-  MenuItem,
-  Container,
-  Button,
-  Avatar,
-  Tooltip,
-  Divider,
-  styled
-} from '@mui/material'
+import React, { useContext, useState } from 'react'
+import { AppBar, Box, Toolbar, IconButton, Typography, Menu, MenuItem, Container, Button, Avatar, Tooltip, Divider, styled } from '@mui/material'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
@@ -27,8 +10,7 @@ import { Link } from 'react-router-dom'
 import { Context } from '../../App'
 
 // פלטות צבע לדוגמה
-const mainGradient =
-  'linear-gradient(90deg, #141E30, #243B55)' // AppBar
+const mainGradient = 'linear-gradient(90deg, #141E30, #243B55)' // AppBar
 const menuBgColor = '#2B3A47' // רקע תפריט אווטאר
 const highlightColor = '#FFC107'
 
@@ -70,14 +52,7 @@ const NavButton = styled(Button)(({ theme }) => ({
 }))
 
 function Navbar() {
-  const {
-    userId,
-    eventId,
-    isEventManager,
-    setEventNumber,
-    userName,
-    userEmail
-  } = useContext(Context)
+  const { userId, eventNumber, isEventManager, setEventNumber, userName, userEmail } = useContext(Context)
 
   // הגדרת הדרגה
   let userRank = 'אורח'
@@ -120,8 +95,7 @@ function Navbar() {
   }
 
   const [anchorNav, setAnchorNav] = useState(null)
-  const [anchorUser, setAnchorUser] =
-    useState(null)
+  const [anchorUser, setAnchorUser] = useState(null)
 
   const handleOpenNavMenu = event => {
     setAnchorNav(event.currentTarget)
@@ -144,10 +118,8 @@ function Navbar() {
         position="fixed"
         sx={{
           // גרדיאנט כהה אופקי
-          background:
-            'linear-gradient(90deg, #141E30, #243B55)',
-          boxShadow:
-            '0 2px 8px rgba(0, 0, 0, 0.7)'
+          background: 'linear-gradient(90deg, #141E30, #243B55)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.7)'
         }}
       >
         <Container maxWidth="xxl">
@@ -177,8 +149,7 @@ function Navbar() {
                   mr: 1.5,
                   transition: '0.3s',
                   '&:hover': {
-                    backgroundColor:
-                      'rgba(255,193,7,0.15)'
+                    backgroundColor: 'rgba(255,193,7,0.15)'
                     //boxShadow: "0 0 8px rgba(255,193,7,0.5)",
                   }
                 }}
@@ -199,8 +170,7 @@ function Navbar() {
                     color: '#ECEFF1',
                     transition: '0.3s',
                     '&:hover': {
-                      backgroundColor:
-                        'rgba(255,255,255,0.1)'
+                      backgroundColor: 'rgba(255,255,255,0.1)'
                       //boxShadow: "0 0 8px rgba(236,239,241,0.4)",
                     }
                   }}
@@ -217,8 +187,7 @@ function Navbar() {
                   my: 2,
                   mr: 1.5,
                   color: '#fff',
-                  backgroundColor:
-                    'rgba(255,255,255,0.1)', // צבע כתום בולט
+                  backgroundColor: 'rgba(255,255,255,0.1)', // צבע כתום בולט
                   fontSize: '1.1rem',
                   fontWeight: 'bold',
                   borderRadius: '20px',
@@ -226,8 +195,7 @@ function Navbar() {
                   py: 1,
                   transition: '0.3s',
                   '&:hover': {
-                    backgroundColor:
-                      'rgba(255, 255, 255, 0.2)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     transform: 'scale(1.1)'
                   }
                 }}
@@ -256,10 +224,10 @@ function Navbar() {
                   ניהול אירועים
                 </Button>
               )} */}
-              {!isEventManager && ( // הצגת האלמנטים הקשורים ל-eventId רק אם isEventManager הוא false
+              {!isEventManager && ( // הצגת האלמנטים הקשורים ל-eventNumber רק אם isEventManager הוא false
                 <>
-                  {/* אם אין eventId */}
-                  {!eventId && (
+                  {/* אם אין eventNumber */}
+                  {!eventNumber && (
                     <Box
                       sx={{
                         width: '20%',
@@ -282,8 +250,8 @@ function Navbar() {
                     </Box>
                   )}
 
-                  {/* אם יש eventId */}
-                  {eventId && (
+                  {/* אם יש eventNumber */}
+                  {eventNumber && (
                     <Typography
                       sx={{
                         color: 'goldenrod',
@@ -294,7 +262,7 @@ function Navbar() {
                         marginRight: '200px'
                       }}
                     >
-                      מזהה אירוע: {eventId}
+                      מזהה אירוע: {eventNumber}
                     </Typography>
                   )}
                 </>
@@ -368,7 +336,7 @@ function Navbar() {
                     </Link>
                   </MenuItem>
                 )}
-                {!eventId && (
+                {!eventNumber && (
                   <MenuItem>
                     <Typography
                       variant="caption"
@@ -428,8 +396,7 @@ function Navbar() {
                     backgroundColor: menuBgColor,
                     color: '#fff',
                     minWidth: 220,
-                    boxShadow:
-                      '0 4px 12px rgba(0,0,0,0.3)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                     borderRadius: 2,
                     textAlign: 'center',
                     alignItems: 'center',
@@ -478,8 +445,7 @@ function Navbar() {
                 </Box>
                 <Divider
                   sx={{
-                    borderColor:
-                      'rgba(255,255,255,0.2)'
+                    borderColor: 'rgba(255,255,255,0.2)'
                   }}
                 />
 
@@ -487,9 +453,7 @@ function Navbar() {
                 {userId && (
                   <>
                     <MenuItem
-                      onClick={
-                        handleCloseUserMenu
-                      }
+                      onClick={handleCloseUserMenu}
                       sx={{
                         color: '#ECEFF1',
                         fontWeight: 'bold',
@@ -502,9 +466,7 @@ function Navbar() {
                       הגדרות חשבון
                     </MenuItem>
                     <MenuItem
-                      onClick={
-                        handleCloseUserMenu
-                      }
+                      onClick={handleCloseUserMenu}
                       sx={{
                         color: '#ECEFF1',
                         fontWeight: 'bold',
@@ -564,13 +526,7 @@ function Navbar() {
                 mr: 10
               }}
             />
-            <Typography
-              variant="h6"
-              noWrap
-              component={Link}
-              to="/"
-              sx={logoStyle}
-            >
+            <Typography variant="h6" noWrap component={Link} to="/" sx={logoStyle}>
               Easy Gift
             </Typography>
           </Toolbar>

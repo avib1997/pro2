@@ -1,33 +1,16 @@
 //client/src/Components/events/AddEventDialog.js
-import React, {
-  useState,
-  useContext
-} from 'react'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  MenuItem
-} from '@mui/material'
+import React, { useState, useContext } from 'react'
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, MenuItem } from '@mui/material'
 import { Context } from '../../App'
 import axios from 'axios'
 
-const AddEventDialog = ({
-  open,
-  onClose,
-  onAdd
-}) => {
+const AddEventDialog = ({ open, onClose, onAdd }) => {
   const { userId } = useContext(Context)
   const [input, setInput] = useState({
     NameOfGroom: '',
     NameOfBride: '',
     NameOfManager: '',
-    Event_number: Math.floor(
-      1000 + Math.random() * 9000
-    ),
+    Event_number: Math.floor(1000 + Math.random() * 9000),
     TypeOfEvent: '',
     phone: '',
     DateOfEvent: '',
@@ -44,40 +27,22 @@ const AddEventDialog = ({
   const handleAddEventClick = async e => {
     e.preventDefault()
 
-    if (
-      !input.TypeOfEvent ||
-      !input.DateOfEvent ||
-      !input.NameOfManager ||
-      !input.phone ||
-      !userId
-    ) {
-      console.error(
-        '❌ Missing required fields:',
-        input
-      )
+    if (!input.TypeOfEvent || !input.DateOfEvent || !input.NameOfManager || !input.phone || !userId) {
+      console.error('❌ Missing required fields:', input)
       alert('נא למלא את כל השדות החיוניים')
       return
     }
 
     const newEvent = {
       ...input,
-      NameOfBride:
-        input.TypeOfEvent === 'חתונה'
-          ? input.NameOfBride
-          : '',
+      NameOfBride: input.TypeOfEvent === 'חתונה' ? input.NameOfBride : '',
       userid_event: userId
     }
 
     try {
       console.log('📡 Adding event:', newEvent)
-      const response = await axios.post(
-        'http://localhost:2001/api/events/addEvent',
-        newEvent
-      )
-      console.log(
-        '✅ Event added:',
-        response.data
-      )
+      const response = await axios.post('http://localhost:2001/api/events/addEvent', newEvent)
+      console.log('✅ Event added:', response.data)
       onAdd(response.data) // הוספת האירוע לרשימה
 
       // ✅ **איפוס השדות לאחר שמירה מוצלחת**
@@ -85,9 +50,7 @@ const AddEventDialog = ({
         NameOfGroom: '',
         NameOfBride: '',
         NameOfManager: '',
-        Event_number: Math.floor(
-          1000 + Math.random() * 9000
-        ), // יצירת מספר חדש
+        Event_number: Math.floor(1000 + Math.random() * 9000), // יצירת מספר חדש
         TypeOfEvent: '',
         phone: '',
         DateOfEvent: '',
@@ -96,10 +59,7 @@ const AddEventDialog = ({
 
       onClose() // סגירת הדיאלוג לאחר שמירה
     } catch (error) {
-      console.error(
-        '❌ Error adding event:',
-        error.response?.data || error.message
-      )
+      console.error('❌ Error adding event:', error.response?.data || error.message)
       alert('שגיאה בהוספת אירוע, נסה שוב')
     }
   }
@@ -117,19 +77,16 @@ const AddEventDialog = ({
       borderRadius: '20px',
       marginTop: '5px',
       // הסתרת ה־legend לקבלת מסגרת שלמה
-      '& .MuiOutlinedInput-notchedOutline legend':
-        {
-          display: 'none',
-          border: 'none'
-        },
-      '&:hover .MuiOutlinedInput-notchedOutline':
-        {
-          border: '2px solid #E0E1DD'
-        },
-      '&.Mui-focused .MuiOutlinedInput-notchedOutline':
-        {
-          border: '2px solid #E0E1DD'
-        },
+      '& .MuiOutlinedInput-notchedOutline legend': {
+        display: 'none',
+        border: 'none'
+      },
+      '&:hover .MuiOutlinedInput-notchedOutline': {
+        border: '2px solid #E0E1DD'
+      },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+        border: '2px solid #E0E1DD'
+      },
       '& .MuiOutlinedInput-input': {
         paddingRight: '0px',
         textAlign: 'center'
@@ -142,12 +99,10 @@ const AddEventDialog = ({
       backgroundColor: '#778DA9',
       padding: '0 10px'
     },
-    '& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink':
-      {
-        transformOrigin: 'top right',
-        transform:
-          'translate(0, .5px) scale(0.75)'
-      }
+    '& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink': {
+      transformOrigin: 'top right',
+      transform: 'translate(0, .5px) scale(0.75)'
+    }
   }
 
   return (
@@ -160,8 +115,7 @@ const AddEventDialog = ({
         alignItems: 'center',
         '& .MuiDialog-paper': {
           borderRadius: '20px',
-          background:
-            'linear-gradient(135deg, #415A77, #778DA9)'
+          background: 'linear-gradient(135deg, #415A77, #778DA9)'
         }
       }}
     >
@@ -275,54 +229,14 @@ const AddEventDialog = ({
         </TextField>
         {input.TypeOfEvent === 'חתונה' ? (
           <>
-            <TextField
-              label="שם החתן"
-              name="NameOfGroom"
-              value={input.NameOfGroom}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              sx={commonTextFieldSX}
-            />
-            <TextField
-              label="שם הכלה"
-              name="NameOfBride"
-              value={input.NameOfBride}
-              onChange={handleInputChange}
-              fullWidth
-              margin="normal"
-              sx={commonTextFieldSX}
-            />
+            <TextField label="שם החתן" name="NameOfGroom" value={input.NameOfGroom} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
+            <TextField label="שם הכלה" name="NameOfBride" value={input.NameOfBride} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
           </>
         ) : (
-          <TextField
-            label="שם"
-            name="NameOfGroom"
-            value={input.NameOfGroom}
-            onChange={handleInputChange}
-            fullWidth
-            margin="normal"
-            sx={commonTextFieldSX}
-          />
+          <TextField label="שם" name="NameOfGroom" value={input.NameOfGroom} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
         )}
-        <TextField
-          label="מנהל האירוע"
-          name="NameOfManager"
-          value={input.NameOfManager}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-          sx={commonTextFieldSX}
-        />
-        <TextField
-          label="טלפון"
-          name="phone"
-          value={input.phone}
-          onChange={handleInputChange}
-          fullWidth
-          margin="normal"
-          sx={commonTextFieldSX}
-        />
+        <TextField label="מנהל האירוע" name="NameOfManager" value={input.NameOfManager} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
+        <TextField label="טלפון" name="phone" value={input.phone} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
         <TextField
           label="תאריך האירוע"
           type="date"
@@ -341,8 +255,7 @@ const AddEventDialog = ({
               backgroundColor: '#778DA9',
               padding: '0 10px',
               // התאמה של הטרנספורם – ניתן לשחק בערכים כדי לקבל את התוצאה הרצויה
-              transform:
-                'translate(10px, -6px) scale(0.75)'
+              transform: 'translate(10px, -6px) scale(0.75)'
             }
           }}
           sx={commonTextFieldSX}
@@ -362,15 +275,12 @@ const AddEventDialog = ({
           sx={{
             borderRadius: '20px',
             padding: '4px 30px',
-            background:
-              'linear-gradient(45deg,rgb(199, 95, 98),rgb(215, 135, 113))',
+            background: 'linear-gradient(45deg,rgb(199, 95, 98),rgb(215, 135, 113))',
             color: '#3F3D56',
             fontWeight: 'bold',
             fontSize: '1.2rem',
-            boxShadow:
-              '0 3px 5px 2px rgba(255, 105, 135, 0.1)',
-            transition:
-              'transform 0.2s, background 0.2s',
+            boxShadow: '0 3px 5px 2px rgba(255, 105, 135, 0.1)',
+            transition: 'transform 0.2s, background 0.2s',
             '&:hover': {
               transform: 'scale(1.05)'
               // background:
@@ -386,15 +296,12 @@ const AddEventDialog = ({
           sx={{
             borderRadius: '20px',
             padding: '4px 30px',
-            background:
-              'linear-gradient(45deg,rgb(63, 91, 136),rgb(107, 181, 215))',
+            background: 'linear-gradient(45deg,rgb(63, 91, 136),rgb(107, 181, 215))',
             color: '#fff',
             fontWeight: 'bold',
             fontSize: '1.2rem',
-            boxShadow:
-              '0 3px 5px 2px rgba(161, 196, 253, 0.1)',
-            transition:
-              'transform 0.2s, background 0.2s',
+            boxShadow: '0 3px 5px 2px rgba(161, 196, 253, 0.1)',
+            transition: 'transform 0.2s, background 0.2s',
             '&:hover': {
               transform: 'scale(1.05)'
               // background:

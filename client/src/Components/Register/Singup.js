@@ -44,9 +44,7 @@ const Signup = props => {
         .post('http://localhost:2001/api/users/register', newUser)
         .then(function (response) {
           setUserId(response.data.user._id)
-          response.data
-            ? Navigate('/Details_page')
-            : console.log('no enter for you')
+          response.data ? Navigate('/Details_page') : console.log('no enter for you')
         })
         .catch(function (error) {
           console.log(error)

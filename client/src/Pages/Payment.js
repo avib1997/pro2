@@ -1,30 +1,22 @@
+//client/src/Pages/Payment.js
+import { useNavigate } from 'react-router-dom'
 import { Context } from '../App'
-import React, {
-  useState,
-  useContext,
-  useEffect
-} from 'react'
-import { useLocation } from 'react-router-dom'
-import {
-  PayPalScriptProvider,
-  PayPalButtons
-} from '@paypal/react-paypal-js'
-import {
-  Box,
-  Container,
-  Typography,
-  Button
-} from '@mui/material'
-import Confetti from 'react-confetti'
+import React, { useState, useContext, useEffect } from 'react'
+import { useLocation } from 'react-router-dom' //
+import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
+import { Container, TextField, Button, Box, Typography } from '@mui/material'
+import axios from 'axios'
 import { useWindowSize } from 'react-use'
 import { motion } from 'framer-motion'
+import Confetti from 'react-confetti'
 
 const PayPalPayment = () => {
-  const [amount, setAmount] = useState(0)
-  const [showPayPal, setShowPayPal] =
-    useState(false)
-  const [paymentSuccess, setPaymentSuccess] =
-    useState(false)
+  const [newGift, setNewGift] = useState(0)
+  const [showPayPal, setShowPayPal] = useState(false)
+  const { userId, eventId, event } = useContext(Context)
+  const location = useLocation()
+  const [emailPaypal, setEmailPaypal] = useState('')
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
   const { width, height } = useWindowSize()
 
   // ספירה לאחור לאירוע (דוגמה):
@@ -35,21 +27,28 @@ const PayPalPayment = () => {
     seconds: 0
   })
 
-  const { userId, enent } = useContext(Context)
-  const location = useLocation()
-
   useEffect(() => {
-    if (location.state?.amount) {
-      setAmount(location.state.amount)
+    if (location.state?.newGift) {
+      setNewGift(location.state.newGift)
     }
-  }, [location.state])
+    //get EmailPaypal from event by eventId
+    const fetchEvent = async () => {
+      console.log('eventId fetchEvent paymant:', eventId)
+      try {
+        const res = await axios.get(`http://localhost:2001/api/events/${eventId}`)
+        console.log('event:', res.data)
+        setEmailPaypal(res.data.EmailPaypal)
+      } catch (error) {
+        console.error('❌ Error getting event:', error)
+      }
+    }
+    fetchEvent()
+    console.log('eventId:', eventId)
+    console.log('NEW GIFT:', newGift)
 
-  // פונקציית ספירה לאחור
-  useEffect(() => {
+    ////////////
     // (דוגמה) תאריך היעד לאירוע
-    const targetDate = new Date(
-      '2025-12-31T00:00:00'
-    )
+    const targetDate = new Date('2025-12-31T00:00:00')
 
     const interval = setInterval(() => {
       const now = new Date()
@@ -61,18 +60,10 @@ const PayPalPayment = () => {
         return
       }
 
-      const days = Math.floor(
-        difference / (1000 * 60 * 60 * 24)
-      )
-      const hours = Math.floor(
-        (difference / (1000 * 60 * 60)) % 24
-      )
-      const minutes = Math.floor(
-        (difference / (1000 * 60)) % 60
-      )
-      const seconds = Math.floor(
-        (difference / 1000) % 60
-      )
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24)
+      const minutes = Math.floor((difference / (1000 * 60)) % 60)
+      const seconds = Math.floor((difference / 1000) % 60)
 
       setTimeLeft({
         days,
@@ -83,15 +74,25 @@ const PayPalPayment = () => {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [])
+    /////////////
+  }, [location.state])
 
-  // טיפול בתשלום מוצלח
+  // פה מעדכנים את המתנה בדאטה בייס עם הפרטים של התשלום
+
   const handlePaymentSuccess = async details => {
-    setPaymentSuccess(true)
-    // כאן אפשר לשלוח בקשה לשרת ולעדכן DB וכו'
+    console.log('✅ תשלום הצליח!', details)
+    alert('✅ העסקה הושלמה בהצלחה על ידי ' + details.payer.name.given_name)
+
+    // **שליחת הנתונים לשרת כדי לעדכן את מסד הנתונים**
+    try {
+      const response = await axios.post('http://localhost:2001/api/gift/addGift', newGift)
+      console.log('✅ מתנה נוספה בהצלחה:', response.data)
+      setPaymentSuccess(true)
+    } catch (error) {
+      console.error('❌ שגיאה בהוספת המתנה:', error.response?.data || error.message)
+    }
   }
 
-  // טיפול בשגיאת תשלום
   const handlePaymentError = error => {
     console.error('❌ תשלום נכשל:', error)
     alert('❌ התשלום נכשל, אנא נסה שוב.')
@@ -115,8 +116,7 @@ const PayPalPayment = () => {
           width: '100%',
           height: '100%',
           zIndex: -1,
-          background:
-            'linear-gradient(135deg, #0D1B2A, #1B263B)',
+          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
           backgroundSize: '400% 400%',
           animation: 'animateBg 15s ease infinite'
         }}
@@ -173,27 +173,12 @@ const PayPalPayment = () => {
             ברוכים הבאים לאירוע המרגש שלנו!
           </Typography>
           {/* ספירה לאחור */}
-          <Typography
-            variant="h5"
-            sx={{ textShadow: '1px 1px #000' }}
-          >
-            האירוע יתחיל בעוד: {timeLeft.days}{' '}
-            ימים, {timeLeft.hours} שעות,{' '}
-            {timeLeft.minutes} דקות ו-
+          <Typography variant="h5" sx={{ textShadow: '1px 1px #000' }}>
+            האירוע יתחיל בעוד: {timeLeft.days} ימים, {timeLeft.hours} שעות, {timeLeft.minutes} דקות ו-
             {timeLeft.seconds} שניות
           </Typography>
         </Box>
       </Box>
-
-      {/* הקונפטי יוצג רק כאשר התשלום מצליח */}
-      {paymentSuccess && (
-        <Confetti
-          width={width}
-          height={height}
-          recycle={false} // יגרום לקונפטי לרדת פעם אחת ולא להתחדש
-          numberOfPieces={400} // אפשר לשנות לגודל הרצוי
-        />
-      )}
 
       {/* תיבת תשלום */}
       <Container
@@ -207,143 +192,140 @@ const PayPalPayment = () => {
           py: 5,
           px: 2,
           borderRadius: '20px',
-          background:
-            'linear-gradient(135deg, #1B263B, #415A77)',
-          boxShadow:
-            '0px 8px 15px rgba(0, 0, 0, 0.1)',
-          transition:
-            'transform 0.3s ease, box-shadow 0.3s ease',
+          background: 'linear-gradient(135deg, #1B263B, #415A77)',
+          boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
+          transition: 'transform 0.3s ease, box-shadow 0.3s ease',
           '&:hover': {
             transform: 'translateY(-5px)',
-            boxShadow:
-              '0px 15px 20px rgba(0, 0, 0, 0.2)'
+            boxShadow: '0px 15px 20px rgba(0, 0, 0, 0.2)'
           },
           mt: 2
         }}
       >
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{
-            fontWeight: 'bold',
-            color: '#E0E1DD',
-            mb: 2,
-            textShadow: '2px 2px #000'
-          }}
-        >
-          תשלום באמצעות PayPal
-        </Typography>
-        <Typography
-          variant="h6"
-          sx={{
-            color: '#E0E1DD',
-            mb: 13,
-            mt: 7,
-            fontWeight: 'bold',
-            fontSize: '1.5rem'
-          }}
-        >
-          סכום לתשלום: {amount} ₪
-        </Typography>
-        {/* כפתור להצגת PayPal */}
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            backgroundColor: '#F0A500',
-            ':hover': {
-              backgroundColor: '#FFD700'
-            },
-            color: '#1B263B',
-            fontWeight: 'bold',
-            boxShadow:
-              '0px 5px 15px rgba(240, 165, 0, 0.4)',
-            transition: '0.3s',
-            borderRadius: 3,
-            fontSize: '1.1rem'
-          }}
-          onClick={() => setShowPayPal(true)}
-        >
-          המשך לתשלום
-        </Button>
-        {/* אזור PayPal מוסתר עד שלוחצים על הכפתור */}
-        {showPayPal && (
-          
-          <Box
-            mt={5}
-            sx={{
-              width: '100%',
-              maxWidth: '800px',
-              display: 'flex',
-              flexDirection: 'column',
-              // שמירה על התוכן במרכז גם בתוך הקופסה הזאת
-              justifyContent: 'center',
-              alignItems: 'center',
-              background:
-                'linear-gradient(135deg, #2F3E4E, #4D5F6F)',
-              p: 3,
-              borderRadius: '20px',
-              boxShadow:
-                '0px 8px 15px rgba(0, 0, 0, 0.2)',
-              transition:
-                'transform 0.3s ease, box-shadow 0.3s ease',
-              ':hover': {
-                transform: 'translateY(-5px)',
-                boxShadow:
-                  '0px 15px 20px rgba(0, 0, 0, 0.3)'
-              }
-            }}
-          >
-            <PayPalScriptProvider
-              options={{
-                'client-id':
-                  'YOUR_PAYPAL_CLIENT_ID'
+        {paymentSuccess ? (
+          // אם התשלום הצליח, הצג הודעה בלבד
+          <Box>
+            <Typography variant="h4" color="success.main" gutterBottom>
+              ✅ התשלום התקבל בהצלחה!
+            </Typography>
+            <Typography variant="h6">תודה על המתנה שלך 🎁</Typography>
+          </Box>
+        ) : (
+          // אם התשלום עדיין לא בוצע, הצג את הטופס וכפתור התשלום
+          <>
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{
+                fontWeight: 'bold',
+                color: '#E0E1DD',
+                mb: 2,
+                textShadow: '2px 2px #000'
               }}
             >
+              תשלום באמצעות PayPal
+            </Typography>
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#E0E1DD',
+                mb: 13,
+                mt: 7,
+                fontWeight: 'bold',
+                fontSize: '1.5rem'
+              }}
+            >
+              סכום לתשלום: {newGift.amount} ₪
+            </Typography>
+            {/* כפתור להצגת PayPal */}
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{
+                backgroundColor: '#F0A500',
+                ':hover': {
+                  backgroundColor: '#FFD700'
+                },
+                color: '#1B263B',
+                fontWeight: 'bold',
+                boxShadow: '0px 5px 15px rgba(240, 165, 0, 0.4)',
+                transition: '0.3s',
+                borderRadius: 3,
+                fontSize: '1.1rem'
+              }}
+              onClick={() => setShowPayPal(true)}
+            >
+              המשך לתשלום
+            </Button>
+            {/* אזור PayPal מוסתר עד שלוחצים על הכפתור */}
+            {showPayPal && (
               <Box
+                mt={5}
                 sx={{
+                  width: '100%',
+                  maxWidth: '800px',
                   display: 'flex',
+                  flexDirection: 'column',
+                  // שמירה על התוכן במרכז גם בתוך הקופסה הזאת
                   justifyContent: 'center',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  background: 'linear-gradient(135deg, #2F3E4E, #4D5F6F)',
+                  p: 3,
+                  borderRadius: '20px',
+                  boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.2)',
+                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  ':hover': {
+                    transform: 'translateY(-5px)',
+                    boxShadow: '0px 15px 20px rgba(0, 0, 0, 0.3)'
+                  }
                 }}
               >
-                <PayPalButtons
-                  style={{
-                    //layout: 'vertical', // או 'vertical'
-                    //color: 'gold', // אפשר 'gold' | 'blue' | 'silver' | 'white'...
-                    shape: 'pill', // 'pill' או 'rect'
-                    label: 'checkout', // 'checkout' | 'paypal' | 'pay'...
-                    tagline: false // הסתרת/הצגת שורת טקסט מתחת לכפתור
-                    //height: 50 // הגדרת גובה הכפתור
+                <PayPalScriptProvider
+                  options={{
+                    'client-id': process.env.REACT_APP_PAYPAL_CLIENT_ID,
+                    currency: 'ILS'
                   }}
-                  createOrder={(
-                    data,
-                    actions
-                  ) => {
-                    return actions.order.create({
-                      purchase_units: [
-                        {
-                          amount: {
-                            value: amount
-                          },
-                          payee: {
-                            email_address:
-                              'receiver@example.com'
-                          }
-                        }
-                      ]
-                    })
-                  }}
-                  onApprove={(data, actions) => {
-                    return actions.order
-                      .capture()
-                      .then(handlePaymentSuccess)
-                  }}
-                  onError={handlePaymentError}
-                />
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <PayPalButtons
+                      style={{
+                        //layout: 'vertical', // או 'vertical'
+                        //color: 'gold', // אפשר 'gold' | 'blue' | 'silver' | 'white'...
+                        shape: 'pill', // 'pill' או 'rect'
+                        label: 'checkout', // 'checkout' | 'paypal' | 'pay'...
+                        tagline: false // הסתרת/הצגת שורת טקסט מתחת לכפתור
+                        //height: 50 // הגדרת גובה הכפתור
+                      }}
+                      createOrder={(data, actions) => {
+                        return actions.order.create({
+                          purchase_units: [
+                            {
+                              amount: {
+                                value: newGift.amount
+                              },
+                              payee: {
+                                email_address: emailPaypal
+                              }
+                            }
+                          ]
+                        })
+                      }}
+                      onApprove={(data, actions) => {
+                        return actions.order.capture().then(handlePaymentSuccess)
+                      }}
+                      onError={handlePaymentError}
+                    />
+                  </Box>
+                </PayPalScriptProvider>
               </Box>
-            </PayPalScriptProvider>
-          </Box>
+            )}
+          </>
         )}
       </Container>
 

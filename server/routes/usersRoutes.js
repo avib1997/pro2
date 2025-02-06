@@ -44,19 +44,16 @@ router.post('/userid', async (req, res) => {
   }
 })
 
-
 // Update the isManeger field by userId
 router.put('/update-manager', async (req, res) => {
-
   try {
-    const updatedUser = await userService.updateManagerStatus(req.body.userId, req.body.isManeger);
-    console.log("✅ Manager status updated:", updatedUser);
-    res.json(updatedUser);
+    const updatedUser = await userService.updateManagerStatus(req.body.userId, req.body.isManeger)
+    console.log('✅ Manager status updated:', updatedUser)
+    res.json(updatedUser)
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message })
   }
-});
-
+})
 
 //router.get('/', authJWT, async (req, res) => {
 router.get('/', async (req, res) => {
@@ -83,7 +80,7 @@ router.post('/giftsById', async (req, res) => {
 
 //get isManeger by userId
 router.post('/isManeger', async (req, res) => {
-  console.log( '(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
+  console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const isManeger = await userService.getIsManeger(req.body)
     console.log('isManeger in user Routes:', isManeger)

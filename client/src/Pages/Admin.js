@@ -1,903 +1,1117 @@
-/* eslint-disable no-unused-vars */
-// src/Pages/Admin.js
-
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 import {
-  AccessTime,
-  Delete,
-  Edit,
-  ExitToApp,
-  Login,
-  People,
-  Refresh,
-  ReportProblem,
-  WarningAmber,
-} from "@mui/icons-material";
-import {
-  Avatar,
   Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CircularProgress,
-  Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  duration,
-  FormControl,
+  Typography,
+  Paper,
   Grid,
   IconButton,
-  InputLabel,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Paper,
-  Select,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
   TextField,
-  Typography,
-} from "@mui/material";
-import { keyframes, styled } from "@mui/material/styles";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
-import advancedFormat from "dayjs/plugin/advancedFormat";
-import customParseFormat from "dayjs/plugin/customParseFormat";
-import isBetween from "dayjs/plugin/isBetween";
-import localizedFormat from "dayjs/plugin/localizedFormat";
-import weekOfYear from "dayjs/plugin/weekOfYear";
-import { color, motion, transform } from "framer-motion";
-import React, { useEffect, useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "recharts";
-import Navbar from "../Components/Navbar/Navbar";
-import shadows from "@mui/material/styles/shadows";
+  Backdrop,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
+} from '@mui/material'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { DataGrid, GridToolbar } from '@mui/x-data-grid'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
+import InfoIcon from '@mui/icons-material/Info'
+import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown'
+// פורמט לתאריך
+import dayjs from 'dayjs'
+import 'dayjs/locale/he' // לעברית, אם תרצה
+dayjs.locale('he')
 
-dayjs.extend(weekOfYear);
-dayjs.extend(customParseFormat);
-dayjs.extend(localizedFormat);
-dayjs.extend(isBetween);
-dayjs.extend(advancedFormat);
-dayjs.extend(require("dayjs/plugin/advancedFormat"));
+export default function Admin() {
+  // --------------------------------
+  // שלב 1: הוספת סטייט לקוד סודי
+  // --------------------------------
+  const [passcode, setPasscode] = useState('')
+  const [authorized, setAuthorized] = useState(false)
 
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#AA336A",
-  "#9933FF",
-];
-const pulse = keyframes` 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); }`;
+  // פונקציה שבודקת אם הקוד נכון
+  const handleCheckPasscode = () => {
+    // לדוגמה: הקוד הקבוע הוא "1234"
+    if (passcode === '1234') {
+      setAuthorized(true)
+    } else {
+      setShowError(true)
+    }
+  }
 
-const AnimatedCard = styled(Card)(({ theme }) => ({
-  transition: "transform 0.3s, box-shadow 0.3s",
-  "&:hover": {
-    transform: "translateY(-10px)",
-    boxShadow: theme.shadows[10],
-    animation: `${pulse} 0.6s`,
-  },
-}));
+  const [users, setUsers] = useState([])
+  const [events, setEvents] = useState([])
+  const [gifts, setGifts] = useState([])
+  const [alerts, setAlerts] = useState([]) // אם תרצה התראות
 
-export default function AdminDashboard() {
-  const [entriesPerDate, setEntriesPerDate] = useState([]);
-  const [exitsPerDate, setExitsPerDate] = useState([]);
-  const [timeOnSite, setTimeOnSite] = useState([]);
-  const [alerts, setAlerts] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [gifts, setGifts] = useState([]);
-  const [filterStartDate, setFilterStartDate] = useState(null);
-  const [filterEndDate, setFilterEndDate] = useState(null);
-  const [openManageDialog, setOpenManageDialog] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [editedUser, setEditedUser] = useState({
-    name: "",
-    role: "",
-    status: "",
-  });
-  const [loading, setLoading] = useState({});
+  // דיאלוג עריכת משתמש
+  const [editUserDialogOpen, setEditUserDialogOpen] = useState(false)
+  const [editedUser, setEditedUser] = useState({})
+
+  // דיאלוג פרטי משתמש מלאים
+  const [userDetailsDialogOpen, setUserDetailsDialogOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
+
+  // דיאלוג פרטי אירוע מלאים
+  const [eventDetailsDialogOpen, setEventDetailsDialogOpen] = useState(false)
+  const [selectedEvent, setSelectedEvent] = useState(null)
+
+  // דיאלוג פרטי מתנה מלאים
+  const [giftDetailsDialogOpen, setGiftDetailsDialogOpen] = useState(false)
+  const [selectedGift, setSelectedGift] = useState(null)
+
+  const [showError, setShowError] = useState(false)
 
   useEffect(() => {
-    generateEntryExitData();
-    generateTimeOnSiteData();
-    generateAdditionalData();
-  }, []);
+    fetchAllData()
+  }, [])
 
-  const generateEntryExitData = () => {
-    const data = [];
-    const startYear = dayjs().year() - 1;
+  const fetchAllData = async () => {
+    try {
+      // קריאה לשרת (החלף לכתובות המתאימות שלך)
+      const [usersRes, eventsRes, giftsRes] = await Promise.all([
+        axios.get('http://localhost:2001/api/users'),
+        axios.get('http://localhost:2001/api/events/getAll'), // אירועים
+        axios.get('http://localhost:2001/api/gift/getAllGifts') // מתנות
+      ])
 
-    for (let year = startYear; year <= dayjs().year(); year++) {
-      for (let month = 1; month <= 12; month++) {
-        const date = dayjs(`${year}-${month}-01`);
-        const entries = Math.floor(Math.random() * 100) + 50;
-        const exits = Math.floor(Math.random() * 100) + 50;
-        data.push({ date: date.format("YYYY-MM"), entries, exits });
-      }
+      setUsers(usersRes.data)
+      setEvents(eventsRes.data)
+      setGifts(giftsRes.data)
+    } catch (error) {
+      console.error('Error fetching data:', error)
     }
+  }
 
-    setEntriesPerDate(data.map((d) => ({ date: d.date, entries: d.entries })));
-    setExitsPerDate(data.map((d) => ({ date: d.date, exits: d.exits })));
-  };
-
-  const generateTimeOnSiteData = () => {
-    const data = [];
-    const startYear = dayjs().year() - 1;
-
-    for (let year = startYear; year <= dayjs().year(); year++) {
-      for (let month = 1; month <= 12; month++) {
-        const date = dayjs(`${year}-${month}-01`);
-        const duration = Math.floor(Math.random() * 170) + 80; // בין 80 ל-250 דקות
-        data.push({ date: date.format("YYYY-MM"), duration });
-      }
-    }
-
-    setTimeOnSite(data);
-  };
-
-  const generateAdditionalData = () => {
-    setUsers([
-      { id: 1, name: "משתמש1", role: "מנהל", status: "פעיל" },
-      { id: 2, name: "משתמש2", role: "משתמש", status: "פעיל" },
-      { id: 3, name: "משתמש3", role: "משתמש", status: "לא פעיל" },
-      { id: 4, name: "משתמש4", role: "סוכן", status: "פעיל" },
-      { id: 5, name: "משתמש5", role: "משתמש", status: "פעיל" },
-      { id: 6, name: "משתמש6", role: "משתמש", status: "לא פעיל" },
-      { id: 7, name: "משתמש7", role: "מנהל", status: "פעיל" },
-      { id: 8, name: "משתמש8", role: "סוכן", status: "פעיל" },
-      { id: 9, name: "משתמש9", role: "משתמש", status: "פעיל" },
-      { id: 10, name: "משתמש10", role: "משתמש", status: "לא פעיל" },
-    ]);
-    setEvents([
-      {
-        id: 1,
-        NameOfGroom: "מוטי",
-        NameOfBride: "איילת",
-        TypeOfEvent: "חתונה",
-        NumOfGuests: 150,
-        DateOfEvent: "2024-06-15",
-      },
-      {
-        id: 2,
-        NameOfGroom: "דוד",
-        NameOfBride: "רותם",
-        TypeOfEvent: "בר/בת מצווה",
-        NumOfGuests: 80,
-        DateOfEvent: "2024-07-20",
-      },
-      {
-        id: 3,
-        NameOfGroom: "יוסי",
-        NameOfBride: "נעמי",
-        TypeOfEvent: "אירוע חברה",
-        NumOfGuests: 200,
-        DateOfEvent: "2024-08-10",
-      },
-      {
-        id: 4,
-        NameOfGroom: "אשר",
-        NameOfBride: "ליאת",
-        TypeOfEvent: "חתונה",
-        NumOfGuests: 120,
-        DateOfEvent: "2024-09-05",
-      },
-      {
-        id: 5,
-        NameOfGroom: "רותם",
-        NameOfBride: "שירה",
-        TypeOfEvent: "בר/בת מצווה",
-        NumOfGuests: 100,
-        DateOfEvent: "2024-10-12",
-      },
-    ]);
-
-    setGifts([
-      {
-        id: 1,
-        name: "משתמש1",
-        gift: 300,
-        date: "2024-04-01",
-        blessing: "מזל טוב! שתזכו לשנים רבות של אושר ואהבה.",
-        toEventName: "מוטי & איילת",
-        amount: 300,
-      },
-      {
-        id: 2,
-        name: "משתמש2",
-        gift: 500,
-        date: "2024-04-02",
-        blessing: "איחולים חמים לחתונה נפלאה!",
-        toEventName: "דוד & רותם",
-        amount: 500,
-      },
-      {
-        id: 3,
-        name: "משתמש3",
-        gift: 250,
-        date: "2024-04-03",
-        blessing: "שפע ברכות ליום המיוחד שלכם.",
-        toEventName: "יוסי & נעמי",
-        amount: 250,
-      },
-      {
-        id: 4,
-        name: "משתמש4",
-        gift: 400,
-        date: "2024-04-04",
-        blessing: "שתזכו לחיים מלאי אושר ושמחה.",
-        toEventName: "אשר & ליאת",
-        amount: 400,
-      },
-      {
-        id: 5,
-        name: "משתמש5",
-        gift: 150,
-        date: "2024-04-05",
-        blessing: "מזל טוב! שתזכו ליום מיוחד ומאושר.",
-        toEventName: "רותם & שירה",
-        amount: 150,
-      },
-      {
-        id: 6,
-        name: "משתמש6",
-        gift: 350,
-        date: "2024-04-06",
-        blessing: "איחולים לבביים לאירוע מוצלח!",
-        toEventName: "מוטי & איילת",
-        amount: 350,
-      },
-      {
-        id: 7,
-        name: "משתמש7",
-        gift: 450,
-        date: "2024-04-07",
-        blessing: "שיהיה לכם חיים מלאים באהבה ואושר.",
-        toEventName: "דוד & רותם",
-        amount: 450,
-      },
-      {
-        id: 8,
-        name: "משתמש8",
-        gift: 200,
-        date: "2024-04-08",
-        blessing: "איחולים לחתונה מושלמת!",
-        toEventName: "יוסי & נעמי",
-        amount: 200,
-      },
-      {
-        id: 9,
-        name: "משתמש9",
-        gift: 300,
-        date: "2024-04-09",
-        blessing: "שתזכו לשנים רבות של אהבה ואושר.",
-        toEventName: "אשר & ליאת",
-        amount: 300,
-      },
-      {
-        id: 10,
-        name: "משתמש10",
-        gift: 100,
-        date: "2024-04-10",
-        blessing: "מזל טוב ליום מיוחד!",
-        toEventName: "רותם & שירה",
-        amount: 100,
-      },
-    ]);
-    setAlerts([
-      { id: 1, type: "חשוד", message: "כניסה מרובה בזמן קצר ממשתמש1." },
-      { id: 2, type: "חריג", message: "משתמש2 ביצע יציאה בלתי צפויה." },
-      { id: 3, type: "חשוד", message: "משתמש3 ביצע כניסה מיותרת." },
-      { id: 4, type: "חריג", message: "משתמש4 יציאה בזמן עבודה." },
-      { id: 5, type: "חשוד", message: "משתמש5 ביצע כניסה מרובה ביום." },
-      { id: 6, type: "חריג", message: "משתמש6 ביצע פעולת חריגה." },
-    ]);
-  };
-
-  const filteredEntryExitData = entriesPerDate
-    .map((entry, index) => ({
-      date: entry.date,
-      entries: entry.entries,
-      exits: exitsPerDate[index]?.exits || 0,
-    }))
-    .filter((entry) => {
-      const entryDate = dayjs(entry.date);
-      const isAfterStart = filterStartDate
-        ? entryDate.isAfter(filterStartDate, "month") ||
-          entryDate.isSame(filterStartDate, "month")
-        : true;
-      const isBeforeEnd = filterEndDate
-        ? entryDate.isBefore(filterEndDate, "month") ||
-          entryDate.isSame(filterEndDate, "month")
-        : true;
-      return isAfterStart && isBeforeEnd;
-    });
-
-  const handleOpenManageDialog = (user) => {
-    setSelectedUser(user);
-    setEditedUser({ name: user.name, role: user.role, status: user.status });
-    setOpenManageDialog(true);
-  };
-  const handleCloseManageDialog = () => {
-    setOpenManageDialog(false);
-    setSelectedUser(null);
-  };
-  const handleSaveUser = () => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === selectedUser.id ? { ...user, ...editedUser } : user
-      )
-    );
-    handleCloseManageDialog();
-  };
-  const handleDeleteUser = (userId) => {
-    if (window.confirm("האם אתה בטוח שברצונך למחוק משתמש זה?")) {
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
-    }
-  };
-  const handleDeleteEvent = (eventId) => {
-    if (window.confirm("האם אתה בטוח שברצונך למחוק אירוע זה?")) {
-      setEvents((prevEvents) =>
-        prevEvents.filter((event) => event.id !== eventId)
-      );
-    }
-  };
-  const handleDeleteGift = (giftId) => {
-    if (window.confirm("האם אתה בטוח שברצונך למחוק מתנה זו?")) {
-      setGifts((prevGifts) => prevGifts.filter((gift) => gift.id !== giftId));
-    }
-  };
-
-  const handleEditEvent = (event) => {
-    console.log("Editing event:", event);
-  };
-
-  const entryExitColumns = [
-    { field: "date", headerName: "תאריך", width: 150 },
-    { field: "entries", headerName: "כניסות", width: 130 },
-    { field: "exits", headerName: "יציאות", width: 130 },
-  ];
+  // ===============================
+  //      טבלת משתמשים
+  // ===============================
+  // עמודות טבלת משתמשים
   const userColumns = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "שם", width: 150 },
-    { field: "role", headerName: "תפקיד", width: 130 },
-    { field: "status", headerName: "סטטוס", width: 130 },
     {
-      field: "actions",
-      headerName: "פעולות",
-      width: 150,
-      renderCell: (params) => (
-        <Box>
-          <IconButton
-            color="primary"
-            onClick={() => handleOpenManageDialog(params.row)}
-          >
-            <Edit />
+      field: '_id',
+      headerName: 'מזהה משתמש',
+      width: 320
+    },
+    {
+      field: 'fname',
+      headerName: 'שם פרטי',
+      width: 120
+    },
+    {
+      field: 'lname',
+      headerName: 'שם משפחה',
+      width: 150
+    },
+    {
+      field: 'email',
+      headerName: 'אימייל',
+      width: 250
+    },
+    {
+      field: 'actions',
+      headerName: 'פעולות',
+      width: 180,
+      renderCell: params => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {/* כפתור עריכה */}
+          <IconButton color="primary" onClick={() => handleEditUserClick(params.row)}>
+            <EditIcon />
           </IconButton>
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteUser(params.row.id)}
-          >
-            <Delete />
+          {/* כפתור מחיקה */}
+          <IconButton color="error" onClick={() => handleDeleteUser(params.row._id)}>
+            <DeleteIcon />
           </IconButton>
         </Box>
-      ),
+      )
     },
-  ];
+    {
+      field: 'more info',
+      headerName: 'מידע נוסף',
+      width: 200,
+      renderCell: params => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <IconButton color="inherit" onClick={() => handleViewUserDetails(params.row)}>
+            פירוט מלא <ExpandCircleDownIcon />
+          </IconButton>
+        </Box>
+      )
+    }
+  ]
+
+  const handleEditUserClick = rowData => {
+    setEditedUser(rowData)
+    setEditUserDialogOpen(true)
+  }
+
+  const handleDeleteUser = async id => {
+    if (!window.confirm('למחוק את המשתמש?')) return
+    try {
+      // await axios.delete(`/api/users/${id}`)
+      // מחיקה מקומית (דוגמה)
+      setUsers(prev => prev.filter(u => u._id !== id))
+    } catch (error) {
+      console.error('Error deleting user:', error)
+    }
+  }
+
+  const handleSaveUser = async () => {
+    try {
+      // עדכון בשרת
+      // await axios.put(`/api/users/${editedUser._id}`, editedUser)
+
+      // עדכון מקומי (דוגמה)
+      setUsers(prev => prev.map(u => (u._id === editedUser._id ? editedUser : u)))
+      setEditUserDialogOpen(false)
+    } catch (error) {
+      console.error('Error saving user:', error)
+    }
+  }
+
+  // ===============================
+  //      פרטי משתמש מלאים
+  // ===============================
+  const handleViewUserDetails = user => {
+    setSelectedUser(user)
+    setUserDetailsDialogOpen(true)
+  }
+
+  // נסנן אירועים שנוצרו ע"י המשתמש הנבחר
+  const getUserEvents = userId => {
+    // אם האירוע מכיל userid_event
+    return events.filter(e => e.userid_event === userId)
+  }
+
+  // נסנן מתנות של המשתמש הנבחר
+  const getUserGifts = userId => {
+    // אם המתנה מכילה userid_gift
+    return gifts.filter(g => g.userid_gift === userId)
+  }
+
+  // עמודות לאירועים של המשתמש
+  const userEventsColumns = [
+    {
+      field: '_id',
+      headerName: 'מזהה אירוע',
+      width: 320
+    },
+    {
+      field: 'NameOfGroom',
+      headerName: 'שם החתן',
+      width: 180
+    },
+    {
+      field: 'NameOfBride',
+      headerName: 'שם הכלה',
+      width: 180
+    },
+    {
+      field: 'TypeOfEvent',
+      headerName: 'סוג אירוע',
+      width: 120
+    },
+    {
+      field: 'DateOfEvent',
+      headerName: 'תאריך',
+      width: 290
+    }
+  ]
+
+  // עמודות למתנות של המשתמש
+  const userGiftsColumns = [
+    {
+      field: '_id',
+      headerName: 'מזהה מתנה',
+      width: 320
+    },
+    {
+      field: 'name',
+      headerName: 'שם נותן המתנה',
+      width: 180
+    },
+    {
+      field: 'phone',
+      headerName: 'טלפון',
+      width: 180
+    },
+    {
+      field: 'amount',
+      headerName: 'סכום',
+      width: 90
+    },
+    {
+      field: 'toEventName',
+      headerName: 'לאירוע',
+      width: 200
+    }
+  ]
+
+  // ===============================
+  //      טבלת אירועים
+  // ===============================
   const eventColumns = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "NameOfGroom", headerName: "שם החתן", width: 150 },
-    { field: "NameOfBride", headerName: "שם הכלה", width: 150 },
-    { field: "TypeOfEvent", headerName: "סוג האירוע", width: 150 },
-    { field: "NumOfGuests", headerName: "מספר אורחים", width: 130 },
-    { field: "DateOfEvent", headerName: "תאריך האירוע", width: 150 },
     {
-      field: "actions",
-      headerName: "פעולות",
-      width: 150,
-      renderCell: (params) => (
-        <Box>
-          <IconButton
-            color="primary"
-            onClick={() => handleEditEvent(params.row)}
-          >
-            <Edit />
-          </IconButton>
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteEvent(params.row.id)}
-          >
-            <Delete />
+      field: '_id',
+      headerName: 'מזהה אירוע',
+      width: 320
+    },
+    {
+      field: 'NameOfGroom',
+      headerName: 'שם החתן',
+      width: 180
+    },
+    {
+      field: 'NameOfBride',
+      headerName: 'שם הכלה',
+      width: 180
+    },
+    {
+      field: 'TypeOfEvent',
+      headerName: 'סוג אירוע',
+      width: 130
+    },
+    {
+      field: 'DateOfEvent',
+      headerName: 'תאריך האירוע',
+      width: 300
+    },
+    {
+      field: 'actions',
+      headerName: 'פעולות',
+      width: 120,
+      renderCell: params => (
+        <IconButton color="error" onClick={() => handleDeleteEvent(params.row._id)}>
+          <DeleteIcon />
+        </IconButton>
+      )
+    },
+    {
+      field: 'more info',
+      headerName: 'מידע נוסף',
+      width: 200,
+      renderCell: params => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <IconButton color="inherit" onClick={() => handleViewEventDetails(params.row)}>
+            פירוט מלא <ExpandCircleDownIcon />
           </IconButton>
         </Box>
-      ),
+      )
+    }
+  ]
+
+  const handleViewEventDetails = event => {
+    setSelectedEvent(event)
+    setEventDetailsDialogOpen(true)
+  }
+
+  const handleDeleteEvent = async id => {
+    if (!window.confirm('למחוק את האירוע?')) return
+    try {
+      // await axios.delete(`/api/events/${id}`)
+      setEvents(prev => prev.filter(e => e._id !== id))
+    } catch (error) {
+      console.error('Error deleting event:', error)
+    }
+  }
+
+  // כאן מחזירים את המתנות ששייכות לאירוע שנבחר
+  const getEventGifts = eventId => {
+    // לדוגמה, אם יש בשדה gift.eventid_gift או eventID
+    return gifts.filter(g => g.eventid_gift === eventId)
+  }
+
+  const eventGiftsColumns = [
+    {
+      field: '_id',
+      headerName: 'מזהה מתנה',
+      width: 320
     },
-  ];
+    {
+      field: 'name',
+      headerName: 'שם נותן המתנה',
+      width: 180
+    },
+    {
+      field: 'phone',
+      headerName: 'טלפון',
+      width: 180
+    },
+    {
+      field: 'amount',
+      headerName: 'סכום',
+      width: 90
+    },
+    {
+      field: 'toEventName',
+      headerName: 'לאירוע',
+      width: 200
+    }
+  ]
+
+  // ===============================
+  //      טבלת מתנות
+  // ===============================
   const giftColumns = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "שם", width: 150 },
-    { field: "gift", headerName: "סכום", width: 130 },
-    { field: "date", headerName: "תאריך", width: 150 },
-    { field: "blessing", headerName: "ברכה", width: 200 },
-    { field: "toEventName", headerName: "אירוע", width: 200 },
     {
-      field: "actions",
-      headerName: "פעולות",
-      width: 150,
-      renderCell: (params) => (
-        <Box>
-          <IconButton
-            color="error"
-            onClick={() => handleDeleteGift(params.row.id)}
-          >
-            <Delete />
+      field: '_id',
+      headerName: 'מזהה מתנה',
+      width: 320
+    },
+    {
+      field: 'name',
+      headerName: 'שם נותן המתנה',
+      width: 180
+    },
+    {
+      field: 'phone',
+      headerName: 'טלפון',
+      width: 200
+    },
+    {
+      field: 'amount',
+      headerName: 'סכום',
+      width: 100
+    },
+    {
+      field: 'toEventName',
+      headerName: 'לאירוע',
+      width: 200
+    },
+    {
+      field: 'actions',
+      headerName: 'פעולות',
+      width: 120,
+      renderCell: params => (
+        <IconButton color="error" onClick={() => handleDeleteGift(params.row._id)}>
+          <DeleteIcon />
+        </IconButton>
+      )
+    },
+    {
+      field: 'more info',
+      headerName: 'מידע נוסף',
+      width: 200,
+      renderCell: params => (
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <IconButton color="inherit" onClick={() => handleViewGiftDetails(params.row)}>
+            פירוט מלא <ExpandCircleDownIcon />
           </IconButton>
         </Box>
-      ),
-    },
-  ];
-
-  const eventTypeData = events.reduce((acc, event) => {
-    const found = acc.find((item) => item.TypeOfEvent === event.TypeOfEvent);
-    if (found) {
-      found.count += 1;
-    } else {
-      acc.push({ TypeOfEvent: event.TypeOfEvent, count: 1 });
+      )
     }
-    return acc;
-  }, []);
+  ]
+  const handleViewGiftDetails = gift => {
+    setSelectedGift(gift)
+    setGiftDetailsDialogOpen(true)
+  }
 
-  const giftSumPerEvent = gifts.reduce((acc, gift) => {
-    const found = acc.find((item) => item.toEventName === gift.toEventName);
-    if (found) {
-      found.amount += gift.amount;
-    } else {
-      acc.push({ toEventName: gift.toEventName, amount: gift.amount });
+  const handleDeleteGift = async id => {
+    if (!window.confirm('למחוק את המתנה?')) return
+    try {
+      // await axios.delete(`/api/gift/${id}`)
+      setGifts(prev => prev.filter(g => g._id !== id))
+    } catch (error) {
+      console.error('Error deleting gift:', error)
     }
-    return acc;
-  }, []);
+  }
 
-  const handleRefresh = (dataKey) => {
-    setLoading((prev) => ({ ...prev, [dataKey]: true }));
-    setTimeout(() => {
-      if (dataKey === "entriesExits") {
-        generateEntryExitData();
-      } else if (dataKey === "timeOnSite") {
-        generateTimeOnSiteData();
-      } else if (dataKey === "users") {
-        generateAdditionalData();
+  // דוגמה ל־Theme מותאם אישית (אם תרצה להשתמש)
+  const theme = createTheme({
+    components: {
+      MuiDataGrid: {
+        styleOverrides: {
+          // דוגמה: רקע כותרות
+          columnHeaders: {
+            backgroundColor: '#1B963B !important',
+            color: '#E0E1DD'
+          }
+        }
       }
-      setLoading((prev) => ({ ...prev, [dataKey]: false }));
-    }, 2000);
-  };
+    }
+  })
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div
-        dir="rtl"
-        style={{
-          fontFamily: "Roboto, sans-serif",
-          backgroundColor: "#f5f5f5",
-          minHeight: "100vh",
-          paddingTop: "120px", // התאמה לבר ניווט קבוע
+    <Box
+      // כיוון מימין לשמאל
+      dir="rtl"
+      sx={{
+        minHeight: '200vh',
+        paddingTop: '120px',
+        background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
+        color: '#E0E1DD'
+      }}
+    >
+      {/* Backdrop שמחשיך את המסך אם המשתמש עדיין לא הזין קוד נכון */}
+      <Backdrop
+        open={!authorized} // אם לא מאושר - פתוח
+        sx={{
+          borderRadius: 5,
+          color: '#fff',
+          zIndex: theme => theme.zIndex.drawer + 9999
         }}
       >
-        <Navbar />
-        {/* כותרת מעל הפירוט */}
-
-        <Typography
-          variant="h3"
-          gutterBottom
-          align="center"
+        <Paper
           sx={{
-            fontWeight: "bold",
-            color: "#1976D2",
-            fontSize: { xs: "2.5rem", sm: "3rem" },
-            fontFamily: "Poppins, sans-serif",
-            textShadow: "0 0 10px rgba(255, 255, 255, 0.7)",
-            animation: "glow 2s ease-in-out infinite alternate",
+            width: 500,
+            p: 3,
+            backgroundColor: '#2B384D',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            alignItems: 'center',
+            borderRadius: 5
           }}
         >
-          דף אדמין
-        </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              color: '#E0E1DD',
+              fontWeight: 'bold'
+            }}
+          >
+            הכנס קוד גישה:
+          </Typography>
+          <TextField
+            type="password"
+            value={passcode}
+            onChange={e => setPasscode(e.target.value)}
+            sx={{
+              borderRadius: 5,
+              backgroundColor: '#d1ecf1',
+              '& .MuiOutlinedInput-root': {
+                color: '#0c5460',
+                borderRadius: 5
+              },
+              '& .MuiInputLabel-root': {
+                borderRadius: 5,
+                color: '#0c5460'
+              }
+            }}
+          />
+          {showError && (
+            <Box
+              sx={{
+                mb: 1,
+                //backgroundColor: '#f8d7da',
+                color: '#FF0000',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                p: 1,
+                borderRadius: 1,
+                textAlign: 'center' // מרכז את הטקסט אופקית
+              }}
+            >
+              <div>שגיאה:</div>
+              <div>אין לך הרשאות לביצוע הפעולה</div>
+            </Box>
+          )}
+          <Button
+            variant="contained"
+            onClick={handleCheckPasscode}
+            sx={{
+              borderRadius: 5
+              // backgroundColor: '#0c5460',
+              // color: '#E0E1DD'
+            }}
+          >
+            אישור
+          </Button>
+        </Paper>
+      </Backdrop>
 
-        <Container
-          maxWidth="xl"
-          sx={{ paddingTop: "80px", paddingBottom: "50px" }}
-        >
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={6} lg={3}>
-              <SummaryCard
-                title="כניסות"
-                value="120"
-                subtitle="ממוצע של 5 כניסות בכל שעה"
-                icon={<Login />}
-                bgColor="#1976D2"
-              />
-            </Grid>
-            <Grid item xs={12} md={6} lg={3}>
-              <SummaryCard
-                title="יציאות"
-                value="80"
-                subtitle="ממוצע של 3 יציאות בכל שעה"
-                icon={<ExitToApp />}
-                bgColor="#d32f2f"
-              />
-            </Grid>
-            <Grid item xs={12} md={6} lg={3}>
-              <SummaryCard
-                title="זמן באתר"
-                value="4 דקות"
-                subtitle="ממוצע זמן שהייה: 15 דקות"
-                icon={<AccessTime />}
-                bgColor="#388e3c"
-              />
-            </Grid>
-            <Grid item xs={12} md={6} lg={3}>
-              <SummaryCard
-                title="משתמשים פעילים"
-                value="35"
-                subtitle="ממוצע זמן שהייה: 10 דקות"
-                icon={<People />}
-                bgColor="#f57c00"
-              />
-            </Grid>
+      {/* רק אם authorized=true נציג את תוכן עמוד האדמין */}
+      {authorized && (
+        <>
+          <Box
+            sx={{
+              textAlign: 'center',
+              mb: 4
+            }}
+          >
+            <Typography variant="h3" sx={{ fontWeight: 'bold' }}>
+              דף אדמין
+            </Typography>
+            <Typography variant="h6">ניהול משתמשים, אירועים ומתנות</Typography>
+          </Box>
 
-            <Grid item xs={14} md={12} lg={12}>
-              <ChartCard title="מספר כניסות ויציאות לפי חודש מה 12 חודשים האחרונים">
-                {loading.entriesExits ? (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      height: "300px",
-                    }}
-                  >
-                    <CircularProgress size={60} thickness={4} />
-                  </Box>
-                ) : (
-                  <LineChart data={filteredEntryExitData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <RechartsTooltip />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="entries"
-                      stroke="#1976D2"
-                      activeDot={{ r: 8 }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="exits"
-                      stroke="#d32f2f"
-                      activeDot={{ r: 8 }}
-                    />
-                  </LineChart>
-                )}
-                <Box sx={{ textAlign: "center", marginTop: 2 }}>
-                  <IconButton
-                    color="primary"
-                    onClick={() => handleRefresh("entriesExits")}
-                    component={motion.div}
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <Refresh fontSize="large" />
-                  </IconButton>
-                </Box>
-              </ChartCard>
-            </Grid>
-            <Grid item xs={12} md={12} lg={12}>
-              <ChartCard title="זמן באתר לפי תאריך (בדקות)">
-                <LineChart data={timeOnSite}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="duration"
-                    stroke="#388e3c"
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ChartCard>
-            </Grid>
-
-            <Grid item xs={12} md={12} lg={6}>
-              <ChartCard title="מספר אירועים לפי סוג">
-                <PieChart>
-                  <Pie
-                    data={eventTypeData}
-                    dataKey="count"
-                    nameKey="TypeOfEvent"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    label
-                  >
-                    {eventTypeData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip />
-                  <Legend />
-                </PieChart>
-              </ChartCard>
-            </Grid>
-            <Grid item xs={12} md={12} lg={6}>
-              <ChartCard title="סכום מתנות לפי אירוע">
-                <BarChart data={giftSumPerEvent}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="toEventName" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Legend />
-                  <Bar dataKey="amount" fill="#82ca9d" />
-                </BarChart>
-              </ChartCard>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TableCard title="כניסות ויציאות">
-                <DateFilter
-                  startDate={filterStartDate}
-                  endDate={filterEndDate}
-                  setStartDate={setFilterStartDate}
-                  setEndDate={setFilterEndDate}
-                  clearFilters={() => {
-                    setFilterStartDate(null);
-                    setFilterEndDate(null);
+          <Grid
+            container
+            justifyContent="center" // מרכוז
+            alignItems="center" // אופציונלי: יישור לאורך הציר האנכי
+            spacing={3}
+            sx={{ px: 3, width: '100%' }}
+          >
+            {/* --- טבלת משתמשים --- */}
+            <Grid item lg={10}>
+              <Paper
+                sx={{
+                  alignContent: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  maxWidth: '100%',
+                  p: 2,
+                  backgroundColor: '#2B384D',
+                  direction: 'rtl',
+                  borderRadius: 5,
+                  color: '#E0E1DD'
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    mb: 2,
+                    color: '#FAF9F6', // כותרת בהירה
+                    fontWeight: 'bold',
+                    textAlign: 'center'
                   }}
-                />
-                <DataGrid
-                  rows={filteredEntryExitData}
-                  getRowId={(row) => row.date}
-                  columns={entryExitColumns}
-                  pageSize={5}
-                  rowsPerPageOptions={[5, 10, 20]}
-                  components={{ Toolbar: GridToolbar }}
-                />
-              </TableCard>
-            </Grid>
-            <Grid item xs={12} md={6} lg={6}>
-              <TableCard title="התראות">
-                <AlertList alerts={alerts} />
-              </TableCard>
-            </Grid>
-            <Grid item xs={12} md={6} lg={12}>
-              <TableCard title="ניהול משתמשים">
+                >
+                  משתמשים
+                </Typography>
+                {/* <ThemeProvider theme={theme}>
+              <Box sx={{ height: 500 }}>
                 <DataGrid
                   rows={users}
                   columns={userColumns}
                   pageSize={5}
                   rowsPerPageOptions={[5, 10, 20]}
-                  components={{ Toolbar: GridToolbar }}
                 />
-              </TableCard>
+              </Box>
+            </ThemeProvider> */}
+                {/* <ThemeProvider theme={theme}> */}
+                <Box
+                  sx={{
+                    height: 500,
+                    overflowX: 'auto',
+                    '& .MuiDataGrid-root': {
+                      direction: 'rtl'
+                    }
+                  }}
+                >
+                  <DataGrid
+                    rows={users}
+                    getRowId={row => row._id}
+                    columns={userColumns}
+                    pageSize={5}
+                    rowsPerPageOptions={[5, 10, 20]}
+                    components={{
+                      Toolbar: GridToolbar
+                    }}
+                    sx={{
+                      borderRadius: 5,
+                      color: '#E0E1DD',
+                      backgroundColor: '#0D1B2A',
+                      // כותרת טבלה
+                      '& .MuiDataGrid-columnHeaders': {
+                        backgroundColor: '#1B263B'
+                      },
+                      '& .MuiDataGrid-columnHeaderTitle': {
+                        color: '#1B263B',
+                        fontWeight: 'bold',
+                        fontSize: 26
+                      }
+                    }}
+                  />
+                </Box>
+                {/* </ThemeProvider> */}
+              </Paper>
             </Grid>
-            <Grid item xs={12}>
-              <TableCard title="ניהול אירועים">
-                <DataGrid
-                  rows={events}
-                  columns={eventColumns}
-                  pageSize={5}
-                  rowsPerPageOptions={[5, 10, 20]}
-                  components={{ Toolbar: GridToolbar }}
-                />
-              </TableCard>
+
+            {/* --- טבלת אירועים --- */}
+            <Grid item lg={10}>
+              <Paper
+                sx={{
+                  p: 2,
+                  backgroundColor: '#2B384D',
+                  direction: 'rtl',
+                  borderRadius: 5,
+                  color: '#E0E1DD'
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    mb: 2,
+                    color: '#FAF9F6',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  אירועים
+                </Typography>
+                <Box
+                  sx={{
+                    height: 500,
+                    overflowX: 'auto',
+                    '& .MuiDataGrid-root': {
+                      direction: 'rtl'
+                    }
+                  }}
+                >
+                  <DataGrid
+                    rows={events}
+                    getRowId={row => row._id}
+                    columns={eventColumns}
+                    pageSize={5}
+                    rowsPerPageOptions={[5, 10, 20]}
+                    components={{
+                      Toolbar: GridToolbar
+                    }}
+                    sx={{
+                      borderRadius: 5,
+                      color: '#E0E1DD',
+                      backgroundColor: '#0D1B2A',
+                      // כותרת טבלה
+                      '& .MuiDataGrid-columnHeaders': {
+                        backgroundColor: '#1B263B'
+                      },
+                      '& .MuiDataGrid-columnHeaderTitle': {
+                        color: '#1B263B',
+                        fontWeight: 'bold',
+                        fontSize: 26
+                      }
+                    }}
+                  />
+                </Box>
+              </Paper>
             </Grid>
-            <Grid item xs={12}>
-              <TableCard title="ניהול מתנות">
-                <DataGrid
-                  rows={gifts}
-                  columns={giftColumns}
-                  pageSize={5}
-                  rowsPerPageOptions={[5, 10, 20]}
-                  components={{ Toolbar: GridToolbar }}
-                />
-              </TableCard>
+
+            {/* --- טבלת מתנות --- */}
+            <Grid item lg={10}>
+              <Paper
+                sx={{
+                  p: 2,
+                  backgroundColor: '#2B384D',
+                  direction: 'rtl',
+                  borderRadius: 5,
+                  color: '#E0E1DD'
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    mb: 2,
+                    color: '#FAF9F6',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  מתנות
+                </Typography>
+                <Box
+                  sx={{
+                    height: 500,
+                    overflowX: 'auto',
+                    '& .MuiDataGrid-root': {
+                      direction: 'rtl'
+                    }
+                  }}
+                >
+                  <DataGrid
+                    rows={gifts}
+                    getRowId={row => row._id}
+                    columns={giftColumns}
+                    pageSize={5}
+                    rowsPerPageOptions={[5, 10, 20]}
+                    components={{
+                      Toolbar: GridToolbar
+                    }}
+                    sx={{
+                      borderRadius: 5,
+                      color: '#E0E1DD',
+                      backgroundColor: '#0D1B2A',
+                      // כותרת טבלה
+                      '& .MuiDataGrid-columnHeaders': {
+                        backgroundColor: '#1B263B'
+                      },
+                      '& .MuiDataGrid-columnHeaderTitle': {
+                        color: '#1B263B',
+                        fontWeight: 'bold',
+                        fontSize: 26
+                      }
+                    }}
+                  />
+                </Box>
+              </Paper>
             </Grid>
           </Grid>
-        </Container>
 
-        <Dialog open={openManageDialog} onClose={handleCloseManageDialog}>
-          <DialogTitle>ניהול משתמש</DialogTitle>
-          <DialogContent>
-            <Box
-              component="form"
-              sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+          {/* --- דיאלוג עריכת משתמש --- */}
+          <Dialog open={editUserDialogOpen} onClose={() => setEditUserDialogOpen(false)} dir="rtl">
+            <DialogTitle>עריכת משתמש</DialogTitle>
+            <DialogContent
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                backgroundColor: '#2B384D'
+              }}
             >
               <TextField
-                label="שם"
-                value={editedUser.name}
-                onChange={(e) =>
-                  setEditedUser({ ...editedUser, name: e.target.value })
+                label="שם פרטי"
+                value={editedUser.fname || ''}
+                onChange={e =>
+                  setEditedUser({
+                    ...editedUser,
+                    fname: e.target.value
+                  })
                 }
-                fullWidth
+                inputProps={{
+                  style: { textAlign: 'right' }
+                }}
+                sx={{
+                  textAlign: 'right',
+                  '& .MuiOutlinedInput-root': {
+                    color: '#E0E1DD'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#E0E1DD'
+                  }
+                }}
               />
-              <FormControl fullWidth>
-                <InputLabel>תפקיד</InputLabel>
-                <Select
-                  value={editedUser.role}
-                  label="תפקיד"
-                  onChange={(e) =>
-                    setEditedUser({ ...editedUser, role: e.target.value })
+              <TextField
+                label="שם משפחה"
+                value={editedUser.lname || ''}
+                onChange={e =>
+                  setEditedUser({
+                    ...editedUser,
+                    lname: e.target.value
+                  })
+                }
+                inputProps={{
+                  style: { textAlign: 'right' }
+                }}
+                sx={{
+                  textAlign: 'right',
+                  '& .MuiOutlinedInput-root': {
+                    color: '#E0E1DD'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#E0E1DD'
                   }
-                >
-                  <MenuItem value="מנהל">מנהל</MenuItem>
-                  <MenuItem value="משתמש">משתמש</MenuItem>
-                  <MenuItem value="סוכן">סוכן</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <InputLabel>סטטוס</InputLabel>
-                <Select
-                  value={editedUser.status}
-                  label="סטטוס"
-                  onChange={(e) =>
-                    setEditedUser({ ...editedUser, status: e.target.value })
+                }}
+              />
+              <TextField
+                label="אימייל"
+                value={editedUser.email || ''}
+                onChange={e =>
+                  setEditedUser({
+                    ...editedUser,
+                    email: e.target.value
+                  })
+                }
+                inputProps={{
+                  style: { textAlign: 'right' }
+                }}
+                sx={{
+                  textAlign: 'right',
+                  '& .MuiOutlinedInput-root': {
+                    color: '#E0E1DD'
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: '#E0E1DD'
                   }
-                >
-                  <MenuItem value="פעיל">פעיל</MenuItem>
-                  <MenuItem value="לא פעיל">לא פעיל</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseManageDialog}>ביטול</Button>
-            <Button
-              onClick={handleSaveUser}
-              variant="contained"
-              color="primary"
+                }}
+              />
+            </DialogContent>
+            <DialogActions sx={{ backgroundColor: '#2B384D' }}>
+              <Button
+                onClick={() => setEditUserDialogOpen(false)}
+                sx={{
+                  color: '#E0E1DD'
+                }}
+              >
+                ביטול
+              </Button>
+              <Button variant="contained" onClick={handleSaveUser}>
+                שמור
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* --- דיאלוג פרטי משתמש מלאים (כרטיסיית מידע) --- */}
+          <Dialog
+            open={userDetailsDialogOpen}
+            onClose={() => setUserDetailsDialogOpen(false)}
+            fullWidth
+            maxWidth="lg"
+            dir="rtl"
+            alignContent="center"
+            alignItems="center"
+            justifyContent="center"
+            textAlign="center"
+          >
+            <DialogTitle
+              sx={{
+                alignContent: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#1B263B',
+                color: '#FAF9F6'
+              }}
             >
-              שמור
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    </LocalizationProvider>
-  );
-}
+              פרטים מלאים על המשתמש
+            </DialogTitle>
+            {selectedUser && (
+              <DialogContent
+                sx={{
+                  backgroundColor: '#2B384D'
+                }}
+              >
+                {/* פרטי משתמש כלליים */}
+                <Box
+                  sx={{
+                    color: '#E0E1DD',
+                    mb: 3,
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>מזהה משתמש:</strong> {selectedUser._id}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>שם מלא:</strong> {selectedUser.fname} {selectedUser.lname}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>אימייל:</strong> {selectedUser.email}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>סיסמה (מצופה שיהיה מוצפן):</strong> {selectedUser.password || 'לא קיים בשדה'}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>מנהל?</strong> {selectedUser.isManeger ? 'כן' : 'לא'}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>תאריך הצטרפות:</strong> {selectedUser.entryDate ? dayjs(selectedUser.entryDate).format('DD/MM/YYYY HH:mm') : 'לא קיים'}
+                  </Typography>
+                </Box>
 
-const SummaryCard = ({ title, value, subtitle, icon, bgColor }) => (
-  <AnimatedCard component={motion.div} whileHover={{ scale: 1.05 }}>
-    <CardHeader
-      avatar={<Avatar sx={{ bgcolor: bgColor }}>{icon}</Avatar>}
-      title={title}
-      subheader={subtitle}
-    />
-    <CardContent>
-      <Typography variant="h5">{value}</Typography>
-    </CardContent>
-  </AnimatedCard>
-);
+                {/* טבלת אירועים של המשתמש */}
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: '#FAF9F6',
+                    mb: 1
+                  }}
+                >
+                  האירועים של המשתמש
+                </Typography>
+                <Box
+                  sx={{
+                    height: 250,
+                    mb: 3,
+                    '& .MuiDataGrid-root': {
+                      direction: 'rtl',
+                      backgroundColor: '#3E4C5E'
+                    }
+                  }}
+                >
+                  <DataGrid
+                    rows={getUserEvents(selectedUser._id)}
+                    getRowId={row => row._id}
+                    columns={userEventsColumns}
+                    pageSize={3}
+                    rowsPerPageOptions={[3, 5]}
+                    components={{
+                      Toolbar: GridToolbar
+                    }}
+                    sx={{
+                      color: '#E0E1DD',
+                      '& .MuiDataGrid-columnHeaders': {
+                        backgroundColor: '#1B263B',
+                        color: '#E0E1DD'
+                      }
+                    }}
+                  />
+                </Box>
 
-const ChartCard = ({ title, children }) => (
-  <Paper
-    sx={{
-      padding: "20px",
-      borderRadius: "15px",
-      boxShadow: 3,
-      backgroundColor: "#ffffff",
-    }}
-    component={motion.div}
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 1 }}
-  >
-    <Typography variant="h6" gutterBottom>
-      {title}
-    </Typography>
-    <ResponsiveContainer width="100%" height={300}>
-      {children}
-    </ResponsiveContainer>
-  </Paper>
-);
-
-const TableCard = ({ title, children }) => (
-  <Paper
-    sx={{
-      padding: "20px",
-      borderRadius: "15px",
-      boxShadow: 3,
-      backgroundColor: "#ffffff",
-    }}
-    component={motion.div}
-    initial={{ y: 50, opacity: 0 }}
-    animate={{ y: 0, opacity: 1 }}
-    transition={{ duration: 1 }}
-  >
-    <Typography variant="h6" gutterBottom>
-      {title}
-    </Typography>
-    {children}
-  </Paper>
-);
-
-const AlertList = ({ alerts }) => (
-  <List>
-    {alerts.map((alert) => (
-      <ListItem key={alert.id}>
-        <ListItemIcon>
-          <motion.div animate={getIconAnimation(alert.type)}>
-            {alert.type === "חשוד" ? (
-              <WarningAmber color="warning" />
-            ) : (
-              <ReportProblem color="error" />
+                {/* טבלת מתנות של המשתמש */}
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: '#FAF9F6',
+                    mb: 1
+                  }}
+                >
+                  המתנות של המשתמש
+                </Typography>
+                <Box
+                  sx={{
+                    height: 250,
+                    '& .MuiDataGrid-root': {
+                      direction: 'rtl',
+                      backgroundColor: '#3E4C5E'
+                    }
+                  }}
+                >
+                  <DataGrid
+                    rows={getUserGifts(selectedUser._id)}
+                    getRowId={row => row._id}
+                    columns={userGiftsColumns}
+                    pageSize={3}
+                    rowsPerPageOptions={[3, 5]}
+                    components={{
+                      Toolbar: GridToolbar
+                    }}
+                    sx={{
+                      color: '#E0E1DD',
+                      '& .MuiDataGrid-columnHeaders': {
+                        backgroundColor: '#1B263B',
+                        color: '#E0E1DD'
+                      }
+                    }}
+                  />
+                </Box>
+              </DialogContent>
             )}
-          </motion.div>
-        </ListItemIcon>
-        <ListItemText primary={alert.message} />
-        <Divider />
-      </ListItem>
-    ))}
-  </List>
-);
+            <DialogActions sx={{ backgroundColor: '#1B263B' }}>
+              <Button onClick={() => setUserDetailsDialogOpen(false)} sx={{ color: '#E0E1DD' }}>
+                סגור
+              </Button>
+            </DialogActions>
+          </Dialog>
+          {/* ============ דיאלוג פרטי אירוע מלאים ============ */}
+          <Dialog open={eventDetailsDialogOpen} onClose={() => setEventDetailsDialogOpen(false)} fullWidth maxWidth="lg" dir="rtl">
+            <DialogTitle
+              sx={{
+                backgroundColor: '#1B263B',
+                color: '#FAF9F6'
+              }}
+            >
+              פרטים מלאים על האירוע
+            </DialogTitle>
+            {selectedEvent && (
+              <DialogContent
+                sx={{
+                  backgroundColor: '#2B384D'
+                }}
+              >
+                {/* פרטי אירוע כלליים */}
+                <Box
+                  sx={{
+                    color: '#E0E1DD',
+                    mb: 3,
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>מזהה אירוע:</strong> {selectedEvent._id}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>שם החתן:</strong> {selectedEvent.NameOfGroom}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>שם הכלה:</strong> {selectedEvent.NameOfBride}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>סוג אירוע:</strong> {selectedEvent.TypeOfEvent}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>תאריך:</strong> {selectedEvent.DateOfEvent}
+                  </Typography>
+                </Box>
 
-const DateFilter = ({
-  startDate,
-  endDate,
-  setStartDate,
-  setEndDate,
-  clearFilters,
-}) => (
-  <Box sx={{ display: "flex", gap: 2, marginBottom: 2, flexWrap: "wrap" }}>
-    <DatePicker
-      label="מתאריך"
-      value={startDate}
-      onChange={(newValue) => setStartDate(newValue)}
-      slots={{ textField: (params) => <TextField {...params} /> }}
-    />
-    <DatePicker
-      label="עד תאריך"
-      value={endDate}
-      onChange={(newValue) => setEndDate(newValue)}
-      slots={{ textField: (params) => <TextField {...params} /> }}
-    />
-    <Button variant="contained" color="primary" onClick={clearFilters}>
-      נקה פילטרים
-    </Button>
-  </Box>
-);
+                {/* טבלת מתנות של האירוע */}
+                <Typography variant="h6" sx={{ color: '#FAF9F6', mb: 1 }}>
+                  המתנות באירוע
+                </Typography>
+                <Box
+                  sx={{
+                    height: 250,
+                    '& .MuiDataGrid-root': {
+                      direction: 'rtl',
+                      backgroundColor: '#3E4C5E'
+                    }
+                  }}
+                >
+                  <DataGrid
+                    rows={getEventGifts(selectedEvent._id)}
+                    getRowId={row => row._id}
+                    columns={eventGiftsColumns}
+                    pageSize={3}
+                    rowsPerPageOptions={[3, 5]}
+                    components={{
+                      Toolbar: GridToolbar
+                    }}
+                    sx={{
+                      color: '#E0E1DD',
+                      '& .MuiDataGrid-columnHeaders': {
+                        backgroundColor: '#1B263B',
+                        color: '#E0E1DD'
+                      }
+                    }}
+                  />
+                </Box>
+              </DialogContent>
+            )}
+            <DialogActions sx={{ backgroundColor: '#1B263B' }}>
+              <Button onClick={() => setEventDetailsDialogOpen(false)} sx={{ color: '#E0E1DD' }}>
+                סגור
+              </Button>
+            </DialogActions>
+          </Dialog>
 
-const getIconAnimation = (type) => {
-  if (type === "חשוד") {
-    return {
-      scale: [1, 1.2, 1],
-      rotate: [0, 5, -5, 0],
-      transition: { duration: 1, repeat: Infinity, ease: "easeInOut" },
-    };
-  }
-  return {
-    scale: [1, 1.05, 1],
-    transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" },
-  };
-};
+          {/* ============ דיאלוג פרטי מתנה מלאים ============ */}
+          <Dialog open={giftDetailsDialogOpen} onClose={() => setGiftDetailsDialogOpen(false)} fullWidth maxWidth="md" dir="rtl">
+            <DialogTitle
+              sx={{
+                backgroundColor: '#1B263B',
+                color: '#FAF9F6'
+              }}
+            >
+              פרטים מלאים על המתנה
+            </DialogTitle>
+            {selectedGift && (
+              <DialogContent
+                sx={{
+                  backgroundColor: '#2B384D'
+                }}
+              >
+                {/* פרטי מתנה */}
+                <Box
+                  sx={{
+                    color: '#E0E1DD',
+                    mb: 3,
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>מזהה מתנה:</strong> {selectedGift._id}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>שם נותן המתנה:</strong> {selectedGift.name}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>טלפון:</strong> {selectedGift.phone}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>סכום:</strong> {selectedGift.amount}
+                  </Typography>
+                  <Typography sx={{ mb: 1 }}>
+                    <strong>לאירוע:</strong> {selectedGift.toEventName}
+                  </Typography>
+                  {/* הוסף כאן שדות נוספים אם יש:  */}
+                  {/* <Typography sx={{ mb: 1 }}>
+                <strong>Another Field:</strong> {selectedGift.someField}
+              </Typography> */}
+                </Box>
+              </DialogContent>
+            )}
+            <DialogActions sx={{ backgroundColor: '#1B263B' }}>
+              <Button onClick={() => setGiftDetailsDialogOpen(false)} sx={{ color: '#E0E1DD' }}>
+                סגור
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </>
+      )}
+    </Box>
+  )
+}

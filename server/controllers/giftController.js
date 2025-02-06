@@ -1,7 +1,6 @@
 //server/controllers/giftController.js
 const giftModel = require('../models/giftModel')
 
-
 async function create(data) {
   try {
     const newGift = await giftModel.create(data)

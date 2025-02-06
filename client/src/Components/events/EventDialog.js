@@ -1,28 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Box,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Typography,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody
-} from '@mui/material'
+import { Box, CircularProgress, Dialog, DialogTitle, DialogContent, Typography, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material'
 import PrintIcon from '@mui/icons-material/Print'
 import GetAppIcon from '@mui/icons-material/GetApp'
 import DeleteIcon from '@mui/icons-material/Delete'
 import axios from 'axios'
 
-const EventDialog = ({
-  open,
-  event,
-  onClose,
-  onDelete
-}) => {
+const EventDialog = ({ open, event, onClose, onDelete }) => {
   const [gifts, setGifts] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -31,17 +14,11 @@ const EventDialog = ({
       if (!event?._id) return
       setLoading(true)
       try {
-        const res = await axios.post(
-          'http://localhost:2001/api/events/getGiftsByEvent',
-          { EventId: event._id }
-        )
+        const res = await axios.post('http://localhost:2001/api/events/getGiftsByEvent', { EventId: event._id })
         console.log('🎁 מתנות שהתקבלו:', res.data)
         setGifts(res.data)
       } catch (error) {
-        console.error(
-          '❌ Error fetching gifts:',
-          error
-        )
+        console.error('❌ Error fetching gifts:', error)
       } finally {
         setLoading(false)
       }
@@ -49,17 +26,13 @@ const EventDialog = ({
     fetchGifts()
   }, [event?._id])
 
-  const totalAmount = gifts.reduce(
-    (sum, gift) => sum + (gift.amount || 0),
-    0
-  )
+  const totalAmount = gifts.reduce((sum, gift) => sum + (gift.amount || 0), 0)
 
   return (
     <Dialog
       PaperProps={{
         sx: {
-          backgroundColor:
-            'rgba(255, 255, 255, 0.1)',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
           borderRadius: '20px',
           boxShadow: 'none'
         }
@@ -80,8 +53,7 @@ const EventDialog = ({
           fontWeight: 'bold',
           fontSize: '2rem',
           color: '#E0E1DD',
-          background:
-            'linear-gradient(135deg, #1B263B, #415A77)',
+          background: 'linear-gradient(135deg, #1B263B, #415A77)',
           borderTopLeftRadius: '20px',
           borderTopRightRadius: '20px',
           display: 'flex',
@@ -106,9 +78,7 @@ const EventDialog = ({
             color: '#E0E1DD'
           }}
         >
-          {event.TypeOfEvent !== 'חתונה'
-            ? event.NameOfGroom
-            : `${event.NameOfGroom} ו${event.NameOfBride}`}
+          {event.TypeOfEvent !== 'חתונה' ? event.NameOfGroom : `${event.NameOfGroom} ו${event.NameOfBride}`}
         </Typography>
         <Typography
           variant="h6"
@@ -118,9 +88,7 @@ const EventDialog = ({
             marginTop: '4px'
           }}
         >
-          <strong>
-            מספר אירוע: {event.Event_number}
-          </strong>
+          <strong>מספר אירוע: {event.Event_number}</strong>
         </Typography>
       </DialogTitle>
       <DialogContent
@@ -128,8 +96,7 @@ const EventDialog = ({
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background:
-            'linear-gradient(135deg,rgb(83, 96, 121),rgb(113, 136, 161))',
+          background: 'linear-gradient(135deg,rgb(83, 96, 121),rgb(113, 136, 161))',
           borderBottomLeftRadius: '20px',
           borderBottomRightRadius: '20px',
           padding: 2,
@@ -147,10 +114,7 @@ const EventDialog = ({
           }}
         >
           <strong>תאריך: </strong>
-          {new Date(
-            event.DateOfEvent
-          ).toLocaleDateString('he-IL')}{' '}
-          📅
+          {new Date(event.DateOfEvent).toLocaleDateString('he-IL')} 📅
         </Typography>
         <Typography
           variant="h6"
@@ -159,8 +123,7 @@ const EventDialog = ({
             marginTop: 2
           }}
         >
-          🎁 :מתנות שהתקבלו (סה"כ{' '}
-          {totalAmount.toLocaleString()} ₪)
+          🎁 :מתנות שהתקבלו (סה"כ {totalAmount.toLocaleString()} ₪)
         </Typography>
         {loading ? (
           <Box
@@ -177,30 +140,17 @@ const EventDialog = ({
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell align="center">
-                  שם שולח
-                </TableCell>
-                <TableCell align="center">
-                  סכום
-                </TableCell>
-                <TableCell align="center">
-                  ברכה
-                </TableCell>
+                <TableCell align="center">שם שולח</TableCell>
+                <TableCell align="center">סכום</TableCell>
+                <TableCell align="center">ברכה</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {gifts.map((gift, index) => (
                 <TableRow key={index}>
-                  <TableCell align="center">
-                    {gift.name}
-                  </TableCell>
-                  <TableCell align="center">
-                    {gift.amount} ₪
-                  </TableCell>
-                  <TableCell align="center">
-                    {gift.blessing ||
-                      'לא צורפה ברכה'}
-                  </TableCell>
+                  <TableCell align="center">{gift.name}</TableCell>
+                  <TableCell align="center">{gift.amount} ₪</TableCell>
+                  <TableCell align="center">{gift.blessing || 'לא צורפה ברכה'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

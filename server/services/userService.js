@@ -1,7 +1,7 @@
+//server/services/userService.js
 const userController = require('../controllers/userController')
 const jwtFn = require('../middleware/jwtMiddleware')
 const { fixHebrewText } = require('../fixHebrew.js')
-
 
 async function getGiftsById(userId) {
   const userDetails = await userController.readOne(userId)
@@ -78,28 +78,35 @@ module.exports.register = async userFields => {
 }
 
 //getIsManeger
-const getIsManeger = async (userId) => {
-  if (!userId) throw new Error("❌ Missing userId");
-  const user = await userController.readOne({ _id: userId });
-  if (!user) throw new Error("❌ User not found");
-  return user.isManeger;
+const getIsManeger = async userId => {
+  if (!userId) throw new Error('❌ Missing userId')
+  const user = await userController.readOne({ _id: userId })
+  if (!user) throw new Error('❌ User not found')
+  return user.isManeger
 }
 
 const updateManagerStatus = async (userId, isManeger) => {
-  if (!userId) throw new Error("❌ Missing userId");
+  if (!userId) throw new Error('❌ Missing userId')
   console.log('userId updateManagerStatus:', userId)
   console.log('isManeger updateManagerStatus:', isManeger)
 
-  
   const updatedUser = await userController.updateOne(
     { _id: userId }, // Find user by ID
     { isManeger } // Update field
-  );
+  )
 
-  if (!updatedUser) throw new Error("❌ User not found");
+  if (!updatedUser) throw new Error('❌ User not found')
 
-  return { message: "✅ Manager status updated successfully", user: updatedUser };
-};
+  return { message: '✅ Manager status updated successfully', user: updatedUser }
+}
+
+const getAllUsers = async () => {
+  const users = await userController.read({})
+  if (users.length === 0) {
+    throw { code: 400, message: 'there is no users' }
+  }
+  return users
+}
 
 module.exports = {
   ...module.exports,
@@ -107,5 +114,6 @@ module.exports = {
   updateManagerStatus,
   login,
   getIdByEmail,
-  getGiftsById
+  getGiftsById,
+  getAllUsers
 }

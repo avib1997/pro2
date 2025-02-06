@@ -3,27 +3,22 @@ import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import MainRouter from './routes/MainRouter' // או הנתיב למקום ששמרת את הקובץ
 import WhatsAppIcon from '@mui/icons-material/WhatsApp'
-import {
-  Box,
-  IconButton,
-  Typography
-} from '@mui/material'
+import { Box, IconButton, Typography } from '@mui/material'
 
 export const Context = createContext()
 
 function App() {
-  const whatsappGroupLink =
-    'https://chat.whatsapp.com/KN1etpCLloyD1wbunuEwdX'
+  const whatsappGroupLink = 'https://chat.whatsapp.com/KN1etpCLloyD1wbunuEwdX'
   const [IsEvent, setIsEvent] = useState(true)
-  const [eventId, setEventNumber] = useState('') // סטייט עבור ה-ID של האירוע
+  const [eventNumber, setEventNumber] = useState('') // סטייט עבור ה-ID של האירוע
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
   const [userId, setUserId] = useState('')
   const [detailsId, setDetailsId] = useState([])
-  const [isEventManager, setIsEventManager] =
-    useState(false) // הוספת סטייט למנהל אירועים
+  const [isEventManager, setIsEventManager] = useState(false) // הוספת סטייט למנהל אירועים
   const [state, setState] = useState()
   const [event, setEvent] = useState('')
+  const [eventId, setEventId] = useState('')
 
   return (
     <Context.Provider
@@ -41,11 +36,13 @@ function App() {
         state,
         setState,
         eventId,
-        setEventNumber,
+        setEventId,
         userName,
         setUserName,
         userEmail,
-        setUserEmail
+        setUserEmail,
+        eventNumber,
+        setEventNumber
       }}
     >
       <BrowserRouter>
@@ -63,12 +60,8 @@ function App() {
           direction: 'rtl' // כיוון הטקסט (מימין לשמאל)
         }}
       >
-        <Typography
-          variant="body2"
-          sx={{ fontSize: '0.9rem' }}
-        >
-          &copy; {new Date().getFullYear()} EASY
-          GIFT | כל הזכויות שמורות
+        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
+          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
         </Typography>
         {/* <Typography>
           פיתוח על ידי אבי ברודצקי ומוטי ברודצקי

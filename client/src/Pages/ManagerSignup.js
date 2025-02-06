@@ -9,12 +9,12 @@ import axios from 'axios' // ייבוא האקסיוס לפני שימוש בו
 import { Person as PersonIcon, Email as EmailIcon, Phone as PhoneIcon, Info as InfoIcon } from '@mui/icons-material'
 
 const ManagerSignup = () => {
-  const { setEventNumber } = useContext(Context) // נקרא את ערך ה-eventId
+  const { setEventNumber, eventId } = useContext(Context) // נקרא את ערך ה-eventId
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [additionalInfo, setAdditionalInfo] = useState('')
-  const [eventId] = useState(Math.floor(1000 + Math.random() * 9000))
+
   const [submitError, setSubmitError] = useState('')
   const [errors, setErrors] = useState({})
   const [isValid, setIsValid] = useState({})
@@ -107,16 +107,14 @@ const ManagerSignup = () => {
         console.log('userId in setAsManeger:', userId)
         const response = await axios.put('http://localhost:2001/api/users/update-manager', {
           userId,
-          isManeger: true, // זה הערך החדש
-        });
-        console.log("✅ סטטוס מנהל עודכן:", response.data);
-      }
-      catch (error) {
-        console.error("❌ עדכון סטטוס מנהל נכשל:", error);
+          isManeger: true // זה הערך החדש
+        })
+        console.log('✅ סטטוס מנהל עודכן:', response.data)
+      } catch (error) {
+        console.error('❌ עדכון סטטוס מנהל נכשל:', error)
       }
     }
   }
-
 
   const handleSignup = async () => {
     setEventNumber('')
@@ -126,16 +124,16 @@ const ManagerSignup = () => {
     if (allValid) {
       setSubmitError('')
       try {
-        const userId = await ifExistEmail(); // ✅ Ensure we wait for the function to return
+        const userId = await ifExistEmail() // ✅ Ensure we wait for the function to return
 
         if (userId) {
-          setAsManeger(userId);
+          setAsManeger(userId)
         } else {
-          console.log('❌ Email does not exist');
+          console.log('❌ Email does not exist')
           // TODO: Add a user notification here
         }
       } catch (error) {
-        console.error("❌ Error in ifExistEmail():", error);
+        console.error('❌ Error in ifExistEmail():', error)
       }
     } else {
       setSubmitError('יש למלא את כל השדות החובה')
@@ -146,7 +144,6 @@ const ManagerSignup = () => {
       navigate('/LoginPage')
     }, 1000)
   }
-
 
   // פונקציית עיצוב בסיסית לשדות
   const createTextFieldSx = bgColor => ({

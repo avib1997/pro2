@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
   fname: { type: String, required: true },
@@ -9,6 +9,6 @@ const userSchema = new mongoose.Schema({
   giftsId: [String],
   eventId: [String],
   isManeger: { type: Boolean, default: false }
-});
+})
 
-module.exports = mongoose.model('User', userSchema); // CommonJS
+module.exports = mongoose.model('User', userSchema) // CommonJS
