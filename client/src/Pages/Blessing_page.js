@@ -109,7 +109,7 @@ export default function BlessingsPage() {
 
   return (
     <div dir="rtl">
-      <Navbar />
+      {/* <Navbar /> */}
       <Box
         sx={{
           position: 'absolute',

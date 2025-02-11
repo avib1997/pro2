@@ -2,6 +2,7 @@
 const userController = require('../controllers/userController')
 const jwtFn = require('../middleware/jwtMiddleware')
 const { fixHebrewText } = require('../fixHebrew.js')
+const { update } = require('../controllers/giftController.js')
 
 async function getGiftsById(userId) {
   const userDetails = await userController.readOne(userId)
@@ -56,13 +57,6 @@ exports.createUser = userFields => {
   userController.create(userFields)
 }
 
-exports.updateUser = (filter, newData) => {
-  if (!newData) {
-    throw { code: 400, message: 'there is no new data' }
-  }
-  userController.update(filter, newData)
-}
-
 module.exports.register = async userFields => {
   if (!userFields.email || !userFields.password || !userFields.fname || !userFields.lname) {
     throw { code: 400, message: 'missing data' }
@@ -83,6 +77,19 @@ const getIsManeger = async userId => {
   const user = await userController.readOne({ _id: userId })
   if (!user) throw new Error('❌ User not found')
   return user.isManeger
+}
+
+exports.updateUser = (filter, newData) => {
+  //אני צריך ש newData יכיל רק את השדות שאני רוצה לעדכן: {fname: , lname: , email: , password: , isManeger: }
+  newData = { fname: newData.fname, lname: newData.lname, email: newData.email, password: newData.password, isManeger: newData.isManeger }
+
+  console.log('filterrrrrrrrrr:', filter)
+  console.log('newDataaaaaaaa:', newData)
+  if (!newData) {
+    throw { code: 400, message: 'there is no new data' }
+  }
+  const updatedUser = userController.updateOne(filter, newData)
+  return { message: 'user updated successfully', user: updatedUser }
 }
 
 const updateManagerStatus = async (userId, isManeger) => {
@@ -108,6 +115,15 @@ const getAllUsers = async () => {
   return users
 }
 
+const deleteUser = async userId => {
+  if (!userId) {
+    throw { code: 400, message: 'missing userId' }
+  }
+
+  const deleted = await userController.del({ _id: userId })
+  return deleted
+}
+
 module.exports = {
   ...module.exports,
   getIsManeger,
@@ -115,5 +131,6 @@ module.exports = {
   login,
   getIdByEmail,
   getGiftsById,
-  getAllUsers
+  getAllUsers,
+  deleteUser
 }

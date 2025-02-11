@@ -57,4 +57,13 @@ async function del(_id) {
   }
 }
 
-module.exports = { create, readOne, read, readById, update, del }
+async function deleteMany(filter) {
+  try {
+    const result = await giftModel.deleteMany(filter)
+    return result
+  } catch (error) {
+    throw error
+  }
+}
+
+module.exports = { create, readOne, read, readById, update, del, deleteMany }

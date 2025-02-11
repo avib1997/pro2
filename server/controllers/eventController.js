@@ -72,4 +72,13 @@ const del = async id => {
   }
 }
 
-module.exports = { read, readOne, readById, create, update, del }
+const deleteOne = async filter => {
+  try {
+    return await eventModel.deleteOne(filter)
+  } catch (error) {
+    console.error('❌ Error deleting event:', error)
+    throw new Error('Failed to delete event')
+  }
+}
+
+module.exports = { read, readOne, readById, create, update, del, deleteOne }

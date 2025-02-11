@@ -1,18 +1,12 @@
 //client/src/Components/Navbar/Navbar.js
 import React, { useContext, useState } from 'react'
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, MenuItem, Container, Button, Avatar, Tooltip, Divider, styled } from '@mui/material'
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
-import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
-import MenuIcon from '@mui/icons-material/Menu'
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard'
 import { Link } from 'react-router-dom'
 import { Context } from '../../App'
 
-// פלטות צבע לדוגמה
-const mainGradient = 'linear-gradient(90deg, #141E30, #243B55)' // AppBar
 const menuBgColor = '#2B3A47' // רקע תפריט אווטאר
-const highlightColor = '#FFC107'
 
 const pagesGuest = [
   { name: 'ברכות', path: '/Blessing' },
@@ -26,7 +20,6 @@ const pagesRegistered = [
   { name: 'ברכות', path: '/Blessing' },
   { name: 'שאלות ותשובות', path: '/Fqa' },
   { name: 'מתנה', path: '/Details_page' }
-  //{ name: 'התחברות ורישום', path: '/Login_page' }
 ]
 
 const pagesManger = [
@@ -37,19 +30,7 @@ const pagesManger = [
     path: '/EventManager'
   },
   { name: 'היסטוריה', path: '/History' }
-  //{ name: 'התחברות ורישום', path: '/Login_page' }
 ]
-
-// עיצוב כפתור הניווט
-const NavButton = styled(Button)(({ theme }) => ({
-  color: '#ECEFF1',
-  fontWeight: 'bold',
-  marginRight: theme.spacing(2),
-  transition: '0.3s',
-  '&:hover': {
-    backgroundColor: 'rgba(255,255,255,0.1)'
-  }
-}))
 
 function Navbar() {
   const { userId, eventNumber, isEventManager, setEventNumber, userName, userEmail } = useContext(Context)
@@ -203,27 +184,6 @@ function Navbar() {
                 התחברות ורישום
               </Button>
 
-              {/* כפתור למנהלי אירועים */}
-              {/* {isEventManager && (
-                <Button
-                  onClick={handleBackToHome}
-                  component={Link}
-                  to="/EventManager"
-                  sx={{
-                    my: 2,
-                    color: '#ECEFF1',
-                    mr: 1.5,
-                    transition: '0.3s',
-                    '&:hover': {
-                      backgroundColor:
-                        'rgba(255,255,255,0.1)'
-                      //boxShadow: "0 0 8px rgba(236,239,241,0.4)",
-                    }
-                  }}
-                >
-                  ניהול אירועים
-                </Button>
-              )} */}
               {!isEventManager && ( // הצגת האלמנטים הקשורים ל-eventNumber רק אם isEventManager הוא false
                 <>
                   {/* אם אין eventNumber */}
@@ -269,89 +229,6 @@ function Navbar() {
               )}
             </Box>
 
-            {/* תפריט למובייל (כפתור המבורגר) */}
-            {/* <Box sx={{ display: { xs: "flex", md: "none" }, mr: 1 }}>
-              <IconButton
-                size="large"
-                aria-label="פתיחת תפריט"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                sx={{ color: "#fff" }}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                open={Boolean(anchorElNav)}
-                onClose={handleBackToHome}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                PaperProps={{
-                  sx: {
-                    backgroundColor: "#2e3b44",
-                  },
-                }}
-              >
-                <MenuItem onClick={handleBackToHome}>
-                  <Link
-                    to="/Details_page"
-                    style={{ textDecoration: "none", color: "#fff" }}
-                  >
-                    מתנה
-                  </Link>
-                </MenuItem>
-                <MenuItem onClick={handleBackToHome}>
-                  <Link
-                    to="/Home"
-                    style={{ textDecoration: "none", color: "#FFC107" }}
-                  >
-                    דף הבית
-                  </Link>
-                </MenuItem>
-                {navigationPages.map((page) => (
-                  <MenuItem key={page.name} onClick={handleBackToHome}>
-                    <Link
-                      to={page.path}
-                      style={{ textDecoration: "none", color: "#fff" }}
-                    >
-                      {page.name}
-                    </Link>
-                  </MenuItem>
-                ))}
-                {isEventManager && (
-                  <MenuItem onClick={handleBackToHome}>
-                    <Link
-                      to="/EventManager"
-                      style={{ textDecoration: "none", color: "#fff" }}
-                    >
-                      ניהול אירועים
-                    </Link>
-                  </MenuItem>
-                )}
-                {!eventNumber && (
-                  <MenuItem>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: "red",
-                        fontStyle: "italic",
-                        fontSize: "0.8rem",
-                      }}
-                    >
-                      כניסה ללא מספר מזהה אירוע
-                    </Typography>
-                  </MenuItem>
-                )}
-              </Menu>
-            </Box> */}
             {/* אייקון/תמונת פרופיל (אווטאר) בצד שמאל - פופאפ */}
             <Box
               sx={{
@@ -482,37 +359,6 @@ function Navbar() {
                 )}
               </Menu>
             </Box>
-
-            {/* אזור הצגת דרגה ופרטי משתמש (Name + Email) */}
-            {/* <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end", // ימינה ב-RTL
-                mr: 0, // רווח מצד ימין
-                ml: 10, // רווח מצד שמאל
-              }}
-            > */}
-            {/* דרגת המשתמש */}
-            {/* <Typography
-                variant="body1"
-                sx={{ color: "#fff", fontWeight: "bold" }}
-              >
-                דרגה: {userRank}
-              </Typography> */}
-            {/* שם (אם ידוע) */}
-            {/* {userName && (
-                <Typography variant="body2" sx={{ color: "#fff" }}>
-                  שם: {userName}
-                </Typography>
-              )} */}
-            {/* אימייל (אם ידוע) */}
-            {/* {userEmail && (
-                <Typography variant="body2" sx={{ color: "#fff" }}>
-                  אימייל: {userEmail}
-                </Typography>
-              )}
-            </Box> */}
 
             {/* לוגו בצד שמאל */}
             <CardGiftcardIcon

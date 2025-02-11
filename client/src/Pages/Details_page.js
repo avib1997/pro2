@@ -4,13 +4,13 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle' // אייקון לסימון העלאה
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice'
 import TheatersIcon from '@mui/icons-material/Theaters'
-import { Box, Button, Container, IconButton, Link, Slide, TextField, Tooltip, Typography } from '@mui/material'
-import axios from 'axios'
+import { Box, Button, Container, IconButton, Link, TextField, Tooltip, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Context } from '../App'
 import BitIcon from '../assets/bit.png'
 import PayPalIcon from '../assets/buy-logo-small-il.png'
 import PayBoxIcon from '../assets/paybox.png'
+import WarningIcon from '@mui/icons-material/Warning' // אייקון סימן קריאה אדום
 
 const Details = () => {
   const navigate = useNavigate()
@@ -22,6 +22,7 @@ const Details = () => {
     amount: ''
   })
   const [amount, setAmount] = useState(0)
+  const [errorMessage, setErrorMessage] = useState('')
 
   // מצבים עבור הקבצים שהועלו
   const [uploadedImage, setUploadedImage] = useState(false)
@@ -42,6 +43,43 @@ const Details = () => {
 
   const handleClick = async e => {
     e.preventDefault()
+    const errors = []
+
+    // בדיקה עבור שדה שם: חובה, ואין בו מספרים
+    if (!inputs.name.trim()) {
+      errors.push('יש למלא את שדה השם')
+    } else if (/\d/.test(inputs.name)) {
+      errors.push('שם לא יכול להכיל מספרים')
+    }
+
+    // בדיקה עבור שדה טלפון: חובה, ורק מספרים
+    if (!inputs.phone.trim()) {
+      errors.push('יש למלא את שדה הטלפון')
+    } else if (!/^\d+$/.test(inputs.phone)) {
+      errors.push('טלפון חייב להכיל רק מספרים')
+    }
+
+    // בדיקה עבור שדה ברכה: אם הוא לא ריק – אין לכלול מספרים
+    if (inputs.blessing.trim() && /\d/.test(inputs.blessing)) {
+      errors.push('ברכה לא יכולה להכיל מספרים')
+    }
+
+    // בדיקה עבור שדה סכום: חובה, ומכיל רק מספרים
+    if (!inputs.amount.trim()) {
+      errors.push('יש למלא את שדה הסכום לתשלום')
+    } else if (isNaN(inputs.amount)) {
+      errors.push('סכום לתשלום חייב להיות מספר בלבד')
+    }
+
+    if (errors.length > 0) {
+      // אם יש שגיאות – מציגים את כל הודעות השגיאה, כאשר כל הודעה בשורה נפרדת
+      setErrorMessage(errors.join('\n'))
+      return
+    }
+
+    // אם הכל תקין – מנקים את הודעות השגיאה ועוברים לדף הבא
+    setErrorMessage('')
+
     console.log('📌 event object:', event) // ✅ נבדוק אם event מוגדר
 
     const newGift = {
@@ -53,27 +91,18 @@ const Details = () => {
       EventId: eventId,
       toEventName: event.NameOfGroom
     }
-    if (!newGift.amount || newGift.name === '' || newGift.phone === '') {
-      console.log('אנא הכנס')
-      return
-    } else {
-      navigate('/Payment', { state: { newGift } }) // שולח את הסכום לעמוד PayPalPayment
-    }
+
+    navigate('/Payment', { state: { newGift } }) // שולח את הסכום לעמוד PayPalPayment
   }
 
   // פונקציות לטיפול בהעלאת קבצים
   const handleImageUpload = e => {
-    // לוגיקה להעלאת תמונה
     setUploadedImage(true)
   }
-
   const handleVideoUpload = e => {
-    // לוגיקה להעלאת וידאו
     setUploadedVideo(true)
   }
-
   const handleAudioUpload = e => {
-    // לוגיקה להעלאת אודיו
     setUploadedAudio(true)
   }
 
@@ -393,6 +422,32 @@ const Details = () => {
                   )}
                 </Box>
               </Box>
+
+              {errorMessage &&
+                errorMessage.split('\n').map((line, index) => (
+                  <Typography
+                    key={index}
+                    variant="body1"
+                    sx={{
+                      color: 'red',
+                      textAlign: 'center',
+                      fontFamily: 'Poppins, sans-serif',
+                      fontSize: '1.2rem',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {line}{' '}
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        animation: 'blink 1s infinite'
+                      }}
+                    >
+                      !
+                    </span>
+                  </Typography>
+                ))}
+
               <TextField
                 onChange={handleChange}
                 name="amount"
@@ -532,34 +587,18 @@ const Details = () => {
 
       <style>
         {`
-          @keyframes animateBg {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-          }
-        `}
+    @keyframes animateBg {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes blink {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.5); }
+      100% { transform: scale(1); }
+    }
+  `}
       </style>
-      {/* Footer פשוט בתחתית העמוד */}
-      {/* <Box
-        sx={{
-          marginTop: 5,
-          textAlign: 'center',
-          py: 1.5,
-          backgroundColor: 'rgba(0,0,0,0.3)',
-          color: '#E0E1DD'
-        }}
-      >
-        <Typography
-          variant="body2"
-          sx={{ fontSize: '0.9rem' }}
-        >
-          &copy; {new Date().getFullYear()} EASY
-          GIFT | כל הזכויות שמורות
-        </Typography>
-        <Typography>
-          פיתוח על ידי אבי ברודצקי ומוטי ברודצקי
-        </Typography>
-      </Box> */}
     </Box>
   )
 }

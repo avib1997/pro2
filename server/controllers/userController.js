@@ -1,4 +1,5 @@
 //server/controllers/userController.js
+const { set } = require('mongoose')
 const userModel = require('../models/userModel')
 
 async function create(data) {
@@ -28,6 +29,23 @@ async function read(filter, proj) {
   }
 }
 
+// const updatedUser = await userModel.findByIdAndUpdate(
+//   userId, // למשל: '67a20b557311038867538be4'
+//   {
+//     $set: {
+//       fname: 'אבי',
+//       lname: 'ברודצקי',
+//       email: 'bro@gmail.com',
+//       password: 'bro',
+//       giftsId: ['67a20c9b7311038867538c00'],
+//       eventId: ['67a20beb7311038867538bf5'],
+//       entryDate: new Date('2025-02-04T12:43:01.603Z'),
+//       isManeger: true
+//     }
+//   },
+//   { new: true } // אפשרות זו מחזירה את המסמך המעודכן
+// )
+
 async function update(filter, newData) {
   try {
     const result = await userModel.updateOne(filter, newData)
@@ -39,25 +57,21 @@ async function update(filter, newData) {
 
 // Update the isManeger field by userId
 const updateOne = async (filter, updateData) => {
+  console.log('filteeeeeeeer:', filter)
+  console.log('updateDaaaaaaata:', updateData)
   try {
-    const updatedUser = await userModel.findOneAndUpdate(
-      filter, // Find user by filter
-      updateData, // Update fields
-      { new: true } // Return updated document
-    );
+    const updatedUser = await userModel.findOneAndUpdate(filter, updateData, { new: true })
 
-    return updatedUser;
+    return updatedUser
   } catch (error) {
-    console.error("❌ Error updating user:", error);
-    throw new Error("❌ Failed to update user");
+    console.error('❌ Error updating user:', error)
+    throw new Error('❌ Failed to update user')
   }
-};
-
-
+}
 
 async function del(filter) {
   try {
-    const result = await update(filter, { isActive: false })
+    const result = await userModel.deleteOne(filter)
     return result
   } catch (error) {
     throw error

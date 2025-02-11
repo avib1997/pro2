@@ -61,7 +61,7 @@ router.post('/addEvent', async (req, res) => {
 
 router.put('/:eventId', async (req, res) => {
   try {
-    const updatedEvent = await eventController.update(req.params.eventId, req.body)
+    const updatedEvent = await eventService.updateEvent(req.params.eventId, req.body)
     res.status(200).json(updatedEvent)
   } catch (error) {
     console.error('❌ Error updating event:', error)
@@ -69,9 +69,12 @@ router.put('/:eventId', async (req, res) => {
   }
 })
 
+//
+
 router.delete('/:eventId', async (req, res) => {
   try {
-    const deletedEvent = await eventController.del(req.params.eventId)
+    const deletedEvent = await eventService.deleteEvent(req.params.eventId)
+    console.log('deletedEvent on eventRoutes delete', deletedEvent)
     res.status(200).json(deletedEvent)
   } catch (error) {
     console.error('❌ Error deleting event:', error)

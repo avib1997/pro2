@@ -7,13 +7,15 @@ import axios from 'axios'
 import EventCard from '../Components/events/EventCard'
 import EventDialog from '../Components/events/EventDialog'
 import AddEventDialog from '../Components/events/AddEventDialog' // דיאלוג חדש להוספת אירוע
+import EditEventDialog from '../Components/events/EditEventDialog' // דיאלוג לעריכת אירוע
 
 const EventManager = () => {
-  const { userId, IsEvent, setIsEvent } = useContext(Context)
+  const { userId, IsEvent } = useContext(Context)
   const [events, setEvents] = useState([])
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [openDialog, setOpenDialog] = useState(false)
   const [openAddEventDialog, setOpenAddEventDialog] = useState(false)
+  const [openEditEventDialog, setOpenEditEventDialog] = useState(false)
 
   useEffect(() => {
     axios
@@ -52,6 +54,18 @@ const EventManager = () => {
     } catch (error) {
       console.error('❌ Error refreshing events:', error)
     }
+  }
+
+  const handleEditEvent = event => {
+    setSelectedEvent(event)
+    setOpenEditEventDialog(true)
+    setOpenDialog(false) // ניתן לסגור את חלון הפרטים בזמן פתיחת חלון העריכה
+  }
+
+  const handleSaveEdit = updatedEvent => {
+    setEvents(prevEvents => prevEvents.map(ev => (ev._id === updatedEvent._id ? updatedEvent : ev)))
+    setOpenEditEventDialog(false)
+    setSelectedEvent(null)
   }
 
   return (
@@ -93,8 +107,24 @@ const EventManager = () => {
         </Grid>
       </Grid>
 
-      {selectedEvent && <EventDialog open={openDialog} event={selectedEvent} onClose={handleCloseDialog} onDelete={handleDeleteEvent} />}
+      {/* חלון פרטי אירוע */}
+      {selectedEvent && <EventDialog open={openDialog} event={selectedEvent} onClose={handleCloseDialog} onDelete={handleDeleteEvent} onEdit={handleEditEvent} />}
+
+      {/* דיאלוג הוספת אירוע */}
       <AddEventDialog open={openAddEventDialog} onClose={() => setOpenAddEventDialog(false)} onAdd={handleAddEvent} />
+
+      {/* דיאלוג עריכת אירוע */}
+      {selectedEvent && (
+        <EditEventDialog
+          open={openEditEventDialog}
+          event={selectedEvent}
+          onClose={() => {
+            setOpenEditEventDialog(false)
+            setSelectedEvent(null)
+          }}
+          onSave={handleSaveEdit}
+        />
+      )}
     </Box>
   )
 }

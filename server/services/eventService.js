@@ -45,10 +45,16 @@ async function deleteEvent(eventId) {
     throw { code: 400, message: 'missing eventId' }
   }
   try {
-    const deleted = await eventController.deleteOne({ _id: eventId })
-    return deleted
+    const eventDeleted = await eventController.deleteOne({ _id: eventId })
+    if (!eventDeleted) {
+      throw { code: 404, message: 'error delete event' }
+    }
+    await userController.update({ eventId: eventId }, { $pull: { eventId: eventId } })
+    console.log('✅ Event', eventId, 'deleted and removed from all users.')
+    return { success: true, message: 'Event deleted and users updated successfully' }
   } catch (error) {
-    throw error
+    console.log('❌ Error deleting event:', error)
+    return { success: false, error: error.message }
   }
 }
 

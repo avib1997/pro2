@@ -1,3 +1,4 @@
+//client/src/App.js
 import { createContext, useState } from 'react'
 import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
@@ -63,9 +64,6 @@ function App() {
         <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
           &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
         </Typography>
-        {/* <Typography>
-          פיתוח על ידי אבי ברודצקי ומוטי ברודצקי
-        </Typography> */}
       </Box>
       <Box
         sx={{

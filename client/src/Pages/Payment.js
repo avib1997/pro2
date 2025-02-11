@@ -1,23 +1,19 @@
 //client/src/Pages/Payment.js
-import { useNavigate } from 'react-router-dom'
 import { Context } from '../App'
 import React, { useState, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router-dom' //
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js'
-import { Container, TextField, Button, Box, Typography } from '@mui/material'
+import { Container, Button, Box, Typography } from '@mui/material'
 import axios from 'axios'
-import { useWindowSize } from 'react-use'
 import { motion } from 'framer-motion'
-import Confetti from 'react-confetti'
 
 const PayPalPayment = () => {
   const [newGift, setNewGift] = useState(0)
   const [showPayPal, setShowPayPal] = useState(false)
-  const { userId, eventId, event } = useContext(Context)
+  const { eventId } = useContext(Context)
   const location = useLocation()
   const [emailPaypal, setEmailPaypal] = useState('')
   const [paymentSuccess, setPaymentSuccess] = useState(false)
-  const { width, height } = useWindowSize()
 
   // ספירה לאחור לאירוע (דוגמה):
   const [timeLeft, setTimeLeft] = useState({

@@ -1,10 +1,6 @@
+//client/src/routes/MainRouter.jsx
 import React from 'react'
-import {
-  useLocation,
-  Route,
-  Routes
-} from 'react-router-dom'
-//import CoupleNames from '../Components/Details/Couple_names'
+import { useLocation, Route, Routes } from 'react-router-dom'
 import AddEvent from '../Components/events/AddEvent'
 import Admin from '../Pages/Admin'
 import Blessing from '../Pages/Blessing_page'
@@ -19,87 +15,49 @@ import Payment from '../Pages/Payment'
 import TheEnd from '../Pages/TheEnd'
 import Navbar from '../Components/Navbar/Navbar'
 import ContactPage from '../Pages/ContactPage'
+import GlobalStyles from '@mui/material/GlobalStyles'
 
 function MainRouter() {
   const location = useLocation()
-  // רשימת הנתיבים שלא רוצים להציג בהם Navbar
-  const hideNavbarOnRoutes = [
-    '/',
-    '/LoginPage',
-    '/Home',
-    '/Admin',
-    '/CoupleNames',
-    '/ManagerSignup'
-  ]
+
+  console.log('location.pathname =', location.pathname)
+
   const shouldHideNavbar =
-    hideNavbarOnRoutes.includes(location.pathname)
+    location.pathname === '/' || location.pathname === '/LoginPage' || location.pathname === '/Home' || location.pathname === '/ManagerSignup' || location.pathname.startsWith('/admin')
 
   return (
     <>
       {/* אם לא נמצאים בנתיבים שאנחנו רוצים להסתיר - מציגים Navbar */}
       {!shouldHideNavbar && <Navbar />}
-      <Routes>
-        <Route
-          element={<Home />}
-          path="/"
-        ></Route>
-        <Route
-          element={<LoginPage />}
-          path="/LoginPage"
-        ></Route>
-        <Route
-          element={<Home />}
-          path="/Home"
-        ></Route>
-        <Route
-          element={<Admin />}
-          path="/Admin"
-        ></Route>
-        <Route
-          element={<Details_page />}
-          path="/Details_Page"
-        ></Route>
-        <Route
-          element={<Payment />}
-          path="/Payment"
-        ></Route>
-        <Route
-          element={<History />}
-          path="/History"
-        ></Route>
-        {/* <Route
-          element={<CoupleNames />}
-          path="/CoupleNames"
-        ></Route> */}
-        <Route
-          element={<Manager />}
-          path="/EventManager"
-        ></Route>
-        <Route
-          element={<ManagerSignup />}
-          path="/ManagerSignup"
+      <>
+        <GlobalStyles
+          styles={{
+            html: {
+              scrollbarWidth: 'none',
+              '-ms-overflow-style': 'none'
+            },
+            'html::-webkit-scrollbar': {
+              display: 'none'
+            }
+          }}
         />
-        <Route
-          element={<AddEvent />}
-          path="/AddEvent"
-        ></Route>
-        <Route
-          element={<Blessing />}
-          path="/Blessing"
-        ></Route>
-        <Route
-          element={<Fqa />}
-          path="/Fqa"
-        ></Route>
-        <Route
-          element={<ContactPage />}
-          path="/contact"
-        />
-        <Route
-          element={<TheEnd />}
-          path="/TheEnd"
-        ></Route>
-      </Routes>
+        <Routes>
+          <Route element={<Home />} path="/"></Route>
+          <Route element={<LoginPage />} path="/LoginPage"></Route>
+          <Route element={<Home />} path="/Home"></Route>
+          <Route element={<Admin />} path="/Admin"></Route>
+          <Route element={<Details_page />} path="/Details_page"></Route>
+          <Route element={<Payment />} path="/Payment"></Route>
+          <Route element={<History />} path="/History"></Route>
+          <Route element={<Manager />} path="/EventManager"></Route>
+          <Route element={<ManagerSignup />} path="/ManagerSignup" />
+          <Route element={<AddEvent />} path="/AddEvent"></Route>
+          <Route element={<Blessing />} path="/Blessing"></Route>
+          <Route element={<Fqa />} path="/Fqa"></Route>
+          <Route element={<ContactPage />} path="/contact" />
+          <Route element={<TheEnd />} path="/TheEnd"></Route>
+        </Routes>
+      </>
     </>
   )
 }

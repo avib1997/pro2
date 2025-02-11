@@ -1,3 +1,4 @@
+//client/src/Components/events/EventCard.js
 import React from 'react'
 import { Grid, Card, CardContent, Typography, CardActions, IconButton, Tooltip } from '@mui/material'
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material'

@@ -90,6 +90,29 @@ router.post('/isManeger', async (req, res) => {
   }
 })
 
+//axios.put(`http://localhost:2001/api/users/${editedUser._id}`, editedUser)
+router.put('/:userId', async (req, res) => {
+  console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
+  try {
+    const updatedUser = await userService.updateUser({ _id: req.params.userId }, req.body)
+    console.log('updatedUser in user Routes:', updatedUser)
+    res.send(updatedUser)
+  } catch (err) {
+    res.status(500).send({ error: err.message })
+  }
+})
+
+router.delete('/:userId', async (req, res) => {
+  console.log('(req.params):' + fixHebrewText('למחיקה נתוני הבקשה '), req.params)
+  try {
+    const deletedUser = await userService.deleteUser(req.params.userId)
+    console.log('deletedUser in user Routes:', deletedUser)
+    res.send(deletedUser)
+  } catch (err) {
+    res.status(500).send({ error: err.message })
+  }
+})
+
 // ראוט בדיקה
 router.get('/test', (req, res) => {
   res.json({ message: 'Users routes are working!' })
