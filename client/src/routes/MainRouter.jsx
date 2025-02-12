@@ -16,6 +16,7 @@ import TheEnd from '../Pages/TheEnd'
 import Navbar from '../Components/Navbar/Navbar'
 import ContactPage from '../Pages/ContactPage'
 import GlobalStyles from '@mui/material/GlobalStyles'
+import Test from '../Pages/test'
 
 function MainRouter() {
   const location = useLocation()
@@ -56,6 +57,7 @@ function MainRouter() {
           <Route element={<Fqa />} path="/Fqa"></Route>
           <Route element={<ContactPage />} path="/contact" />
           <Route element={<TheEnd />} path="/TheEnd"></Route>
+          <Route element={<Test />} path="/Test"></Route>
         </Routes>
       </>
     </>

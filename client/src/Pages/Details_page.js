@@ -11,6 +11,7 @@ import BitIcon from '../assets/bit.png'
 import PayPalIcon from '../assets/buy-logo-small-il.png'
 import PayBoxIcon from '../assets/paybox.png'
 import WarningIcon from '@mui/icons-material/Warning' // אייקון סימן קריאה אדום
+import sendLog from '../LogSend'
 
 const Details = () => {
   const navigate = useNavigate()
@@ -91,7 +92,8 @@ const Details = () => {
       EventId: eventId,
       toEventName: event.NameOfGroom
     }
-
+    //sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Signup', 'handleSubmit', userId, null, null)
+    sendLog('success', 'pages', 200, '✅ Payment עבר לדף', 'client', '/Details_page', 'handleClick', userId, null, null)
     navigate('/Payment', { state: { newGift } }) // שולח את הסכום לעמוד PayPalPayment
   }
 

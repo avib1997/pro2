@@ -7,9 +7,11 @@ import axios from 'axios' // ייבוא האקסיוס לפני שימוש בו
 
 // אייקונים מותאמים לכל שדה
 import { Person as PersonIcon, Email as EmailIcon, Phone as PhoneIcon, Info as InfoIcon } from '@mui/icons-material'
+import sendLog from '../LogSend'
+import { set } from 'mongoose'
 
 const ManagerSignup = () => {
-  const { setEventNumber, eventId } = useContext(Context) // נקרא את ערך ה-eventId
+  const [uid, setUid] = useState('') //יוזר איידי מקומי
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -87,26 +89,30 @@ const ManagerSignup = () => {
   const ifExistEmail = async () => {
     try {
       const response = await axios.post('http://localhost:2001/api/users/userid', { email: emailUser })
-      console.log('response.data in ManegerSignup ifExistEmail:', response.data.userid[0]._id)
+
       if (response.data.userid[0]._id) {
+        setUid(response.data.userid[0]._id)
+        sendLog('success', 'user', 200, '✅ קיים משתמש במערכת', 'client', '/ManagerSignup', 'ifExistEmail', uid, null, null, emailUser)
         return response.data.userid[0]._id
       } else {
+        sendLog('error', 'user', '❌ אימייל לא קיים במערכת', 'client', '/ManagerSignup', 'ifExistEmail', null, null, null, emailUser)
         return null
       }
     } catch (error) {
+      sendLog('error', 'user', 500, '❌ תקלה בשרת', 'client', '/ManagerSignup', 'ifExistEmail', null, null, null)
       console.log('error in ManegerSignup ifExistEmail:', error)
     }
   }
 
-  const setAsManeger = async userId => {
-    if (!userId) {
+  const setAsManeger = async () => {
+    if (!uid) {
       console.log('userId is not exist')
       return
     } else {
       try {
-        console.log('userId in setAsManeger:', userId)
+        console.log('userId in setAsManeger:', uid)
         const response = await axios.put('http://localhost:2001/api/users/update-manager', {
-          userId,
+          uid,
           isManeger: true // זה הערך החדש
         })
         console.log('✅ סטטוס מנהל עודכן:', response.data)
@@ -117,30 +123,24 @@ const ManagerSignup = () => {
   }
 
   const handleSignup = async () => {
-    setEventNumber('')
-    // אם הכל תקין
     const allValid = Object.values(isValid).every(v => v === true)
 
     if (allValid) {
       setSubmitError('')
       try {
-        const userId = await ifExistEmail() // ✅ Ensure we wait for the function to return
-
-        if (userId) {
-          setAsManeger(userId)
-        } else {
-          console.log('❌ Email does not exist')
-          // TODO: Add a user notification here
-        }
+        setAsManeger(await ifExistEmail())
       } catch (error) {
         console.error('❌ Error in ifExistEmail():', error)
       }
     } else {
+      sendLog('error', 'general', '❌ יש למלא את כל השדות החובה', 'client', '/ManagerSignup', 'handleSignup', null, null, null)
       setSubmitError('יש למלא את כל השדות החובה')
     }
 
     setShowSuccessAnimation(true)
     setTimeout(() => {
+      //sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Signup', 'handleSubmit', userId, null, null)
+      sendLog('success', 'pages', 200, '✅ LoginPage עבר לדף', 'client', '/Signup', 'handleSubmit', uid, null, null)
       navigate('/LoginPage')
     }, 1000)
   }

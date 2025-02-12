@@ -4,9 +4,10 @@ import { Email as EmailIcon, Lock as LockIcon } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Context } from '../../App'
+import sendLog from '../../LogSend'
 
 const Login = props => {
-  const { setUserId, setDetailsId, setIsEventManager, setUserName, setUserEmail, setEventNumber } = useContext(Context)
+  const { setUserId, setDetailsId, setIsEventManager, setUserName, setUserEmail, setEventNumber ,userId} = useContext(Context)
 
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
@@ -81,21 +82,27 @@ const Login = props => {
           if (managerResponse.data) {
             setIsEventManager(true)
             setEventNumber('')
+            sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Login', 'handleSubmit', userId, null, null)
             navigate('/EventManager')
           } else {
+            sendLog('error', 'user', '❌ אין הרשאה לכניסה כמנהל', 'client', '/Login', 'handleSubmit', userId, null, null)
             setErrorMessage('אין הרשאה לכניסה כמנהל.')
           }
         } else {
           setIsEventManager(false)
+          sendLog('success', 'pages', 200, '✅ Details_page עבר לדף', 'client', '/Login', 'handleSubmit', userId, null, null)
           navigate('/Details_page')
         }
       } else {
         // טיפול במקרה של שגיאה מהשרת
         if (response.data === 'not exist') {
+          sendLog('error', 'user', '❌ המייל לא קיים במערכת', 'client', '/Login', 'handleSubmit', null, null, null)
           setErrorMessage('המייל לא קיים במערכת.')
         } else if (response.data === 'password not correct') {
+          sendLog('error', 'user', '❌ הסיסמה שגויה', 'client', '/Login', 'handleSubmit', null, null, null)
           setErrorMessage('הסיסמה שגויה.')
         } else {
+          sendLog('error', 'user', '❌ התחברות נכשלה', 'client', '/Login', 'handleSubmit', null, null, null)
           setErrorMessage(response.data || 'התחברות נכשלה. נסה שוב.')
         }
         console.log('התחברות נכשלה:', response.data)
@@ -104,13 +111,17 @@ const Login = props => {
       // טיפול בשגיאות רשת או שגיאות בלתי צפויות
       if (error.response) {
         if (error.response.data === 'not exist') {
+          sendLog('error', 'user', '❌ המייל לא קיים במערכת', 'client', '/Login', 'handleSubmit', null, null, null)
           setErrorMessage('המייל לא קיים במערכת.')
         } else if (error.response.data === 'password not correct') {
+          sendLog('error', 'user', '❌ הסיסמה שגויה', 'client', '/Login', 'handleSubmit', null, null, null)
           setErrorMessage('הסיסמה שגויה.')
         } else {
+          sendLog('error', 'user', '❌ התחברות נכשלה', 'client', '/Login', 'handleSubmit', null, null, null)
           setErrorMessage(error.response.data || 'אירעה שגיאה. אנא נסה שוב.')
         }
       } else {
+        sendLog('error', 'user', '❌ התחברות נכשלה', 'client', '/Login', 'handleSubmit', null, null, null)
         setErrorMessage('אירעה שגיאה. אנא נסה שוב.')
       }
       console.error('Error during login:', error)

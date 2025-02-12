@@ -5,6 +5,7 @@ import axios from 'axios'
 import { Context } from '../../App'
 // אייקונים מתאימים לשדות
 import { Person as PersonIcon, PersonOutline as PersonOutlineIcon, Email as EmailIcon, Lock as LockIcon } from '@mui/icons-material'
+import sendLog from '../../LogSend'
 
 const Signup = props => {
   const Navigate = useNavigate()
@@ -32,6 +33,7 @@ const Signup = props => {
         password: input.password
       }
       axios.post('http://localhost:2001/addUserManager', addUserManager)
+      sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Signup', 'handleSubmit', userId, null, null)
       Navigate('/EventManager')
     } else {
       const newUser = {

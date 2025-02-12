@@ -1,17 +1,6 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Container,
-  Paper,
-  TextField,
-  Typography
-} from '@mui/material'
+import { Avatar, Box, Button, Container, Paper, TextField, Typography } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2' // ייבוא נכון של Grid2
-import React, {
-  useContext,
-  useState
-} from 'react'
+import React, { useContext, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { Link } from 'react-router-dom'
 import { Context } from '../App' // ייבוא הקונטקסט עבור ID של האירוע
@@ -19,30 +8,24 @@ import profilePic1 from '../assets/profile1.jpg' // תמונת אבי
 import profilePic2 from '../assets/profile2.jpg' // תמונת מוטי
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import sendLog from '../LogSend'
 
 const Home = () => {
   const navigate = useNavigate()
-  const { setEventNumber, setEvent } =
-    useContext(Context) // נעדכן את ה-ID של האירוע בקונטקסט
-  const [EventNumber, setEventNumberInput] =
-    useState('') // ניהול הסטייט של השדה
-  const [errorMessage, setErrorMessage] =
-    useState('') // סטייט עבור הודעת השגיאה
+  const { setEventNumber, setEvent, eventId, setEventId } = useContext(Context) // נעדכן את ה-ID של האירוע בקונטקסט
+  const [EventNum, setEventNum] = useState('') // ניהול הסטייט של השדה
+  const [errorMessage, setErrorMessage] = useState('') // סטייט עבור הודעת השגיאה
 
-  const { ref: titleRef, inView: titleInView } =
-    useInView({
-      triggerOnce: true
-    })
-  const { ref: textRef, inView: textInView } =
-    useInView({ triggerOnce: true })
-  const { ref: buttonRef, inView: buttonInView } =
-    useInView({
-      triggerOnce: true
-    })
-  const { ref: inputRef, inView: inputInView } =
-    useInView({
-      triggerOnce: true
-    })
+  const { ref: titleRef, inView: titleInView } = useInView({
+    triggerOnce: true
+  })
+  const { ref: textRef, inView: textInView } = useInView({ triggerOnce: true })
+  const { ref: buttonRef, inView: buttonInView } = useInView({
+    triggerOnce: true
+  })
+  const { ref: inputRef, inView: inputInView } = useInView({
+    triggerOnce: true
+  })
 
   const [ref1, inView1] = useInView({
     triggerOnce: true,
@@ -78,52 +61,39 @@ const Home = () => {
   })
 
   const handleEventIdChange = e => {
-    setEventNumberInput(e.target.value)
+    setEventNum(e.target.value)
     // בכל הקלדה חדשה, ננקה את הודעת השגיאה
     setErrorMessage('')
   }
 
   const handleStartClick = () => {
-    console.log(
-      '🔍 בדיקת מספר אירוע:',
-      EventNumber
-    )
+    console.log('🔍 בדיקת מספר אירוע:', EventNum)
     // אם לא הוזן מספר אירוע, נציג הודעת שגיאה ולא נמשיך
-    if (!EventNumber) {
+    if (!EventNum) {
       setErrorMessage('❌ חסר מספר אירוע')
       return
     }
 
     // אם כן הוזן, נבצע את הקריאה לשרת
     axios
-      .post(
-        `http://localhost:2001/api/events/checkEventNumber`,
-        { Event_number: EventNumber }
-      )
+      .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: EventNum })
       .then(response => {
-        console.log(
-          '✅ תגובה מהשרת:',
-          response.data
-        )
+        console.log('✅ תגובה מהשרת:', response.data)
         if (response.data && response.data._id) {
           setEvent(response.data._id) // שמירת האירוע בסטייט
-          setEventNumber(EventNumber) // שמירת ה-ID בקונטקסט
+          setEventNumber(EventNum) // שמירת ה-ID בקונטקסט
+          setEventId(response.data._id) // שמירת ה-ID בסטייט
+          sendLog('success', 'pages', 200, '✅ LoginPage עבר לדף', 'client', '/HomePage', 'handleStartClick', null, null, eventId)
           navigate('/LoginPage')
         } else {
+          sendLog('error', 'event', 404, '❌ מספר האירוע לא נמצא', 'client', '/HomePage', 'handleStartClick', null, null, null)
           console.log('❌ מספר האירוע לא נמצא')
-          setErrorMessage(
-            '❌ אירוע לא נמצא, בדוק את המספר שהוזן'
-          )
+          setErrorMessage('❌ אירוע לא נמצא, בדוק את המספר שהוזן')
         }
       })
       .catch(error => {
-        console.log(
-          '❌ שגיאה בזמן בדיקת מספר האירוע:',
-          error
-        )
-        setErrorMessage(
-          '❌ שגיאה בחיבור לשרת, נסה שוב'
-        )
+        console.log('❌ שגיאה בזמן בדיקת מספר האירוע:', error)
+        setErrorMessage('❌ שגיאה בחיבור לשרת, נסה שוב')
       })
   }
 
@@ -167,8 +137,7 @@ const Home = () => {
       {/* חלק ראשון - ברוכים הבאים עם כפתור */}
       <Box
         sx={{
-          background:
-            'linear-gradient(135deg, #1E3A8A, #E5E7EB)',
+          background: 'linear-gradient(135deg, #1E3A8A, #E5E7EB)',
           color: 'white',
           padding: '100px 0',
           textAlign: 'center',
@@ -184,9 +153,7 @@ const Home = () => {
               color: '#F9A826',
               marginBottom: '20px',
               opacity: titleInView ? 1 : 0,
-              transform: titleInView
-                ? 'translateY(0)'
-                : 'translateY(-50px)',
+              transform: titleInView ? 'translateY(0)' : 'translateY(-50px)',
               transition: 'all 0.7s ease-out'
             }}
           >
@@ -200,15 +167,11 @@ const Home = () => {
               color: '#fff',
               marginBottom: '40px',
               opacity: textInView ? 1 : 0,
-              transform: textInView
-                ? 'translateY(0)'
-                : 'translateY(-50px)',
+              transform: textInView ? 'translateY(0)' : 'translateY(-50px)',
               transition: 'all 0.7s ease-out'
             }}
           >
-            גלו את הדרך הטובה ביותר לנהל את
-            האירועים והמתנות שלכם. פשוט, יעיל
-            ואלגנטי.
+            גלו את הדרך הטובה ביותר לנהל את האירועים והמתנות שלכם. פשוט, יעיל ואלגנטי.
           </Typography>
           <Typography
             sx={{
@@ -216,9 +179,7 @@ const Home = () => {
               color: '#fff',
               marginBottom: '10px',
               opacity: inputInView ? 1 : 0,
-              transform: inputInView
-                ? 'translateY(0)'
-                : 'translateY(-50px)',
+              transform: inputInView ? 'translateY(0)' : 'translateY(-50px)',
               transition: 'all 0.7s ease-out'
             }}
           >
@@ -245,7 +206,7 @@ const Home = () => {
             InputProps={{
               disableUnderline: true // מבטלים את הקו התחתון של ברירת המחדל ב־filled
             }}
-            value={EventNumber}
+            value={EventNum}
             onChange={handleEventIdChange}
             sx={{
               direction: 'rtl',
@@ -253,18 +214,14 @@ const Home = () => {
               marginLeft: '20px',
               width: '500px',
               //height: "50px",
-              backgroundColor:
-                'rgba(255, 255, 255, 0.3)', // רקע שקוף למחצה עם מעט חלבי
+              backgroundColor: 'rgba(255, 255, 255, 0.3)', // רקע שקוף למחצה עם מעט חלבי
               borderRadius: '15px',
               opacity: inputInView ? 1 : 0,
-              transform: inputInView
-                ? 'translateY(0)'
-                : 'translateY(-50px)',
+              transform: inputInView ? 'translateY(0)' : 'translateY(-50px)',
               transition: 'all 0.7s ease-out', // מעבר חלק כמו הכפתור
               '& .MuiFilledInput-root': {
                 borderRadius: '15px',
-                backgroundColor:
-                  'rgba(255, 255, 255, 0.3)', // רקע שקוף למחצה עם מעט חלבי
+                backgroundColor: 'rgba(255, 255, 255, 0.3)', // רקע שקוף למחצה עם מעט חלבי
                 color: '#333', // צבע טקסט כהה
                 boxShadow: 'none',
                 padding: '0px', // רווח פנימי
@@ -276,13 +233,11 @@ const Home = () => {
 
                 '&:hover': {
                   backgroundColor: '#f4f4f4',
-                  boxShadow:
-                    '0px 8px 15px rgba(0, 0, 0, 0.1)' // צל עדין
+                  boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)' // צל עדין
                 },
                 '&.Mui-focused': {
                   backgroundColor: '#fff',
-                  boxShadow:
-                    '0px 8px 15px rgba(0, 0, 0, 0.3)'
+                  boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)'
                 }
               },
 
@@ -294,12 +249,11 @@ const Home = () => {
                 color: '#666',
                 fontSize: '1rem'
               },
-              '& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink':
-                {
-                  right: '20px',
-                  transformOrigin: 'top right',
-                  color: 'darkblue'
-                }
+              '& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink': {
+                right: '20px',
+                transformOrigin: 'top right',
+                color: 'darkblue'
+              }
             }}
           />
 
@@ -314,14 +268,11 @@ const Home = () => {
               padding: '5px 40px',
               borderRadius: '15px',
               opacity: buttonInView ? 1 : 0,
-              transform: buttonInView
-                ? 'translateY(0)'
-                : 'translateY(-50px)',
+              transform: buttonInView ? 'translateY(0)' : 'translateY(-50px)',
               transition: 'all 0.7s ease-out',
               '&:hover': {
                 backgroundColor: '#d88d1c',
-                boxShadow:
-                  '0px 8px 15px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)'
               }
             }}
             // component={Link}
@@ -336,9 +287,7 @@ const Home = () => {
               color: '#fff',
               marginTop: '20px',
               opacity: inputInView ? 1 : 0,
-              transform: inputInView
-                ? 'translateY(0)'
-                : 'translateY(-50px)',
+              transform: inputInView ? 'translateY(0)' : 'translateY(-50px)',
               transition: 'all 0.7s ease-out'
             }}
           >
@@ -354,14 +303,11 @@ const Home = () => {
               borderRadius: '30px',
               marginTop: '10px',
               opacity: inputInView ? 1 : 0,
-              transform: inputInView
-                ? 'translateY(0)'
-                : 'translateY(-50px)',
+              transform: inputInView ? 'translateY(0)' : 'translateY(-50px)',
               transition: 'all 0.7s ease-out',
               '&:hover': {
                 backgroundColor: '#1976D2',
-                boxShadow:
-                  '0px 5px 10px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.3)'
               }
             }}
             onClick={() => navigate('/LoginPage')}
@@ -376,9 +322,7 @@ const Home = () => {
               color: '#fff',
               marginTop: '20px',
               opacity: inputInView ? 1 : 0,
-              transform: inputInView
-                ? 'translateY(0)'
-                : 'translateY(-50px)',
+              transform: inputInView ? 'translateY(0)' : 'translateY(-50px)',
               transition: 'all 0.7s ease-out'
             }}
           >
@@ -395,14 +339,11 @@ const Home = () => {
               borderRadius: '30px',
               marginTop: '10px',
               opacity: inputInView ? 1 : 0,
-              transform: inputInView
-                ? 'translateY(0)'
-                : 'translateY(-50px)',
+              transform: inputInView ? 'translateY(0)' : 'translateY(-50px)',
               transition: 'all 0.7s ease-out',
               '&:hover': {
                 backgroundColor: '#388E3C',
-                boxShadow:
-                  '0px 5px 10px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.3)'
               }
             }}
             component={Link}
@@ -420,15 +361,11 @@ const Home = () => {
           width: '100%',
           height: '100%',
           zIndex: -1,
-          background:
-            'linear-gradient(135deg, #0D1B2A, #1B263B)',
+          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
           backgroundSize: '400% 400%',
-          animation:
-            'animateBg 15s ease infinite',
+          animation: 'animateBg 15s ease infinite',
           opacity: inputInView ? 1 : 0,
-          transform: inputInView
-            ? 'translateY(0)'
-            : 'translateY(-50px)',
+          transform: inputInView ? 'translateY(0)' : 'translateY(-50px)',
           transition: 'all 0.7s ease-out'
         }}
       />
@@ -447,18 +384,13 @@ const Home = () => {
           sx={{
             borderRadius: '50px',
             marginBottom: '50px',
-            backgroundColor:
-              cardStyles[1].backgroundColor,
+            backgroundColor: cardStyles[1].backgroundColor,
             color: '#000',
-            transition:
-              'transform 0.5s ease-in-out, box-shadow 0.3s ease-in-out',
-            transform: inView2
-              ? 'translateY(0)'
-              : 'translateY(50px)',
+            transition: 'transform 0.5s ease-in-out, box-shadow 0.3s ease-in-out',
+            transform: inView2 ? 'translateY(0)' : 'translateY(50px)',
             opacity: inView2 ? 1 : 0,
             '&:hover': {
-              boxShadow:
-                '0px 10px 20px rgba(0, 0, 0, 0.2)'
+              boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)'
             },
             fontFamily: 'Poppins, sans-serif'
           }}
@@ -472,36 +404,16 @@ const Home = () => {
           >
             מייסדי המערכת
           </Typography>
-          <Grid2
-            container
-            spacing={20}
-            justifyContent="center"
-          >
+          <Grid2 container spacing={20} justifyContent="center">
             <Grid2 item>
-              <Avatar
-                alt="Avi Brodetsky"
-                src={profilePic1}
-                sx={{ width: 200, height: 200 }}
-              />
-              <Typography
-                align="center"
-                variant="h4"
-                sx={{ marginTop: '10px' }}
-              >
+              <Avatar alt="Avi Brodetsky" src={profilePic1} sx={{ width: 200, height: 200 }} />
+              <Typography align="center" variant="h4" sx={{ marginTop: '10px' }}>
                 אבי ברודצקי
               </Typography>
             </Grid2>
             <Grid2 item>
-              <Avatar
-                alt="Moti Brodetsky"
-                src={profilePic2}
-                sx={{ width: 200, height: 200 }}
-              />
-              <Typography
-                align="center"
-                variant="h4"
-                sx={{ marginTop: '10px' }}
-              >
+              <Avatar alt="Moti Brodetsky" src={profilePic2} sx={{ width: 200, height: 200 }} />
+              <Typography align="center" variant="h4" sx={{ marginTop: '10px' }}>
                 מוטי ברודצקי
               </Typography>
             </Grid2>
@@ -512,15 +424,8 @@ const Home = () => {
               textAlign: 'center'
             }}
           >
-            אבי ומוטי ברודצקי, יזמים ואחים, קיבלו
-            השראה מאביהם, מפתח תוכנה במשך 25 שנים.
-            עם תשוקה לתחום וליצירת פתרון טכנולוגי
-            חכם, הם הביאו לעולם את Easy Gift. הם
-            שמו להם למטרה ליצור מערכת שתעזור
-            למארגני אירועים לנהל את האירועים שלהם
-            בצורה הכי פשוטה, תוך שמירה על כל
-            הפרטים החשובים – מתשלומים ועד ניהול
-            מוזמנים.
+            אבי ומוטי ברודצקי, יזמים ואחים, קיבלו השראה מאביהם, מפתח תוכנה במשך 25 שנים. עם תשוקה לתחום וליצירת פתרון טכנולוגי חכם, הם הביאו לעולם את Easy Gift. הם שמו להם למטרה ליצור מערכת שתעזור
+            למארגני אירועים לנהל את האירועים שלהם בצורה הכי פשוטה, תוך שמירה על כל הפרטים החשובים – מתשלומים ועד ניהול מוזמנים.
           </Typography>
         </Box>
       </Container>
@@ -532,64 +437,23 @@ const Home = () => {
           textAlign: 'right'
         }}
       >
-        {[
-          'למה Easy Gift נבנה?',
-          'יתרונות המערכת',
-          'איך המערכת עובדת?',
-          'מוצר ראשון מסוגו',
-          'למי המערכת מתאימה?',
-          'שירות לקוחות ותמיכה',
-          'הסיפור שלנו'
-        ].map((title, index) => (
+        {['למה Easy Gift נבנה?', 'יתרונות המערכת', 'איך המערכת עובדת?', 'מוצר ראשון מסוגו', 'למי המערכת מתאימה?', 'שירות לקוחות ותמיכה', 'הסיפור שלנו'].map((title, index) => (
           <Box
             key={index}
             component={Paper}
             elevation={4}
             p={3}
-            ref={
-              [
-                ref1,
-                ref3,
-                ref4,
-                ref5,
-                ref6,
-                ref7,
-                ref8
-              ][index]
-            }
+            ref={[ref1, ref3, ref4, ref5, ref6, ref7, ref8][index]}
             sx={{
               borderRadius: '50px',
               marginBottom: '50px',
-              backgroundColor:
-                cardStyles[index].backgroundColor,
+              backgroundColor: cardStyles[index].backgroundColor,
               color: '#000',
-              transition:
-                'transform 0.5s ease-in-out, box-shadow 0.3s ease-in-out',
-              transform: [
-                inView1,
-                inView3,
-                inView4,
-                inView5,
-                inView6,
-                inView7,
-                inView8
-              ][index]
-                ? 'translateY(0)'
-                : 'translateY(50px)',
-              opacity: [
-                inView1,
-                inView3,
-                inView4,
-                inView5,
-                inView6,
-                inView7,
-                inView8
-              ][index]
-                ? 1
-                : 0,
+              transition: 'transform 0.5s ease-in-out, box-shadow 0.3s ease-in-out',
+              transform: [inView1, inView3, inView4, inView5, inView6, inView7, inView8][index] ? 'translateY(0)' : 'translateY(50px)',
+              opacity: [inView1, inView3, inView4, inView5, inView6, inView7, inView8][index] ? 1 : 0,
               '&:hover': {
-                boxShadow:
-                  '0px 10px 20px rgba(0, 0, 0, 0.2)'
+                boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)'
               },
               fontFamily: 'Poppins, sans-serif'
             }}
@@ -598,8 +462,7 @@ const Home = () => {
               variant="h5"
               gutterBottom
               sx={{
-                color:
-                  cardStyles[index].titleColor
+                color: cardStyles[index].titleColor
               }}
             >
               {title}
