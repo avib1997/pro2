@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useContext } from 'react'
 import { Box, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Tooltip } from '@mui/material'
 import PrintIcon from '@mui/icons-material/Print'
 import GetAppIcon from '@mui/icons-material/GetApp'
@@ -7,8 +7,11 @@ import EditIcon from '@mui/icons-material/Edit'
 import axios from 'axios'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
+import sendLog from '../../LogSend'
+import { Context } from '../../App'
 
 const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
+  const { userId, eventId } = useContext(Context)
   const [gifts, setGifts] = useState([])
   const [loading, setLoading] = useState(true)
   const printRef = useRef()
@@ -73,17 +76,20 @@ const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
 
   // קריאה לפונקציית עריכה שמופעלת מההורה
   const handleEdit = () => {
-    if (onEdit) onEdit(event)
+    onEdit(event)
   }
 
   // פונקציה למחיקת האירוע – מבצעת קריאה לשרת ואז מפעילה את onDelete עם מזהה האירוע
   const handleDelete = async () => {
+    console.log('🗑 eventId במחיקת אירוע:', eventId)
     if (!window.confirm('האם אתה בטוח שברצונך למחוק את האירוע?')) return
     try {
-      await axios.delete(`http://localhost:2001/api/events/deleteEvent/${event._id}`)
+      await axios.delete(`http://localhost:2001/api/events/${eventId}`)
       onDelete(event._id)
+      onClose()
     } catch (error) {
       console.error('❌ Error deleting event:', error)
+      //sendLog('error', 'event', 500, 'Error deleting event', 'client', 'http://localhost:3000/events', 'handleDelete', null, event._id, error)
     }
   }
 
@@ -222,10 +228,11 @@ const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
               sx={{
                 textAlign: 'center',
                 marginTop: '10px',
-                color: '#1B263B'
+                color: 'red',
+                fontWeight: 'bold'
               }}
             >
-              אין מתנות לאירוע זה.
+              אין מתנות לאירוע זה
             </Typography>
           )}
         </DialogContent>

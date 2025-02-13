@@ -72,9 +72,9 @@ const Signup = props => {
             variant="h2"
             padding={3}
             textAlign="center"
-            sx={{ fontWeight: '600', color: '#1976D2' }} // טקסט כחול ובולט
+            sx={{ fontWeight: '600', color: '#4CAF50' }} // טקסט כחול ובולט
           >
-            הרשמה
+            רישום
           </Typography>
           <TextField
             onChange={handelchange}

@@ -61,6 +61,7 @@ router.post('/addEvent', async (req, res) => {
 
 router.put('/:eventId', async (req, res) => {
   try {
+    console.log('📌 req.params.eventId:', typeof req.params.eventId, req.params.eventId)
     const updatedEvent = await eventService.updateEvent(req.params.eventId, req.body)
     res.status(200).json(updatedEvent)
   } catch (error) {
@@ -68,8 +69,6 @@ router.put('/:eventId', async (req, res) => {
     res.status(500).json({ error: 'Failed to update event' })
   }
 })
-
-//
 
 router.delete('/:eventId', async (req, res) => {
   try {

@@ -8,7 +8,6 @@ import axios from 'axios' // ייבוא האקסיוס לפני שימוש בו
 // אייקונים מותאמים לכל שדה
 import { Person as PersonIcon, Email as EmailIcon, Phone as PhoneIcon, Info as InfoIcon } from '@mui/icons-material'
 import sendLog from '../LogSend'
-import { set } from 'mongoose'
 
 const ManagerSignup = () => {
   const [uid, setUid] = useState('') //יוזר איידי מקומי

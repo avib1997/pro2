@@ -32,8 +32,12 @@ async function updateEvent(eventId, updateFields) {
   if (!eventId) {
     throw { code: 400, message: 'missing eventId' }
   }
+  // אם eventId מגיע כאובייקט, שלוף ממנו את ה-_id
+  if (typeof eventId === 'object' && eventId._id) {
+    eventId = String(eventId._id)
+  }
   try {
-    const updated = await eventController.update({ _id: eventId }, updateFields)
+    const updated = await eventController.update(eventId, updateFields)
     return updated
   } catch (error) {
     throw error

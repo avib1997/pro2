@@ -39,27 +39,27 @@ const UsersTable = () => {
   const [saving, setSaving] = useState(false)
   const [canceling, setCanceling] = useState(false)
 
-    useEffect(() => {
-      fetchAllData()
-    }, [])
+  useEffect(() => {
+    fetchAllData()
+  }, [])
 
-    const fetchAllData = async () => {
-      try {
-        // קריאה לשרת (החלף לכתובות המתאימות שלך)
-        const [usersRes, eventsRes, giftsRes] = await Promise.all([
-          axios.get('http://localhost:2001/api/users'),
-          axios.get('http://localhost:2001/api/events/getAll'), // אירועים
-          axios.get('http://localhost:2001/api/gift/getAllGifts') // מתנות
-        ])
+  const fetchAllData = async () => {
+    try {
+      // קריאה לשרת (החלף לכתובות המתאימות שלך)
+      const [usersRes, eventsRes, giftsRes] = await Promise.all([
+        axios.get('http://localhost:2001/api/users'),
+        axios.get('http://localhost:2001/api/events/getAll'), // אירועים
+        axios.get('http://localhost:2001/api/gift/getAllGifts') // מתנות
+      ])
 
-        setUsers(usersRes.data)
-        setEvents(eventsRes.data)
-        setGifts(giftsRes.data)
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      }
+      setUsers(usersRes.data)
+      setEvents(eventsRes.data)
+      setGifts(giftsRes.data)
+    } catch (error) {
+      console.error('Error fetching data:', error)
     }
-    
+  }
+
   const handleSaveUser = async () => {
     // router.put('/:userId', async (req, res) => {
     //   console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
@@ -71,7 +71,7 @@ const UsersTable = () => {
     //     res.status(500).send({ error: err.message })
     //   }
     // })
-    console.log('(editedUser._id): נתוני המשתמש שנשמרו ', editedUser._id)
+    
 
     axios
       .put(`http://localhost:2001/api/users/${editedUser._id}`, editedUser)

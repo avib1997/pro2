@@ -5,10 +5,11 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Context } from '../../App'
 import sendLog from '../../LogSend'
+import ForgotPassword from './ForgotPassword' // ייבוא הקומפוננטה החדשה
 
 const Login = props => {
-  const { setUserId, setDetailsId, setIsEventManager, setUserName, setUserEmail, setEventNumber ,userId} = useContext(Context)
-
+  const { setUserId, setDetailsId, setIsEventManager, setUserName, setUserEmail, setEventNumber, userId } = useContext(Context)
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false) // מצב טעינה
@@ -151,7 +152,7 @@ const Login = props => {
               textAlign="center"
               sx={{
                 fontWeight: '600',
-                color: '#1976D2'
+                color: '#FF9800'
               }} // טקסט כחול ובולט
             >
               התחבר כמנהל
@@ -292,6 +293,10 @@ const Login = props => {
           >
             {isSubmitting ? 'מתבצע...' : 'התחברות'} {/* הצגת טקסט בזמן טעינה */}
           </Button>
+          <Button onClick={() => setForgotPasswordOpen(true)} color="primary" sx={{ fontWeight: '600' }}>
+            שכחתי סיסמה
+          </Button>
+          <ForgotPassword open={forgotPasswordOpen} handleClose={() => setForgotPasswordOpen(false)} />
         </Box>
       </form>
     </div>

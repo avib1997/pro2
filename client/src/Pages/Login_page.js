@@ -398,15 +398,13 @@ const LoginPage = () => {
                   backgroundColor: '#1976D2',
                   color: '#fff',
                   '&:hover': {
-                    backgroundColor: '#115293'
+                    backgroundColor: '#115293',
+                    transform: 'scale(1.05)'
                   },
                   flex: 1,
                   marginRight: 0.5,
                   fontWeight: 'bold',
-                  transition: '0.3s',
-                  '&:hover': {
-                    transform: 'scale(1.05)'
-                  }
+                  transition: '0.3s'
                 }}
                 variant="contained"
               >
@@ -422,19 +420,17 @@ const LoginPage = () => {
                   backgroundColor: '#4CAF50',
                   color: '#fff',
                   '&:hover': {
-                    backgroundColor: '#388E3C'
+                    backgroundColor: '#388E3C',
+                    transform: 'scale(1.05)'
                   },
                   flex: 1,
                   marginLeft: 0.5,
                   fontWeight: 'bold',
-                  transition: '0.3s',
-                  '&:hover': {
-                    transform: 'scale(1.05)'
-                  }
+                  transition: '0.3s'
                 }}
                 variant="contained"
               >
-                הרשמה
+                רישום
               </Button>
 
               <Button
@@ -446,15 +442,13 @@ const LoginPage = () => {
                   backgroundColor: '#FF9800',
                   color: '#fff',
                   '&:hover': {
-                    backgroundColor: '#F57C00'
+                    backgroundColor: '#F57C00',
+                    transform: 'scale(1.05)'
                   },
                   flex: 1,
                   marginLeft: 0.5,
                   fontWeight: 'bold',
-                  transition: '0.3s',
-                  '&:hover': {
-                    transform: 'scale(1.05)'
-                  }
+                  transition: '0.3s'
                 }}
                 variant="contained"
               >

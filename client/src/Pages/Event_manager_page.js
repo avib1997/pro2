@@ -10,7 +10,7 @@ import AddEventDialog from '../Components/events/AddEventDialog' // דיאלוג
 import EditEventDialog from '../Components/events/EditEventDialog' // דיאלוג לעריכת אירוע
 
 const EventManager = () => {
-  const { userId, IsEvent } = useContext(Context)
+  const { userId, IsEvent, setEventId } = useContext(Context)
   const [events, setEvents] = useState([])
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [openDialog, setOpenDialog] = useState(false)
@@ -28,6 +28,7 @@ const EventManager = () => {
   }, [userId, IsEvent])
 
   const handleEventClick = event => {
+    setEventId(event._id)
     setSelectedEvent(event)
     setOpenDialog(true)
   }
@@ -59,13 +60,15 @@ const EventManager = () => {
   const handleEditEvent = event => {
     setSelectedEvent(event)
     setOpenEditEventDialog(true)
-    setOpenDialog(false) // ניתן לסגור את חלון הפרטים בזמן פתיחת חלון העריכה
   }
 
   const handleSaveEdit = updatedEvent => {
     setEvents(prevEvents => prevEvents.map(ev => (ev._id === updatedEvent._id ? updatedEvent : ev)))
-    setOpenEditEventDialog(false)
-    setSelectedEvent(null)
+
+    setTimeout(() => {
+      setOpenEditEventDialog(false)
+      setSelectedEvent(null)
+    }, 2000)
   }
 
   return (
@@ -120,7 +123,7 @@ const EventManager = () => {
           event={selectedEvent}
           onClose={() => {
             setOpenEditEventDialog(false)
-            setSelectedEvent(null)
+            // setSelectedEvent(null)
           }}
           onSave={handleSaveEdit}
         />

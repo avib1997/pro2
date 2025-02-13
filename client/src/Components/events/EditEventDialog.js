@@ -1,9 +1,11 @@
 //client/src/Components/events/EditEventDialog.js
 import React, { useState, useEffect } from 'react'
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, IconButton } from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Typography, Button, Box, IconButton, MenuItem } from '@mui/material'
 import axios from 'axios'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CloseIcon from '@mui/icons-material/Close'
+import CircularProgress from '@mui/material/CircularProgress'
+import dayjs from 'dayjs'
 
 const EditEventDialog = ({ open, event, onClose, onSave }) => {
   const [formData, setFormData] = useState({
@@ -11,10 +13,13 @@ const EditEventDialog = ({ open, event, onClose, onSave }) => {
     NameOfGroom: '',
     NameOfBride: '',
     DateOfEvent: '',
-    Event_number: ''
+    NameOfManager: '',
+    phone: ''
   })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState('') // שמירת הודעת שגיאה
+  const [saved, setSaved] = useState(false)
 
   // עדכון הטופס עם פרטי האירוע הקיימים
   useEffect(() => {
@@ -24,30 +29,50 @@ const EditEventDialog = ({ open, event, onClose, onSave }) => {
         NameOfGroom: event.NameOfGroom || '',
         NameOfBride: event.NameOfBride || '',
         DateOfEvent: event.DateOfEvent ? new Date(event.DateOfEvent).toISOString().substring(0, 10) : '',
-        Event_number: event.Event_number || ''
+        NameOfManager: event.NameOfManager || '',
+        phone: event.phone || ''
       })
       setSuccess(false)
+      setSaved(false)
     }
   }, [event])
 
   const handleChange = e => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
   // קריאה לעדכון האירוע בשרת
   const handleSubmit = async () => {
+    if (loading) return
+
+    const selectedDate = dayjs(formData.DateOfEvent)
+    const today = dayjs().startOf('day') // תאריך היום בלי שעות ודקות
+
+    if (selectedDate.isBefore(today)) {
+      setError('תאריך האירוע לא יכול להיות בעבר. אנא בחר תאריך עתידי.')
+      return
+    }
+
+    setError('') // אם אין שגיאה, איפוס ההודעה
     setLoading(true)
+    setSuccess(false)
+
     try {
-      const res = await axios.put(`http://localhost:2001/api/events/${event._id}`, formData)
-      console.log('אירוע עודכן:', res.data)
+      const response = await axios.put(`http://localhost:2001/api/events/${String(event._id)}`, formData)
+      // const response = await axios.put(`http://localhost:2001/api/events/${event._id}`, formData)
+      onSave(response.data)
       setSuccess(true)
-      if (onSave) onSave(res.data)
+      setSaved(true) // ✅ הצגת אייקון אישור ✔️
+
+      // ✅ השאר את הדיאלוג פתוח ל-2 שניות לפני סגירה
+
       setTimeout(() => {
-        onClose()
-      }, 1500)
+        setSaved(false) // ❌ הסרת האייקון
+        onClose() // ✅ סגירה רק לאחר 3 שניות
+      }, 3000)
     } catch (error) {
-      console.error('שגיאה בעדכון האירוע:', error)
+      setError('❌ אירעה שגיאה בעת עדכון האירוע. נסה שוב.')
+      console.error('Error updating event:', error)
     } finally {
       setLoading(false)
     }
@@ -61,6 +86,10 @@ const EditEventDialog = ({ open, event, onClose, onSave }) => {
       maxWidth="sm"
       PaperProps={{
         sx: {
+          textAlign: 'center',
+          //alignItems: 'center',
+          justifyContent: 'center',
+          alignContent: 'center',
           background: 'linear-gradient(135deg, #1B263B, #415A77)',
           borderRadius: '20px',
           color: '#E0E1DD',
@@ -72,126 +101,186 @@ const EditEventDialog = ({ open, event, onClose, onSave }) => {
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
           padding: '16px'
         }}
       >
         <Box>עריכת פרטי האירוע</Box>
-        <IconButton onClick={onClose} sx={{ color: '#E0E1DD' }}>
-          <CloseIcon />
-        </IconButton>
       </DialogTitle>
 
-      <DialogContent>
-        <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-          <TextField
-            label="סוג אירוע"
-            name="TypeOfEvent"
-            value={formData.TypeOfEvent}
-            onChange={handleChange}
-            fullWidth
-            variant="filled"
-            InputProps={{
-              sx: {
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                color: '#E0E1DD'
-              }
+      <DialogContent sx={{ padding: '36px' }}>
+        {saved ? ( // ✅ אם השמירה הצליחה, הצג אייקון ✔️
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '200px',
+              animation: 'fadeIn 0.5s ease-in-out'
             }}
-            InputLabelProps={{ sx: { color: '#E0E1DD' } }}
-          />
-          <TextField
-            label="שם החתן"
-            name="NameOfGroom"
-            value={formData.NameOfGroom}
-            onChange={handleChange}
-            fullWidth
-            variant="filled"
-            InputProps={{
-              sx: {
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                color: '#E0E1DD'
-              }
-            }}
-            InputLabelProps={{ sx: { color: '#E0E1DD' } }}
-          />
-          {formData.TypeOfEvent === 'חתונה' && (
+          >
+            <CheckCircleIcon sx={{ fontSize: 100, color: 'green', animation: 'pop 0.5s ease' }} />
+          </Box>
+        ) : (
+          <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2, direction: 'rtl' }}>
             <TextField
-              label="שם הכלה"
-              name="NameOfBride"
-              value={formData.NameOfBride}
+              select
+              label="סוג האירוע"
+              name="TypeOfEvent"
+              value={formData.TypeOfEvent}
+              onChange={handleChange}
+              fullWidth
+              variant="filled"
+              SelectProps={{
+                MenuProps: {
+                  PaperProps: {
+                    sx: {
+                      borderRadius: '30px',
+                      '& .MuiMenu-list': {
+                        paddingTop: 0,
+                        paddingBottom: 0
+                      }
+                    }
+                  }
+                }
+              }}
+              InputProps={{
+                sx: {
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  borderRadius: 5,
+                  color: '#E0E1DD'
+                }
+              }}
+              InputLabelProps={{ sx: { color: '#E0E1DD' } }}
+            >
+              <MenuItem value="חתונה">חתונה</MenuItem>
+              <MenuItem value="בר מצווה">בר מצווה</MenuItem>
+              <MenuItem value="בת מצווה">בת מצווה</MenuItem>
+              <MenuItem value="ברית">ברית</MenuItem>
+              <MenuItem value="יום הולדת">יום הולדת</MenuItem>
+            </TextField>
+            <TextField
+              label="שם החתן"
+              name="NameOfGroom"
+              value={formData.NameOfGroom}
               onChange={handleChange}
               fullWidth
               variant="filled"
               InputProps={{
                 sx: {
                   backgroundColor: 'rgba(255,255,255,0.1)',
-                  borderRadius: '8px',
+                  borderRadius: 5,
                   color: '#E0E1DD'
                 }
               }}
               InputLabelProps={{ sx: { color: '#E0E1DD' } }}
             />
-          )}
-          <TextField
-            label="תאריך אירוע"
-            name="DateOfEvent"
-            type="date"
-            value={formData.DateOfEvent}
-            onChange={handleChange}
-            fullWidth
-            variant="filled"
-            InputProps={{
-              sx: {
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                color: '#E0E1DD'
-              }
-            }}
-            InputLabelProps={{ shrink: true, sx: { color: '#E0E1DD' } }}
-          />
-          <TextField
-            label="מספר אירוע"
-            name="Event_number"
-            value={formData.Event_number}
-            onChange={handleChange}
-            fullWidth
-            variant="filled"
-            InputProps={{
-              sx: {
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                color: '#E0E1DD'
-              }
-            }}
-            InputLabelProps={{ sx: { color: '#E0E1DD' } }}
-          />
-        </Box>
+            {formData.TypeOfEvent === 'חתונה' && (
+              <TextField
+                label="שם הכלה"
+                name="NameOfBride"
+                value={formData.NameOfBride}
+                onChange={handleChange}
+                fullWidth
+                variant="filled"
+                InputProps={{
+                  sx: {
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    borderRadius: 5,
+                    color: '#E0E1DD'
+                  }
+                }}
+                InputLabelProps={{ sx: { color: '#E0E1DD' } }}
+              />
+            )}
+            <TextField
+              label="תאריך אירוע"
+              name="DateOfEvent"
+              type="date"
+              value={formData.DateOfEvent}
+              onChange={handleChange}
+              fullWidth
+              variant="filled"
+              InputProps={{
+                sx: {
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  borderRadius: 5,
+                  color: '#E0E1DD'
+                }
+              }}
+              InputLabelProps={{ shrink: true, sx: { color: '#E0E1DD' } }}
+            />
+            {error && (
+              <Typography color="error" sx={{ mt: 1 }}>
+                {error}
+              </Typography>
+            )}
+            <TextField
+              label="שם מנהל האירוע"
+              name="NameOfManager"
+              value={formData.NameOfManager}
+              onChange={handleChange}
+              fullWidth
+              variant="filled"
+              InputProps={{
+                sx: {
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  borderRadius: 5,
+                  color: '#E0E1DD'
+                }
+              }}
+              InputLabelProps={{ sx: { color: '#E0E1DD' } }}
+            />
+            <TextField
+              label="טלפון"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              fullWidth
+              variant="filled"
+              InputProps={{
+                sx: {
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  borderRadius: 5,
+                  color: '#E0E1DD'
+                }
+              }}
+              InputLabelProps={{ sx: { color: '#E0E1DD' } }}
+            />
+          </Box>
+        )}
       </DialogContent>
+
       <DialogActions sx={{ justifyContent: 'space-between', padding: '16px' }}>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          color="primary"
-          disabled={loading}
-          startIcon={success ? <CheckCircleIcon sx={{ animation: 'pop 0.5s ease-in-out', fontSize: '1.8rem' }} /> : null}
-          sx={{
-            background: 'linear-gradient(135deg, #415A77, #1B263B)',
-            color: '#E0E1DD',
-            fontWeight: 'bold',
-            padding: '8px 16px',
-            borderRadius: '20px',
-            transition: 'transform 0.3s, box-shadow 0.3s',
-            '&:hover': {
-              transform: 'scale(1.05)',
-              boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.3)'
-            }
-          }}
-        >
-          {loading ? 'שומר...' : success ? 'נשמר' : 'שמור שינויים'}
-        </Button>
+        {!saved && ( // ✅ כפתור שמירה יוצג רק אם השינויים עוד לא נשמרו
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            startIcon={success ? <CheckCircleIcon sx={{ animation: 'pop 0.5s ease-in-out', fontSize: '1.8rem' }} /> : null}
+            sx={{
+              background: '#4CAF50',
+              color: '#E0E1DD',
+              fontWeight: 'bold',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              transition: 'transform 0.3s, box-shadow 0.3s',
+              '&:hover': {
+                backgroundColor: '#388E3C',
+                transform: 'scale(1.05)',
+                boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.3)'
+              }
+            }}
+          >
+            {loading ? <CircularProgress size={20} sx={{ color: '#E0E1DD' }} /> : success ? 'נשמר' : 'שמור שינויים'}
+          </Button>
+        )}
+        <IconButton onClick={onClose} sx={{ color: '#E0E1DD', marginLeft: '100px' }}>
+          <CloseIcon />
+        </IconButton>
       </DialogActions>
+
       <style>
         {`
           @keyframes pop {
