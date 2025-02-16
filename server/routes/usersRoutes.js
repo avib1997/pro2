@@ -21,18 +21,35 @@ router.post('/login', async (req, res) => {
   }
 })
 
+// module.exports.register = async userFields => {
+//   if (Object.keys(userFields).length === 0) {
+//     console.log('keys:', object.keys(userFields))
+//     console.log('values:', Object.values(userFields))
+//     throw { code: 400, message: 'there is no user fields' }
+//   }
+//   console.log('userFields:', userFields)
+//   const email = userFields.email
+//   const existUser = await userController.readOne({ email: email })
+//   if (existUser) {
+//     return { message: 'user already exist' }
+//   }
+//   const user = await userController.create(userFields)
+//   const token = jwtFn.createToken(user._id)
+//   return { token: token, user: user }
+// }
+
 router.post('/register', async (req, res) => {
   console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
-    const newUser = await userService.register(req.body)
-    console.log(fixHebrewText('משתמש חדש נוצר בהצלחה:'), newUser)
-    res.send(newUser)
+    const { user, token } = await userService.register(req.body)
+    console.log(fixHebrewText('משתמש חדש נוצר בהצלחה:'), user)
+    console.log(fixHebrewText('טוקן נוצר בהצלחה:'), token)
+    res.json({ user, token })
   } catch (err) {
     res.status(500).send({ error: err.message })
   }
 })
 
-// Get user id by email
 router.post('/userid', async (req, res) => {
   console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
@@ -44,18 +61,6 @@ router.post('/userid', async (req, res) => {
   }
 })
 
-// Update the isManeger field by userId
-router.put('/update-manager', async (req, res) => {
-  try {
-    const updatedUser = await userService.updateManagerStatus(req.body.userId, req.body.isManeger)
-    console.log('✅ Manager status updated:', updatedUser)
-    res.json(updatedUser)
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-//router.get('/', authJWT, async (req, res) => {
 router.get('/', async (req, res) => {
   console.log(fixHebrewText('אובייקט הבקשה (req):'), req)
   try {
@@ -78,19 +83,18 @@ router.post('/giftsById', async (req, res) => {
   }
 })
 
-//get isManeger by userId
-router.post('/isManeger', async (req, res) => {
+//get isManager by userId
+router.post('/isManager', async (req, res) => {
   console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
-    const isManeger = await userService.getIsManeger(req.body)
-    console.log('isManeger in user Routes:', isManeger)
-    res.send(isManeger)
+    const isManager = await userService.getisManager(req.body)
+    console.log('isManager in user Routes:', isManager)
+    res.send(isManager)
   } catch (err) {
     res.status(500).send({ error: err.message })
   }
 })
 
-//axios.put(`http://localhost:2001/api/users/${editedUser._id}`, editedUser)
 router.put('/:userId', async (req, res) => {
   console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {

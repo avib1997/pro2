@@ -9,7 +9,12 @@ const giftSchema = new mongoose.Schema({
   userid_gift: { type: String },
   EventId: { type: String, required: true }, // ✅ ודא שהאירוע קיים לפני שמנסים לשמור
   toEventName: { type: String },
-  entryDate: { type: Date, default: Date.now }
+  entryDate: { type: Date, default: Date.now },
+
+  // שדות חדשים לקבצים (Buffer)
+  imageFile: { type: Buffer },
+  videoFile: { type: Buffer },
+  audioFile: { type: Buffer }
 })
 
 module.exports = mongoose.model('gift', giftSchema)

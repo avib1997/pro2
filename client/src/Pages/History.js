@@ -158,7 +158,7 @@ const GiftHistory = () => {
                     <TableRow>
                       <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}></TableCell>
                       <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}>מתנה מספר</TableCell>
-                      <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}>שם</TableCell>
+                      <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}>שם האירוע</TableCell>
                       <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}>סכום</TableCell>
                       <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}>תאריך</TableCell>
                     </TableRow>

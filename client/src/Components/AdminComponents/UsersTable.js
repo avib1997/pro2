@@ -71,7 +71,6 @@ const UsersTable = () => {
     //     res.status(500).send({ error: err.message })
     //   }
     // })
-    
 
     axios
       .put(`http://localhost:2001/api/users/${editedUser._id}`, editedUser)
@@ -581,11 +580,11 @@ const UsersTable = () => {
               />
               <TextField
                 label="מנהל?"
-                value={editedUser.isManeger || ''}
+                value={editedUser.isManager || ''}
                 onChange={e =>
                   setEditedUser({
                     ...editedUser,
-                    isManeger: e.target.value
+                    isManager: e.target.value
                   })
                 }
                 inputProps={{
@@ -723,7 +722,7 @@ const UsersTable = () => {
                 <strong>סיסמה (מצופה שיהיה מוצפן):</strong> {selectedUser.password || 'לא קיים בשדה'}
               </Typography>
               <Typography sx={{ mb: 1 }}>
-                <strong>מנהל?</strong> {selectedUser.isManeger ? 'כן' : 'לא'}
+                <strong>מנהל?</strong> {selectedUser.isManager ? 'כן' : 'לא'}
               </Typography>
               <Typography sx={{ mb: 1 }}>
                 <strong>תאריך הצטרפות:</strong> {selectedUser.entryDate ? dayjs(selectedUser.entryDate).format('DD/MM/YYYY HH:mm') : 'לא קיים'}

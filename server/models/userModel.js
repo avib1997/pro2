@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   entryDate: { type: Date, default: Date.now },
   giftsId: [String],
   eventId: [String],
-  isManeger: { type: Boolean, default: false }
+  isManager: { type: Boolean, required: true }
 })
 
 module.exports = mongoose.model('User', userSchema) // CommonJS

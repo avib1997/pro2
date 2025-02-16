@@ -4,6 +4,9 @@ const userModel = require('../models/userModel')
 
 async function create(data) {
   try {
+    console.log('data:', data)
+    console.log('data.isManager:', data.isManager)
+    console.log('typeof data.isManager:', typeof data.isManager)
     const newUser = await userModel.create(data)
     return newUser
   } catch (error) {
@@ -40,7 +43,7 @@ async function read(filter, proj) {
 //       giftsId: ['67a20c9b7311038867538c00'],
 //       eventId: ['67a20beb7311038867538bf5'],
 //       entryDate: new Date('2025-02-04T12:43:01.603Z'),
-//       isManeger: true
+//       isManager: true
 //     }
 //   },
 //   { new: true } // אפשרות זו מחזירה את המסמך המעודכן
@@ -55,7 +58,7 @@ async function update(filter, newData) {
   }
 }
 
-// Update the isManeger field by userId
+// Update the isManager field by userId
 const updateOne = async (filter, updateData) => {
   console.log('filteeeeeeeer:', filter)
   console.log('updateDaaaaaaata:', updateData)

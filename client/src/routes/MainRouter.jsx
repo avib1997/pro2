@@ -1,5 +1,5 @@
 //client/src/routes/MainRouter.jsx
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useLocation, Route, Routes } from 'react-router-dom'
 import AddEvent from '../Components/events/AddEvent'
 import Admin from '../Pages/Admin'
@@ -10,7 +10,6 @@ import Fqa from '../Pages/Fqa'
 import History from '../Pages/History'
 import Home from '../Pages/Home'
 import LoginPage from '../Pages/Login_page'
-import ManagerSignup from '../Pages/ManagerSignup' // ייבוא הדף
 import Payment from '../Pages/Payment'
 import TheEnd from '../Pages/TheEnd'
 import Navbar from '../Components/Navbar/Navbar'
@@ -20,6 +19,16 @@ import Test from '../Pages/test'
 
 function MainRouter() {
   const location = useLocation()
+
+  function ScrollToTopOnRouteChange() {
+    const { pathname } = useLocation()
+
+    useEffect(() => {
+      window.scrollTo(0, 0)
+    }, [pathname])
+
+    return null
+  }
 
   console.log('location.pathname =', location.pathname)
 
@@ -42,6 +51,7 @@ function MainRouter() {
             }
           }}
         />
+        <ScrollToTopOnRouteChange />
         <Routes>
           <Route element={<Home />} path="/"></Route>
           <Route element={<LoginPage />} path="/LoginPage"></Route>
@@ -51,7 +61,6 @@ function MainRouter() {
           <Route element={<Payment />} path="/Payment"></Route>
           <Route element={<History />} path="/History"></Route>
           <Route element={<Manager />} path="/EventManager"></Route>
-          <Route element={<ManagerSignup />} path="/ManagerSignup" />
           <Route element={<AddEvent />} path="/AddEvent"></Route>
           <Route element={<Blessing />} path="/Blessing"></Route>
           <Route element={<Fqa />} path="/Fqa"></Route>

@@ -1,7 +1,7 @@
 //client/src/App.js
-import { createContext, useState } from 'react'
+import { createContext, useState, useEffect } from 'react'
 import React from 'react'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, useLocation } from 'react-router-dom'
 import MainRouter from './routes/MainRouter' // או הנתיב למקום ששמרת את הקובץ
 import WhatsAppIcon from '@mui/icons-material/WhatsApp'
 import { Box, IconButton, Typography } from '@mui/material'
@@ -21,9 +21,30 @@ function App() {
   const [event, setEvent] = useState('')
   const [eventId, setEventId] = useState('')
 
+  const getSavedGiftDetails = () => {
+    try {
+      const storedData = localStorage.getItem('giftDetails')
+      return storedData ? JSON.parse(storedData) : { name: '', phone: '', blessing: '', amount: '' }
+    } catch (error) {
+      console.error('❌ שגיאה בטעינת הנתונים מ-localStorage:', error)
+      return { name: '', phone: '', blessing: '', amount: '' } // החזרת נתונים ריקים במקרה של שגיאה
+    }
+  }
+  const [giftDetails, setGiftDetails] = useState(getSavedGiftDetails)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('giftDetails', JSON.stringify(giftDetails))
+    } catch (error) {
+      console.error('❌ שגיאה בשמירת הנתונים ל-localStorage:', error)
+    }
+  }, [giftDetails])
+
   return (
     <Context.Provider
       value={{
+        giftDetails,
+        setGiftDetails,
         isEventManager,
         setIsEventManager, // הוספת הפונקציה לקונטקסט
         IsEvent,

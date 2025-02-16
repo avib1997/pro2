@@ -3,37 +3,53 @@ import React, { useContext, useState } from 'react'
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, MenuItem, Container, Button, Avatar, Tooltip, Divider, styled } from '@mui/material'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Context } from '../../App'
+import axios from 'axios'
+//import { useSnackbar } from 'notistack'
+//import { fadeIn, pop, pulse } from '../../styles/animations'
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CloseIcon from '@mui/icons-material/Close'
 
 const menuBgColor = '#2B3A47' // רקע תפריט אווטאר
 
 const pagesGuest = [
+  { name: 'מתנה', path: '/Details_page' },
   { name: 'ברכות', path: '/Blessing' },
   { name: 'שאלות ותשובות', path: '/Fqa' },
-  //{ name: 'התחברות ורישום', path: '/Login_page' }
-  { name: 'מתנה', path: '/Details_page' }
+  { name: 'התחברות ורישום', path: '/Login_page' }
 ]
 
 const pagesRegistered = [
-  { name: 'היסטוריה', path: '/History' },
+  { name: 'מתנה', path: '/Details_page' },
   { name: 'ברכות', path: '/Blessing' },
-  { name: 'שאלות ותשובות', path: '/Fqa' },
-  { name: 'מתנה', path: '/Details_page' }
+  { name: 'היסטוריה', path: '/History' },
+  { name: 'שאלות ותשובות', path: '/Fqa' }
 ]
 
-const pagesManger = [
+const pagesManager = [
+  { name: 'מתנה', path: '/Details_page' },
   { name: 'ברכות', path: '/Blessing' },
+  { name: 'היסטוריה', path: '/History' },
   { name: 'שאלות ותשובות', path: '/Fqa' },
   {
     name: 'ניהול אירועים',
     path: '/EventManager'
-  },
-  { name: 'היסטוריה', path: '/History' }
+  }
 ]
 
 function Navbar() {
-  const { userId, eventNumber, isEventManager, setEventNumber, userName, userEmail } = useContext(Context)
+  const { isManager, userId, eventNumber, isEventManager, setEventNumber, userName, userEmail, setUserId, setUserEmail, setIsEventManager } = useContext(Context)
+  const location = useLocation() // קבלת הנתיב הנוכחי
+  const navigate = useNavigate()
+  const [editUserDialogOpen, setEditUserDialogOpen] = useState(false)
+  const [editedUser, setEditedUser] = useState({ fname: '', lname: '', email: '', password: '', isManager: '' })
+
+  const [anchorNav, setAnchorNav] = useState(null)
+  const [anchorUser, setAnchorUser] = useState(null)
+
+  let navigationPages = userId === '' ? pagesGuest : isEventManager ? pagesManager : pagesRegistered
 
   // הגדרת הדרגה
   let userRank = 'אורח'
@@ -60,23 +76,30 @@ function Navbar() {
     }
   }
 
-  // בחירת דפי הניווט לפי סוג המשתמש
-  let navigationPages
-  // אם המשתמש אינו מחובר (userId הוא מחרוזת ריקה)
-  if (userId === '') {
-    navigationPages = pagesGuest // דפים לאורח
+  // פונקציות לפתיחת וסגירת הדיאלוג
+  const handleOpenEditUserDialog = () => {
+    setAnchorUser(null) // נסגור את תפריט המשתמש קודם
+    setEditUserDialogOpen(true) // פותחים את הדיאלוג
   }
-  // אם המשתמש הוא מנהל אירועים
-  else if (isEventManager) {
-    navigationPages = pagesManger // דפים למנהל אירועים
-  }
-  // אם המשתמש מחובר אך אינו מנהל
-  else {
-    navigationPages = pagesRegistered // דפים למשתמש רגיל
+  const handleCloseEditUserDialog = () => {
+    setEditUserDialogOpen(false) // סוגרים את הדיאלוג
   }
 
-  const [anchorNav, setAnchorNav] = useState(null)
-  const [anchorUser, setAnchorUser] = useState(null)
+  // פונקציית התנתקות
+  const handleLogout = () => {
+    // איפוס כל הפרטים מה-context
+    setUserId('')
+    setUserEmail('')
+    setEventNumber('')
+    setIsEventManager(false)
+    // אפשר לאפס גם פרטים נוספים בהתאם למבנה הפרויקט שלך
+
+    // סוגרים תפריט
+    handleCloseUserMenu()
+
+    // מעבירים את המשתמש לדף ההתחברות
+    navigate('/LoginPage')
+  }
 
   const handleOpenNavMenu = event => {
     setAnchorNav(event.currentTarget)
@@ -92,6 +115,276 @@ function Navbar() {
   const handleCloseUserMenu = () => {
     setAnchorUser(null)
   }
+
+  {
+    /* --- דיאלוג עריכת משתמש --- */
+  }
+  // ;<Dialog
+  //   open={editUserDialogOpen}
+  //   onClose={() => setEditUserDialogOpen(false)}
+  //   dir="rtl"
+  //   PaperProps={{
+  //     sx: {
+  //       borderRadius: '25px',
+  //       backgroundColor: '#2B384D',
+  //       width: 600,
+  //       height: 800,
+  //       padding: 2,
+  //       color: '#E0E1DD'
+  //     }
+  //   }}
+  // >
+  //   <DialogTitle sx={{ textAlign: 'center', fontSize: 40 }}>עריכת משתמש</DialogTitle>
+  //   {saving || canceling ? (
+  //     <Box
+  //       sx={{
+  //         height: '100%',
+  //         display: 'flex',
+  //         justifyContent: 'center',
+  //         alignItems: 'center',
+  //         animation: `${fadeIn} 0.5s ease-in-out`
+  //       }}
+  //     >
+  //       {saving ? (
+  //         <CheckCircleIcon
+  //           sx={{
+  //             fontSize: 100,
+  //             color: 'green',
+  //             animation: `${pop} 0.5s ease`
+  //           }}
+  //         />
+  //       ) : (
+  //         <CloseIcon
+  //           sx={{
+  //             fontSize: 100,
+  //             color: 'red',
+  //             animation: `${pop} 0.5s ease`
+  //           }}
+  //         />
+  //       )}
+  //     </Box>
+  //   ) : (
+  //     <>
+  //       <DialogContent
+  //         sx={{
+  //           display: 'flex',
+  //           flexDirection: 'column',
+  //           gap: 2,
+  //           backgroundColor: '#1B263B',
+  //           borderRadius: '25px',
+  //           color: '#E0E1DD'
+  //         }}
+  //       >
+  //         <TextField
+  //           label="שם פרטי"
+  //           value={editedUser.fname || ''}
+  //           onChange={e =>
+  //             setEditedUser({
+  //               ...editedUser,
+  //               fname: e.target.value
+  //             })
+  //           }
+  //           inputProps={{
+  //             style: { textAlign: 'right' }
+  //           }}
+  //           sx={{
+  //             borderRadius: 5,
+  //             backgroundColor: '#2B384D',
+  //             mt: 4,
+  //             textAlign: 'right',
+  //             '& .MuiOutlinedInput-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5,
+  //               '&:hover fieldset': {
+  //                 borderColor: 'lightskyblue'
+  //               }
+  //             },
+  //             '& .MuiInputLabel-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5
+  //             }
+  //           }}
+  //         />
+  //         <TextField
+  //           label="שם משפחה"
+  //           value={editedUser.lname || ''}
+  //           onChange={e =>
+  //             setEditedUser({
+  //               ...editedUser,
+  //               lname: e.target.value
+  //             })
+  //           }
+  //           inputProps={{
+  //             style: { textAlign: 'right' }
+  //           }}
+  //           sx={{
+  //             borderRadius: 5,
+  //             backgroundColor: '#2B384D',
+  //             mt: 4,
+  //             textAlign: 'right',
+  //             '& .MuiOutlinedInput-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5,
+  //               '&:hover fieldset': {
+  //                 borderColor: 'lightskyblue'
+  //               }
+  //             },
+  //             '& .MuiInputLabel-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5
+  //             }
+  //           }}
+  //         />
+  //         <TextField
+  //           label="אימייל"
+  //           value={editedUser.email || ''}
+  //           onChange={e =>
+  //             setEditedUser({
+  //               ...editedUser,
+  //               email: e.target.value
+  //             })
+  //           }
+  //           inputProps={{
+  //             style: { textAlign: 'right' }
+  //           }}
+  //           sx={{
+  //             borderRadius: 5,
+  //             backgroundColor: '#2B384D',
+  //             mt: 4,
+  //             textAlign: 'right',
+  //             '& .MuiOutlinedInput-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5,
+  //               '&:hover fieldset': {
+  //                 borderColor: 'lightskyblue'
+  //               }
+  //             },
+  //             '& .MuiInputLabel-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5
+  //             }
+  //           }}
+  //         />
+  //         <TextField
+  //           label="סיסמה"
+  //           value={editedUser.password || ''}
+  //           onChange={e =>
+  //             setEditedUser({
+  //               ...editedUser,
+  //               password: e.target.value
+  //             })
+  //           }
+  //           inputProps={{
+  //             style: { textAlign: 'right' }
+  //           }}
+  //           sx={{
+  //             borderRadius: 5,
+  //             backgroundColor: '#2B384D',
+  //             mt: 4,
+  //             textAlign: 'right',
+  //             '& .MuiOutlinedInput-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5,
+  //               '&:hover fieldset': {
+  //                 borderColor: 'lightskyblue'
+  //               }
+  //             },
+  //             '& .MuiInputLabel-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5
+  //             }
+  //           }}
+  //         />
+  //         <TextField
+  //           label="מנהל?"
+  //           value={editedUser.isManager || ''}
+  //           onChange={e =>
+  //             setEditedUser({
+  //               ...editedUser,
+  //               isManager: e.target.value
+  //             })
+  //           }
+  //           inputProps={{
+  //             style: { textAlign: 'right' }
+  //           }}
+  //           sx={{
+  //             borderRadius: 5,
+  //             backgroundColor: '#2B384D',
+  //             mt: 4,
+  //             textAlign: 'right',
+  //             '& .MuiOutlinedInput-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5,
+  //               '&:hover fieldset': {
+  //                 borderColor: 'lightskyblue'
+  //               }
+  //             },
+  //             '& .MuiInputLabel-root': {
+  //               color: '#E0E1DD',
+  //               borderRadius: 5
+  //             }
+  //           }}
+  //         />
+  //       </DialogContent>
+  //       <DialogActions
+  //         sx={{
+  //           //backgroundColor: 'rgba(43,59,61,1)', // רקע דיאלוג: RGBA של #2B384D
+  //           display: 'flex',
+  //           justifyContent: 'center',
+  //           gap: 2,
+  //           margin: '10px 0'
+  //         }}
+  //       >
+  //         <Button
+  //           variant="contained"
+  //           onClick={handleCancel}
+  //           sx={{
+  //             borderRadius: 5,
+  //             margin: '0 15px',
+  //             fontWeight: 'bold',
+  //             fontSize: '1.1rem',
+  //             backgroundColor: 'rgba(87,96,111,1)', // צבע ביטול: RGBA של #57606F
+  //             color: '#E0E1DD',
+  //             padding: '10px 20px',
+  //             transition: 'background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease',
+  //             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+  //             '&:hover': {
+  //               backgroundColor: 'rgba(72,81,92,1)', // גוון כהה יותר בעת ה-hover (RGBA של #48515C)
+  //               transform: 'translateY(-2px)',
+  //               boxShadow: '0px 6px 8px rgba(0, 0, 0, 0.15)'
+  //             },
+  //             '&:active': {
+  //               animation: `${pulse} 0.5s ease-in-out`
+  //             }
+  //           }}
+  //         >
+  //           ביטול
+  //         </Button>
+  //         <Button
+  //           variant="contained"
+  //           onClick={handleSaveUser}
+  //           sx={{
+  //             borderRadius: 5,
+  //             fontWeight: 'bold',
+  //             fontSize: '1.1rem',
+  //             backgroundColor: 'rgb(0, 139, 63)', // ירוק טבעי: RGBA של MediumSeaGreen (#3CB371)
+  //             color: '#E0E1DD',
+  //             padding: '10px 20px',
+  //             transition: 'background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease',
+  //             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+  //             '&:hover': {
+  //               backgroundColor: 'rgb(0, 113, 51)', // גוון כהה יותר בעת ה-hover
+  //               transform: 'translateY(-2px)',
+  //               boxShadow: '0px 6px 8px rgba(0, 0, 0, 0.15)'
+  //             }
+  //           }}
+  //         >
+  //           שמור
+  //         </Button>
+  //       </DialogActions>
+  //     </>
+  //   )}
+  // </Dialog>
 
   return (
     <Box sx={{ marginBottom: 0 }} dir="rtl">
@@ -123,11 +416,11 @@ function Navbar() {
                 to="/Home"
                 sx={{
                   my: 2,
-                  margin: '0 10px',
+                  margin: '0px',
                   borderRadius: '20px',
                   color: '#FFC107',
                   fontWeight: 'bold',
-                  mr: 1.5,
+                  mr: 3,
                   transition: '0.3s',
                   '&:hover': {
                     backgroundColor: 'rgba(255,193,7,0.15)'
@@ -137,7 +430,6 @@ function Navbar() {
               >
                 דף הבית
               </Button>
-
               {/* כפתורי ניווט בהתאם לניווט שנקבע */}
               {navigationPages.map(page => (
                 <Button
@@ -145,15 +437,15 @@ function Navbar() {
                   component={Link}
                   to={page.path}
                   sx={{
-                    margin: '0 10px',
+                    backgroundColor: location.pathname === page.path ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.07)',
+                    margin: '2px',
+                    padding: '5px 15px',
                     borderRadius: '20px',
                     my: 2,
-                    color: '#ECEFF1',
+                    color: location.pathname === page.path ? 'skyblue' : '#ECEFF1',
+                    fontWeight: location.pathname === page.path ? 'bold' : 'normal',
                     transition: '0.3s',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255,255,255,0.1)'
-                      //boxShadow: "0 0 8px rgba(236,239,241,0.4)",
-                    }
+                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' }
                   }}
                 >
                   {page.name}
@@ -183,61 +475,53 @@ function Navbar() {
               >
                 התחברות ורישום
               </Button>
-
-              {!isEventManager && ( // הצגת האלמנטים הקשורים ל-eventNumber רק אם isEventManager הוא false
-                <>
-                  {/* אם אין eventNumber */}
-                  {!eventNumber && (
-                    <Box
-                      sx={{
-                        width: '20%',
-                        mr: 5,
-                        textAlign: 'center'
-                      }}
-                    >
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'red',
-                          fontSize: '1.2rem',
-                          fontStyle: 'italic',
-                          marginRight: '0px',
-                          lineHeight: 1
-                        }}
-                      >
-                        כניסה ללא מספר מזהה אירוע
-                      </Typography>
-                    </Box>
-                  )}
-
-                  {/* אם יש eventNumber */}
-                  {eventNumber && (
-                    <Typography
-                      sx={{
-                        color: 'goldenrod',
-                        ml: 2,
-                        fontWeight: 'bold',
-                        fontSize: '1.4rem',
-                        fontFamily: 'serif',
-                        marginRight: '200px'
-                      }}
-                    >
-                      מזהה אירוע: {eventNumber}
-                    </Typography>
-                  )}
-                </>
+              {/* {!isEventManager && ( // הצגת האלמנטים הקשורים ל-eventNumber רק אם isEventManager הוא false */}
+              {/* <> */}
+              {/* אם אין eventNumber */}
+              {!eventNumber && (
+                <Box
+                  sx={{
+                    width: '20%',
+                    mr: 5,
+                    textAlign: 'center'
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'red',
+                      fontSize: '1.2rem',
+                      fontStyle: 'italic',
+                      marginRight: '0px',
+                      lineHeight: 1
+                    }}
+                  >
+                    כניסה ללא מספר מזהה אירוע
+                  </Typography>
+                </Box>
               )}
+
+              {/* אם יש eventNumber */}
+              {eventNumber && (
+                <Typography
+                  sx={{
+                    color: 'goldenrod',
+                    ml: 2,
+                    fontWeight: 'bold',
+                    fontSize: '1.4rem',
+                    fontFamily: 'serif',
+                    marginRight: '200px'
+                  }}
+                >
+                  מזהה אירוע: {eventNumber}
+                </Typography>
+              )}
+              {/* </> */}
+              {/* )} */}
             </Box>
 
-            {/* אייקון/תמונת פרופיל (אווטאר) בצד שמאל - פופאפ */}
-            <Box
-              sx={{
-                flexGrow: 0,
-                ml: 3,
-                alignItems: 'center', // יישור אנכי
-                justifyContent: 'center' // יישור אופקי
-              }}
-            >
+            {/* אווטאר משתמש */}
+            <Box sx={{ flexGrow: 0, ml: 3 }}>
               <Tooltip title="פרופיל המשתמש">
                 <IconButton
                   onClick={handleOpenUserMenu}
@@ -247,12 +531,7 @@ function Navbar() {
                     color: '#fff'
                   }}
                 >
-                  {/* אם יש תמונת פרופיל: src='url...' אחרת יופיע default */}
-                  <AccountCircleIcon
-                    //sx={{ color: "white" }}
-                    alt="User Avatar"
-                    src=""
-                  />
+                  <AccountCircleIcon />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -330,7 +609,7 @@ function Navbar() {
                 {userId && (
                   <>
                     <MenuItem
-                      onClick={handleCloseUserMenu}
+                      onClick={handleOpenEditUserDialog}
                       sx={{
                         color: '#ECEFF1',
                         fontWeight: 'bold',
@@ -343,7 +622,7 @@ function Navbar() {
                       הגדרות חשבון
                     </MenuItem>
                     <MenuItem
-                      onClick={handleCloseUserMenu}
+                      onClick={handleLogout}
                       sx={{
                         color: '#ECEFF1',
                         fontWeight: 'bold',
@@ -378,6 +657,125 @@ function Navbar() {
           </Toolbar>
         </Container>
       </AppBar>
+
+      {/* =============== דיאלוג עריכת משתמש =============== */}
+      <Dialog
+        open={editUserDialogOpen}
+        onClose={handleCloseEditUserDialog}
+        dir="rtl"
+        PaperProps={{
+          sx: {
+            borderRadius: '25px',
+            backgroundColor: '#2B384D',
+            width: 600,
+            height: 600,
+            padding: 2,
+            color: '#E0E1DD'
+          }
+        }}
+      >
+        <Typography variant="h5" sx={{ textAlign: 'center', mt: 2 }}>
+          עריכת משתמש
+        </Typography>
+        <Divider sx={{ backgroundColor: '#fff', my: 1 }} />
+
+        <DialogContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2
+            //height: '100%',
+            //overflowY: 'auto', // אם צריך גלילה
+          }}
+        >
+          {/* כאן מוסיפים TextField-ים לפרטי המשתמש (fname, lname, email, password וכו') */}
+          <TextField
+            label="שם פרטי"
+            variant="outlined"
+            // value={editedUser.fname || ''}
+            // onChange={(e) => setEditedUser({ ...editedUser, fname: e.target.value })}
+            sx={{
+              backgroundColor: '#22303C',
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
+              },
+              '& .MuiInputLabel-root': { color: '#E0E1DD' },
+              '& .MuiInputBase-input': { color: '#E0E1DD' }
+            }}
+          />
+
+          <TextField
+            label="אימייל"
+            variant="outlined"
+            // value={editedUser.email || ''}
+            // onChange={(e) => setEditedUser({ ...editedUser, email: e.target.value })}
+            sx={{
+              backgroundColor: '#22303C',
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
+              },
+              '& .MuiInputLabel-root': { color: '#E0E1DD' },
+              '& .MuiInputBase-input': { color: '#E0E1DD' }
+            }}
+          />
+          <TextField
+            label="סיסמה"
+            variant="outlined"
+            // value={editedUser.password || ''}
+            // onChange={(e) => setEditedUser({ ...editedUser, password: e.target.value })}
+            sx={{
+              backgroundColor: '#22303C',
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
+              },
+              '& .MuiInputLabel-root': { color: '#E0E1DD' },
+              '& .MuiInputBase-input': { color: '#E0E1DD' }
+            }}
+          />
+          <TextField
+            label="מנהל?"
+            variant="outlined"
+            // value={editedUser.isManager || ''}
+            // onChange={(e) => setEditedUser({ ...editedUser, isManager: e.target.value })}
+            sx={{
+              backgroundColor: '#22303C',
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
+              },
+              '& .MuiInputLabel-root': { color: '#E0E1DD' },
+              '& .MuiInputBase-input': { color: '#E0E1DD' }
+            }}
+          />
+
+          {/* ...שדות נוספים לעריכה... */}
+        </DialogContent>
+
+        <Divider sx={{ backgroundColor: '#fff', mt: 1 }} />
+        <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
+          <Button onClick={handleCloseEditUserDialog} variant="contained" sx={{ backgroundColor: 'gray', mx: 2 }}>
+            ביטול
+          </Button>
+          <Button
+            onClick={() => {
+              // שמירה/שליחה לשרת וכו'...
+              // לאחר מכן סגירה
+              handleCloseEditUserDialog()
+            }}
+            variant="contained"
+            sx={{ backgroundColor: 'blue' }}
+          >
+            שמור
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Box sx={{ marginBottom: 8 }} />
     </Box>
   )

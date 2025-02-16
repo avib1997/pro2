@@ -3,6 +3,7 @@ const userController = require('../controllers/userController')
 const jwtFn = require('../middleware/jwtMiddleware')
 const { fixHebrewText } = require('../fixHebrew.js')
 const { update } = require('../controllers/giftController.js')
+const { object } = require('joi')
 
 async function getGiftsById(userId) {
   const userDetails = await userController.readOne(userId)
@@ -58,30 +59,34 @@ exports.createUser = userFields => {
 }
 
 module.exports.register = async userFields => {
-  if (!userFields.email || !userFields.password || !userFields.fname || !userFields.lname) {
-    throw { code: 400, message: 'missing data' }
+  if (Object.keys(userFields).length === 0) {
+    console.log('keys:', object.keys(userFields))
+    console.log('values:', Object.values(userFields))
+    throw { code: 400, message: 'there is no user fields' }
   }
+  console.log('userFields:', userFields)
   const email = userFields.email
   const existUser = await userController.readOne({ email: email })
   if (existUser) {
-    throw { code: 405, message: 'duplicated email' }
+    return { message: 'user already exist' }
   }
   const user = await userController.create(userFields)
+  console.log('user in register:', user)
   const token = jwtFn.createToken(user._id)
-  return { token: token, user: user }
+  return { user: user, token: token }
 }
 
-//getIsManeger
-const getIsManeger = async userId => {
+//getisManager
+const getisManager = async userId => {
   if (!userId) throw new Error('❌ Missing userId')
   const user = await userController.readOne({ _id: userId })
   if (!user) throw new Error('❌ User not found')
-  return user.isManeger
+  return user.isManager
 }
 
 exports.updateUser = (filter, newData) => {
-  //אני צריך ש newData יכיל רק את השדות שאני רוצה לעדכן: {fname: , lname: , email: , password: , isManeger: }
-  newData = { fname: newData.fname, lname: newData.lname, email: newData.email, password: newData.password, isManeger: newData.isManeger }
+  //אני צריך ש newData יכיל רק את השדות שאני רוצה לעדכן: {fname: , lname: , email: , password: , isManager: }
+  newData = { fname: newData.fname, lname: newData.lname, email: newData.email, password: newData.password, isManager: newData.isManager }
 
   console.log('filterrrrrrrrrr:', filter)
   console.log('newDataaaaaaaa:', newData)
@@ -92,14 +97,14 @@ exports.updateUser = (filter, newData) => {
   return { message: 'user updated successfully', user: updatedUser }
 }
 
-const updateManagerStatus = async (userId, isManeger) => {
+const updateManagerStatus = async (userId, isManager) => {
   if (!userId) throw new Error('❌ Missing userId')
   console.log('userId updateManagerStatus:', userId)
-  console.log('isManeger updateManagerStatus:', isManeger)
+  console.log('isManager updateManagerStatus:', isManager)
 
   const updatedUser = await userController.updateOne(
     { _id: userId }, // Find user by ID
-    { isManeger } // Update field
+    { isManager } // Update field
   )
 
   if (!updatedUser) throw new Error('❌ User not found')
@@ -126,7 +131,7 @@ const deleteUser = async userId => {
 
 module.exports = {
   ...module.exports,
-  getIsManeger,
+  getisManager,
   updateManagerStatus,
   login,
   getIdByEmail,

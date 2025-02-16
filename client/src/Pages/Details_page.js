@@ -17,14 +17,7 @@ import axios from 'axios'
 const Details = () => {
   const navigate = useNavigate()
   const [eventNum, setEventNum] = useState('')
-  const { userId, event, eventId, setEvent, eventNumber, setEventId, setEventNumber } = useContext(Context)
-
-  const [inputs, setInputs] = useState({
-    name: '',
-    phone: '',
-    blessing: '',
-    amount: ''
-  })
+  const { giftDetails, setGiftDetails, userId, event, eventId, setEvent, eventNumber, setEventId, setEventNumber } = useContext(Context)
   const [amount, setAmount] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -38,11 +31,13 @@ const Details = () => {
   }, [eventNumber])
 
   const handleChange = e => {
-    setAmount(e.target.value)
-    setInputs(prevState => ({
-      ...prevState,
-      [e.target.name]: e.target.value
-    }))
+    const { name, value } = e.target
+    setGiftDetails(prev => {
+      const updatedDetails = { ...prev, [name]: value }
+      const { name: n, phone, blessing, amount } = updatedDetails
+      localStorage.setItem('giftDetails', JSON.stringify({ name: n, phone, blessing, amount }))
+      return updatedDetails
+    })
   }
 
   const handleClick = async e => {
@@ -50,28 +45,28 @@ const Details = () => {
     const errors = []
 
     // בדיקה עבור שדה שם: חובה, ואין בו מספרים
-    if (!inputs.name.trim()) {
+    if (!giftDetails.name.trim()) {
       errors.push('יש למלא את שדה השם')
-    } else if (/\d/.test(inputs.name)) {
+    } else if (/\d/.test(giftDetails.name)) {
       errors.push('שם לא יכול להכיל מספרים')
     }
 
     // בדיקה עבור שדה טלפון: חובה, ורק מספרים
-    if (!inputs.phone.trim()) {
+    if (!giftDetails.phone.trim()) {
       errors.push('יש למלא את שדה הטלפון')
-    } else if (!/^\d+$/.test(inputs.phone)) {
+    } else if (!/^\d+$/.test(giftDetails.phone)) {
       errors.push('טלפון חייב להכיל רק מספרים')
     }
 
     // בדיקה עבור שדה ברכה: אם הוא לא ריק – אין לכלול מספרים
-    if (inputs.blessing.trim() && /\d/.test(inputs.blessing)) {
+    if (giftDetails.blessing.trim() && /\d/.test(giftDetails.blessing)) {
       errors.push('ברכה לא יכולה להכיל מספרים')
     }
 
     // בדיקה עבור שדה סכום: חובה, ומכיל רק מספרים
-    if (!inputs.amount.trim()) {
+    if (!giftDetails.amount.trim()) {
       errors.push('יש למלא את שדה הסכום לתשלום')
-    } else if (isNaN(inputs.amount)) {
+    } else if (isNaN(giftDetails.amount)) {
       errors.push('סכום לתשלום חייב להיות מספר בלבד')
     }
 
@@ -87,23 +82,41 @@ const Details = () => {
     console.log('📌 event object:', event) // ✅ נבדוק אם event מוגדר
 
     const newGift = {
-      name: inputs.name,
-      phone: inputs.phone,
-      blessing: inputs.blessing,
-      amount: inputs.amount,
+      name: giftDetails.name,
+      phone: giftDetails.phone,
+      blessing: giftDetails.blessing,
+      amount: giftDetails.amount,
       userid_gift: userId,
       EventId: eventId,
-      toEventName: event.NameOfGroom
+      toEventName: event.NameOfGroom,
+      imageBase64: giftDetails.imageBase64,
+      videoBase64: giftDetails.videoBase64,
+      audioBase64: giftDetails.audioBase64
     }
     //sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Signup', 'handleSubmit', userId, null, null)
     sendLog('success', 'pages', 200, '✅ Payment עבר לדף', 'client', '/Details_page', 'handleClick', userId, null, null)
     navigate('/Payment', { state: { newGift } }) // שולח את הסכום לעמוד PayPalPayment
+
+    setGiftDetails({
+      name: '',
+      phone: '',
+      blessing: '',
+      amount: ''
+    })
+
+    localStorage.removeItem('giftDetails') // מחיקת הנתונים מה-LocalStorage
   }
 
   const handleImageUpload = e => {
     const file = e.target.files[0]
     if (file && file.size <= 10 * 1024 * 1024) {
       setUploadedImage(true)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        // reader.result יהיה "data:image/png;base64,...."
+        setGiftDetails(prev => ({ ...prev, imageBase64: reader.result }))
+      }
+      reader.readAsDataURL(file)
     } else {
       alert('הקובץ גדול מדי! ניתן להעלות עד 10MB בלבד.')
     }
@@ -113,6 +126,12 @@ const Details = () => {
     const file = e.target.files[0]
     if (file && file.size <= 10 * 1024 * 1024) {
       setUploadedVideo(true)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        // reader.result יהיה "data:image/png;base64,...."
+        setGiftDetails(prev => ({ ...prev, videoBase64: reader.result }))
+      }
+      reader.readAsDataURL(file)
     } else {
       alert('הקובץ גדול מדי! ניתן להעלות עד 10MB בלבד.')
     }
@@ -122,6 +141,12 @@ const Details = () => {
     const file = e.target.files[0]
     if (file && file.size <= 10 * 1024 * 1024) {
       setUploadedAudio(true)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        // reader.result יהיה "data:image/png;base64,...."
+        setGiftDetails(prev => ({ ...prev, audioBase64: reader.result }))
+      }
+      reader.readAsDataURL(file)
     } else {
       alert('הקובץ גדול מדי! ניתן להעלות עד 10MB בלבד.')
     }
@@ -244,7 +269,7 @@ const Details = () => {
                 <TextField
                   onChange={handleChange}
                   name="name"
-                  value={inputs.name}
+                  value={giftDetails.name}
                   label="שם"
                   variant="outlined"
                   margin="normal"
@@ -284,7 +309,7 @@ const Details = () => {
                 <TextField
                   onChange={handleChange}
                   name="phone"
-                  value={inputs.phone}
+                  value={giftDetails.phone}
                   label="טלפון"
                   variant="outlined"
                   margin="normal"
@@ -324,7 +349,7 @@ const Details = () => {
                 <TextField
                   onChange={handleChange}
                   name="blessing"
-                  value={inputs.blessing}
+                  value={giftDetails.blessing}
                   label="ברכה"
                   variant="outlined"
                   multiline
@@ -504,7 +529,7 @@ const Details = () => {
                 <TextField
                   onChange={handleChange}
                   name="amount"
-                  value={inputs.amount}
+                  value={giftDetails.amount}
                   label="סכום לתשלום"
                   variant="outlined"
                   margin="normal"

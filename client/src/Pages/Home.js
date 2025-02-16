@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Container, Paper, TextField, Typography } from '@mui/material'
+import { Avatar, Box, Button, Container, Paper, TextField, Typography, Link as MuiLink } from '@mui/material'
 import Grid2 from '@mui/material/Unstable_Grid2' // ייבוא נכון של Grid2
 import React, { useContext, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
@@ -15,6 +15,8 @@ const Home = () => {
   const { setEventNumber, setEvent, eventId, setEventId } = useContext(Context) // נעדכן את ה-ID של האירוע בקונטקסט
   const [EventNum, setEventNum] = useState('') // ניהול הסטייט של השדה
   const [errorMessage, setErrorMessage] = useState('') // סטייט עבור הודעת השגיאה
+  const [guestEventNumber, setGuestEventNumber] = useState('') // state for guest event number
+  const [isGuestClicked, setIsGuestClicked] = useState(false) // state for guest click
 
   const { ref: titleRef, inView: titleInView } = useInView({
     triggerOnce: true
@@ -62,23 +64,18 @@ const Home = () => {
 
   const handleEventIdChange = e => {
     setEventNum(e.target.value)
-    // בכל הקלדה חדשה, ננקה את הודעת השגיאה
     setErrorMessage('')
   }
 
   const handleStartClick = () => {
-    console.log('🔍 בדיקת מספר אירוע:', EventNum)
-    // אם לא הוזן מספר אירוע, נציג הודעת שגיאה ולא נמשיך
-    if (!EventNum) {
+    if (!EventNum.trim()) {
       setErrorMessage('❌ חסר מספר אירוע')
       return
     }
 
-    // אם כן הוזן, נבצע את הקריאה לשרת
     axios
       .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: EventNum })
       .then(response => {
-        console.log('✅ תגובה מהשרת:', response.data)
         if (response.data && response.data._id) {
           setEvent(response.data._id) // שמירת האירוע בסטייט
           setEventNumber(EventNum) // שמירת ה-ID בקונטקסט
@@ -87,12 +84,39 @@ const Home = () => {
           navigate('/LoginPage')
         } else {
           sendLog('error', 'event', 404, '❌ מספר האירוע לא נמצא', 'client', '/HomePage', 'handleStartClick', null, null, null)
-          console.log('❌ מספר האירוע לא נמצא')
           setErrorMessage('❌ אירוע לא נמצא, בדוק את המספר שהוזן')
         }
       })
       .catch(error => {
-        console.log('❌ שגיאה בזמן בדיקת מספר האירוע:', error)
+        setErrorMessage('❌ שגיאה בחיבור לשרת, נסה שוב')
+      })
+  }
+
+  const handleGuestContinue = () => {
+    // if (!isGuestClicked) {
+    //   setIsGuestClicked(true)
+    //   setErrorMessage('יש להזין מספר אירוע כדי להמשיך כאורח.')
+    //   return
+    // }
+
+    if (!EventNum.trim()) {
+      setErrorMessage('יש להזין מספר אירוע כדי להמשיך כאורח.')
+      return
+    }
+
+    axios
+      .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: EventNum })
+      .then(response => {
+        if (response.data && response.data._id) {
+          setEvent(response.data._id)
+          setEventNumber(EventNum)
+          setEventId(response.data._id)
+          navigate('/Details_page')
+        } else {
+          setErrorMessage('❌ אירוע לא נמצא, בדוק את המספר שהוזן')
+        }
+      })
+      .catch(error => {
         setErrorMessage('❌ שגיאה בחיבור לשרת, נסה שוב')
       })
   }
@@ -144,7 +168,7 @@ const Home = () => {
           fontFamily: 'Poppins, sans-serif'
         }}
       >
-        <Container>
+        <Container sx={{ justifyItems: 'center' }}>
           <Typography
             ref={titleRef}
             variant="h2"
@@ -183,17 +207,18 @@ const Home = () => {
               transition: 'all 0.7s ease-out'
             }}
           >
-            כניסה לאירוע - לחץ כאן:
+            כניסה לאירוע - הכנס מספר אירוע:
           </Typography>
           {/* הצגת הודעת שגיאה מעל השדה, אם קיימת */}
           {errorMessage && (
             <Typography
               sx={{
-                color: 'red',
+                width: '500px',
+                color: 'rgba(255, 87, 34, 1)',
                 marginBottom: '10px',
-                fontSize: '2rem', // גודל גופן גדול יותר
-                fontWeight: 'bold' // טקסט מודגש
-                //textShadow: "1px 1px 2px rgba(0,0,0,0.3)", // צל קטן לטקסט (לא חובה)
+                fontSize: '1.2rem', // גודל גופן גדול יותר
+                fontWeight: 'bold', // טקסט מודגש
+                backgroundColor: 'rgba(255, 87, 34, 0.2)' // רקע חלבי עם צבע חזק
               }}
             >
               {errorMessage}
@@ -213,7 +238,6 @@ const Home = () => {
               marginBottom: '0px',
               marginLeft: '20px',
               width: '500px',
-              //height: "50px",
               backgroundColor: 'rgba(255, 255, 255, 0.3)', // רקע שקוף למחצה עם מעט חלבי
               borderRadius: '15px',
               opacity: inputInView ? 1 : 0,
@@ -225,7 +249,6 @@ const Home = () => {
                 color: '#333', // צבע טקסט כהה
                 boxShadow: 'none',
                 padding: '0px', // רווח פנימי
-                // יישור טקסט התוכן לימין, אם רוצים שהמשתמש יקליד מימין לשמאל
                 '& input': {
                   textAlign: 'right',
                   paddingRight: '12px'
@@ -241,7 +264,6 @@ const Home = () => {
                 }
               },
 
-              // עיצוב הלייבל (הטקסט "הכנס מספר אירוע"):
               '& .MuiInputLabel-root': {
                 right: '20px', // הזזת הלייבל ימינה
                 left: 'auto', // ביטול ערך left
@@ -257,7 +279,6 @@ const Home = () => {
             }}
           />
 
-          {/* כפתור התחלה מתחת לשדה */}
           <Button
             ref={buttonRef}
             onClick={handleStartClick}
@@ -275,11 +296,30 @@ const Home = () => {
                 boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.3)'
               }
             }}
-            // component={Link}
-            // to="/LoginPage"
           >
             התחלה
           </Button>
+
+          {/* כניסת אורח */}
+          <Box sx={{ textAlign: 'center', mt: 2 }}>
+            {/* כפתור המשך כאורח */}
+            <MuiLink
+              component="button"
+              onClick={handleGuestContinue}
+              underline="hover"
+              sx={{
+                opacity: buttonInView ? 1 : 0,
+                transform: buttonInView ? 'translateY(0)' : 'translateY(-50px)',
+                transition: 'all 0.7s ease-out',
+                color: '#F0A500',
+                cursor: 'pointer',
+                '&:hover': { textDecoration: 'underline', color: '#F0C040' },
+                fontSize: '1.2rem'
+              }}
+            >
+              המשך כאורח
+            </MuiLink>
+          </Box>
 
           <Typography
             sx={{
@@ -312,7 +352,7 @@ const Home = () => {
             }}
             onClick={() => navigate('/LoginPage')}
           >
-            כניסה ללא אירוע{' '}
+            כניסה ללא אירוע
           </Button>
 
           {/* טקסט קטן מעל קישור לרישום מנהל אירוע */}
@@ -347,7 +387,7 @@ const Home = () => {
               }
             }}
             component={Link}
-            to="/ManagerSignup"
+            to="/LoginPage?userType=manager"
           >
             רישום מנהל אירוע
           </Button>
@@ -485,24 +525,6 @@ const Home = () => {
           </Box>
         ))}
       </Container>
-      {/* Footer פשוט בתחתית העמוד */}
-      {/* <Box
-        sx={{
-          marginTop: 5,
-          textAlign: 'center',
-          py: 1.5,
-          backgroundColor: 'rgba(0,0,0,0.3)',
-          color: '#E0E1DD'
-        }}
-      >
-        <Typography
-          variant="body2"
-          sx={{ fontSize: '0.9rem' }}
-        >
-          &copy; {new Date().getFullYear()} EASY
-          GIFT | כל הזכויות שמורות
-        </Typography>
-      </Box> */}
     </Box>
   )
 }

@@ -1,20 +1,23 @@
-import React, { useState, useContext } from 'react'
-import { Box, Button, TextField, Typography, InputAdornment } from '@mui/material'
+import React, { useState, useContext, useEffect } from 'react'
+import { Box, Button, TextField, Typography, InputAdornment, MenuItem } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Context } from '../../App'
-// אייקונים מתאימים לשדות
 import { Person as PersonIcon, PersonOutline as PersonOutlineIcon, Email as EmailIcon, Lock as LockIcon } from '@mui/icons-material'
 import sendLog from '../../LogSend'
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
+import SecurityIcon from '@mui/icons-material/Security'
 
 const Signup = props => {
   const Navigate = useNavigate()
-  const { userId, setUserId } = useContext(Context)
+  const { isEventManager, setIsEventManager, userId, setUserId, eventNumber } = useContext(Context)
   const [input, setInput] = useState({
     fname: '',
     lname: '',
     email: '',
-    password: ''
+    password: '',
+    isManager: false
   })
   const handelchange = e => {
     setInput(prevState => ({
@@ -23,34 +26,141 @@ const Signup = props => {
     }))
   }
 
-  const handeClick = e => {
+  // Signup.js
+  useEffect(() => {
+    // אם אנו מגיעים "מכוון" למנהל (למשל, באמצעות prop שהגיע מהורה)
+    if (props.defaultManager === true) {
+      setInput(prev => ({ ...prev, isManager: true }))
+    }
+  }, [props.defaultManager])
+
+  // switch (field) {
+  //   case 'name':
+  //     if (!value) {
+  //       newErrors.name = 'יש להזין שם מלא'
+  //       newValidState.name = false
+  //     } else {
+  //       newErrors.name = 'תקין'
+  //       newValidState.name = true
+  //     }
+  //     break
+  //   case 'email':
+  //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  //     if (!value) {
+  //       newErrors.email = 'יש להזין כתובת אימייל'
+  //       newValidState.email = false
+  //     } else if (!emailRegex.test(value)) {
+  //       newErrors.email = 'כתובת אימייל לא תקינה'
+  //       newValidState.email = false
+  //     } else {
+  //       newErrors.email = 'תקין'
+  //       newValidState.email = true
+  //       setEmailUser(value)
+  //     }
+  //     break
+  //   case 'phone':
+  //     const phoneRegex = /^[0-9]{10}$/
+  //     if (!value) {
+  //       newErrors.phone = 'יש להזין מספר טלפון'
+  //       newValidState.phone = false
+  //     } else if (!phoneRegex.test(value)) {
+  //       newErrors.phone = 'מספר טלפון חייב לכלול 10 ספרות'
+  //       newValidState.phone = false
+  //     } else {
+  //       newErrors.phone = 'תקין'
+  //       newValidState.phone = true
+  //     }
+  //     break
+  //   case 'additionalInfo':
+  //     if (!value) {
+  //       newErrors.additionalInfo = 'יש להזין מידע נוסף'
+  //       newValidState.additionalInfo = false
+  //     } else {
+  //       newErrors.additionalInfo = 'תקין'
+  //       newValidState.additionalInfo = true
+  //     }
+  //     break
+  //   default:
+  //     break
+  // }
+  // setErrors(newErrors)
+  // setIsValid(newValidState)
+
+  const handeClick = async e => {
     e.preventDefault()
-    if (props.a === 'manager') {
-      const addUserManager = {
-        fname: input.fname,
-        lname: input.lname,
-        email: input.email,
-        password: input.password
+    switch (input) {
+      case 'fname':
+        if (!input.fname) {
+          console.log('יש להזין שם מלא')
+        } else if (/\d/.test(input.fname)) {
+          console.log('אין לכתוב מספרים בשם')
+        } else {
+          console.log('תקין')
+        }
+        break
+
+      case 'lname':
+        if (!input.lname) {
+          console.log('יש להזין שם משפחה')
+        } else if (/\d/.test(input.lname)) {
+          console.log('אין לכתוב מספרים בשם המשפחה')
+        } else {
+          console.log('תקין')
+        }
+        break
+      case 'email':
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!input.email) {
+          console.log('יש להזין כתובת אימייל')
+        } else if (!emailRegex.test(input.email)) {
+          console.log('כתובת אימייל לא תקינה')
+        } else {
+          console.log('תקין')
+        }
+        break
+      case 'password':
+        if (!input.password) {
+          console.log('יש להזין סיסמה')
+        } else if (input.password.length < 3) {
+          console.log('סיסמה חייבת להכיל לפחות 3 תווים')
+        } else {
+          console.log('תקין')
+        }
+        break
+      default:
+        break
+    }
+
+    try {
+      const response = await axios.post('http://localhost:2001/api/users/register', input)
+      console.log('response in singup:', response)
+      const { user, token } = response.data
+
+      // if (token) {
+      //   console.log('המשתמש נוצר בהצלחה')
+      //   if (input.isManager) {
+      //     console.log('המשתמש הוא מנהל')
+      //     Navigate('/EventManager')
+      //   } else {
+      //     console.log('המשתמש הוא לא מנהל')
+      //     Navigate('/Details_page')
+      //   }
+      // } else {
+      //   console.log('המשתמש לא נוצר')
+      // }
+      if (token) {
+        if (eventNumber) {
+          Navigate('/Details_page')
+        } else if (input.isManager) {
+          Navigate('/EventManager')
+        } else {
+          Navigate('/History')
+        }
+      } else {
+        console.log('המשתמש לא נוצר')
       }
-      axios.post('http://localhost:2001/addUserManager', addUserManager)
-      sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Signup', 'handleSubmit', userId, null, null)
-      Navigate('/EventManager')
-    } else {
-      const newUser = {
-        fname: input.fname,
-        lname: input.lname,
-        email: input.email,
-        password: input.password
-      }
-      axios
-        .post('http://localhost:2001/api/users/register', newUser)
-        .then(function (response) {
-          setUserId(response.data.user._id)
-          response.data ? Navigate('/Details_page') : console.log('no enter for you')
-        })
-        .catch(function (error) {
-          console.log(error)
-        })
+    } catch (error) {
+      console.log(error)
     }
   }
 
@@ -86,7 +196,7 @@ const Signup = props => {
             placeholder="שם"
             label="שם"
             sx={{
-              width: '300px',
+              width: '400px',
               backgroundColor: '#fff',
               borderRadius: '20px', // רינוד פינות
               // עיצוב כללי של השדה
@@ -147,7 +257,7 @@ const Signup = props => {
             placeholder="שם משפחה"
             label="שם משפחה"
             sx={{
-              width: '300px',
+              width: '400px',
               backgroundColor: '#fff',
               borderRadius: '20px', // רינוד פינות
               // עיצוב כללי של השדה
@@ -208,7 +318,7 @@ const Signup = props => {
             placeholder="דואר אלקטרוני"
             label="דואר אלקטרוני"
             sx={{
-              width: '300px',
+              width: '400px',
               backgroundColor: '#fff',
               borderRadius: '20px', // רינוד פינות
               // עיצוב כללי של השדה
@@ -269,7 +379,7 @@ const Signup = props => {
             placeholder="סיסמה"
             label="סיסמה"
             sx={{
-              width: '300px',
+              width: '400px',
               backgroundColor: '#fff',
               borderRadius: '20px', // רינוד פינות
               // עיצוב כללי של השדה
@@ -320,6 +430,85 @@ const Signup = props => {
               )
             }}
           />
+          <TextField
+            select // הופך את השדה ל-Select
+            onChange={handelchange}
+            name="isManager"
+            value={input.isManager}
+            margin="normal"
+            variant="outlined"
+            placeholder="האם אתה רוצה להירשם כמנהל?"
+            label="האם אתה רוצה להירשם כמנהל?"
+            sx={{
+              width: '400px',
+              backgroundColor: '#fff',
+              borderRadius: '20px',
+              '& .MuiOutlinedInput-root': {
+                fontWeight: 600,
+                borderRadius: '20px',
+                '& fieldset': { border: 'none' },
+                '&:hover fieldset': { border: 'none' },
+                '&.Mui-focused fieldset': { border: 'none' },
+                '& .MuiOutlinedInput-input': { paddingRight: '0px' }
+              },
+              '& .MuiSelect-select': {
+                textAlign: 'center',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: '10px'
+              },
+              '& .MuiInputLabel-root': {
+                //position: 'relative', // כדי שנוכל למרכז
+                width: '100%',
+                textAlign: 'center', // מלל באמצע
+                transform: 'none', // ביטול האנימציה הרגילה
+                left: 'auto', // שלא יתהפך ב-RTL
+                right: 'auto', // שלא יתהפך ב-RTL
+                fontWeight: 600
+              },
+              '& .MuiInputLabel-root.Mui-focused, & .MuiInputLabel-shrink': {
+                // כאן אפשר לשחק עם מיקום/הצפה של הטקסט
+              }
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <ManageAccountsIcon sx={{ color: 'rgba(76, 175, 80, 1)' }} />
+                </InputAdornment>
+              )
+            }}
+          >
+            <MenuItem
+              value={true}
+              sx={{
+                transition: 'transform 0.2s ease',
+                textAlign: 'center',
+                justifyContent: 'center',
+                '&:hover': {
+                  transform: 'scale(1.1)', // "קפיצה" קלה
+                  backgroundColor: '#DEEFE2', // צבע רקע בהיר
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.2)' // צל עדין
+                }
+              }}
+            >
+              כן
+            </MenuItem>
+            <MenuItem
+              value={false}
+              sx={{
+                textAlign: 'center',
+                justifyContent: 'center',
+                transition: 'transform 0.2s ease',
+                '&:hover': {
+                  transform: 'scale(1.1)',
+                  backgroundColor: '#FDEDEC',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+                }
+              }}
+            >
+              לא
+            </MenuItem>
+          </TextField>
           {/* {props.a === "manager" && <Button>change to login</Button>} */}
           <Button
             onClick={handeClick}

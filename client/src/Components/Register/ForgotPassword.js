@@ -48,11 +48,53 @@ const ForgotPassword = ({ open, handleClose }) => {
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} dir="rtl">
-      <DialogTitle>איפוס סיסמה</DialogTitle>
-      <DialogContent>
-        {errorMessage && <Typography color="error">{errorMessage}</Typography>}
-        <TextField label="אימייל" type="email" fullWidth margin="dense" value={email} onChange={e => setEmail(e.target.value)} />
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      dir="rtl"
+      PaperProps={{
+        sx: {
+          borderRadius: '25px',
+          backgroundColor: '#2B384D',
+          width: 500,
+          padding: 2,
+          color: '#E0E1DD'
+        }
+      }}
+    >
+      <DialogTitle sx={{ textAlign: 'center', fontSize: 30, color: '#E0E1DD' }}>איפוס סיסמה</DialogTitle>
+      <DialogContent
+        sx={{
+          backgroundColor: '#1B263B',
+          borderRadius: '25px',
+          padding: 3,
+          color: '#E0E1DD'
+          //paddingTop: '10px'
+        }}
+      >
+        {errorMessage && (
+          <Typography color="error" sx={{ textAlign: 'center', marginBottom: 1, marginTop: 1, fontWeight: 'bold' }}>
+            {errorMessage}
+          </Typography>
+        )}
+        <TextField
+          label="אימייל"
+          type="email"
+          fullWidth
+          margin="dense"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          sx={{
+            backgroundColor: '#2B384D',
+            borderRadius: 5,
+            '& .MuiOutlinedInput-root': {
+              color: '#E0E1DD',
+              borderRadius: 5,
+              '&:hover fieldset': { borderColor: 'lightskyblue' }
+            },
+            '& .MuiInputLabel-root': { color: '#E0E1DD' }
+          }}
+        />
         <TextField
           label="סיסמה חדשה"
           type={showPassword ? 'text' : 'password'}
@@ -67,14 +109,65 @@ const ForgotPassword = ({ open, handleClose }) => {
               </InputAdornment>
             )
           }}
+          sx={{
+            backgroundColor: '#2B384D',
+            borderRadius: 5,
+            '& .MuiOutlinedInput-root': {
+              color: '#E0E1DD',
+              borderRadius: 5,
+              '&:hover fieldset': { borderColor: 'lightskyblue' }
+            },
+            '& .MuiInputLabel-root': { color: '#E0E1DD' }
+          }}
         />
-        <TextField label="אימות סיסמה חדשה" type={showPassword ? 'text' : 'password'} fullWidth margin="dense" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
+        <TextField
+          label="אימות סיסמה חדשה"
+          type={showPassword ? 'text' : 'password'}
+          fullWidth
+          margin="dense"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+          sx={{
+            backgroundColor: '#2B384D',
+            borderRadius: 5,
+            '& .MuiOutlinedInput-root': {
+              color: '#E0E1DD',
+              borderRadius: 5,
+              '&:hover fieldset': { borderColor: 'lightskyblue' }
+            },
+            '& .MuiInputLabel-root': { color: '#E0E1DD' }
+          }}
+        />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="secondary">
+      <DialogActions sx={{ display: 'flex', justifyContent: 'center', gap: 2, margin: '10px 0' }}>
+        <Button
+          onClick={handleClose}
+          sx={{
+            borderRadius: 5,
+            fontWeight: 'bold',
+            fontSize: '1.1rem',
+            backgroundColor: 'rgba(87,96,111,1)',
+            color: '#E0E1DD',
+            padding: '10px 20px',
+            transition: 'background-color 0.3s ease, transform 0.2s ease',
+            '&:hover': { backgroundColor: 'rgba(72,81,92,1)', transform: 'translateY(-2px)' }
+          }}
+        >
           ביטול
         </Button>
-        <Button onClick={handleResetPassword} color="primary">
+        <Button
+          onClick={handleResetPassword}
+          sx={{
+            borderRadius: 5,
+            fontWeight: 'bold',
+            fontSize: '1.1rem',
+            backgroundColor: 'rgb(0, 139, 63)',
+            color: '#E0E1DD',
+            padding: '10px 20px',
+            transition: 'background-color 0.3s ease, transform 0.2s ease',
+            '&:hover': { backgroundColor: 'rgb(0, 113, 51)', transform: 'translateY(-2px)' }
+          }}
+        >
           אישור
         </Button>
       </DialogActions>

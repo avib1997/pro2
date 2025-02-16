@@ -38,9 +38,31 @@ module.exports.addgift = async giftFields => {
     const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`
     console.log(fixHebrewText('שם האירוע שנמצא:', '📌'), eventName)
 
+    // המרת Base64 (אם קיים) ל-Buffer
+    let imageBuffer = null
+    if (giftFields.imageBase64) {
+      const base64WithoutPrefix = giftFields.imageBase64.replace(/^data:.*;base64,/, '')
+      imageBuffer = Buffer.from(base64WithoutPrefix, 'base64')
+    }
+
+    let videoBuffer = null
+    if (giftFields.videoBase64) {
+      const base64WithoutPrefix = giftFields.videoBase64.replace(/^data:.*;base64,/, '')
+      videoBuffer = Buffer.from(base64WithoutPrefix, 'base64')
+    }
+
+    let audioBuffer = null
+    if (giftFields.audioBase64) {
+      const base64WithoutPrefix = giftFields.audioBase64.replace(/^data:.*;base64,/, '')
+      audioBuffer = Buffer.from(base64WithoutPrefix, 'base64')
+    }
+
     const newGift = await giftController.create({
       ...giftFields,
-      toEventName: eventName // ✅ הוספת שם האירוע למתנה
+      toEventName: eventName,
+      imageFile: imageBuffer,
+      videoFile: videoBuffer,
+      audioFile: audioBuffer
     })
 
     console.log(fixHebrewText('מתנה נוספה בהצלחה:', '✅'), newGift)
@@ -71,12 +93,42 @@ module.exports.addgiftG = async giftFields => {
   if (!giftFields.phone || !giftFields.amount) {
     throw { code: 400, message: '❌ שדה טלפון או סכום חסר!' }
   }
-  let newGift
+
   try {
-    newGift = await giftController.create(giftFields)
-    const updatedEvent = await eventController.update(giftFields.EventId, { $push: { giftsId: newGift._id.toString() } }, { new: true })
+    let imageBuffer = null
+    if (giftFields.imageBase64) {
+      // מורידים את header "data:image/png;base64," אם יש
+      const base64WithoutPrefix = giftFields.imageBase64.replace(/^data:.*;base64,/, '')
+      imageBuffer = Buffer.from(base64WithoutPrefix, 'base64')
+    }
+
+    let videoBuffer = null
+    if (giftFields.videoBase64) {
+      const base64WithoutPrefix = giftFields.videoBase64.replace(/^data:.*;base64,/, '')
+      videoBuffer = Buffer.from(base64WithoutPrefix, 'base64')
+    }
+
+    let audioBuffer = null
+    if (giftFields.audioBase64) {
+      const base64WithoutPrefix = giftFields.audioBase64.replace(/^data:.*;base64,/, '')
+      audioBuffer = Buffer.from(base64WithoutPrefix, 'base64')
+    }
+
+    const newGift = await giftController.create({
+      ...giftFields,
+      imageFile: imageBuffer,
+      videoFile: videoBuffer,
+      audioFile: audioBuffer
+    })
+
+    if (giftFields.EventId) {
+      const updatedEvent = await eventController.update(giftFields.EventId, { $push: { giftsId: newGift._id.toString() } }, { new: true })
+      console.log(fixHebrewText('אירוע לאחר עדכון (אורח):', '✅'), updatedEvent)
+    }
+
     return { message: '✅ מתנה נוספה בהצלחה', gift: newGift }
   } catch (error) {
+    console.error(fixHebrewText('שגיאה בהוספת המתנה (אורח):', '❌'), error)
     throw error
   }
 }

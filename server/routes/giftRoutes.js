@@ -46,4 +46,23 @@ router.get('/getAllGifts', async (req, res) => {
   }
 })
 
+// routes/giftRoutes.js
+router.get('/getGiftFile/:giftId/:fileType', async (req, res) => {
+  try {
+    const { giftId, fileType } = req.params // fileType יכול להיות imageFile/videoFile/audioFile
+    const gift = await giftController.readById(giftId)
+    if (!gift) return res.status(404).send('Gift not found')
+
+    const fileBuffer = gift[fileType] // נניח gift.imageFile
+    if (!fileBuffer) return res.status(404).send('No file found for this gift')
+
+    // אם זה תמונה, אפשר לשלוח עם content-type בהתאם
+    // כאן דוגמה בלי זיהוי מלא, בהנחה תמונה png:
+    res.set('Content-Type', 'image/png')
+    res.send(fileBuffer)
+  } catch (err) {
+    res.status(500).send('Error retrieving file')
+  }
+})
+
 module.exports = router

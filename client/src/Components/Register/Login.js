@@ -8,12 +8,11 @@ import sendLog from '../../LogSend'
 import ForgotPassword from './ForgotPassword' // ייבוא הקומפוננטה החדשה
 
 const Login = props => {
-  const { setUserId, setDetailsId, setIsEventManager, setUserName, setUserEmail, setEventNumber, userId } = useContext(Context)
+  const { isEventManager, setUserId, setDetailsId, setIsEventManager, setUserName, setUserEmail, setEventNumber, userId, eventNumber } = useContext(Context)
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState(false) // מצב טעינה
-
   const [input, setInput] = useState({
     email: '',
     password: ''
@@ -48,8 +47,8 @@ const Login = props => {
       return
     }
 
-    setIsSubmitting(true) // התחלת טעינה
-    setErrorMessage('') // איפוס הודעות שגיאה
+    setIsSubmitting(true)
+    setErrorMessage('')
 
     try {
       const response = await axios.post('http://localhost:2001/api/users/login', {
@@ -57,42 +56,36 @@ const Login = props => {
         password
       })
 
-      console.log('res:', response)
-
       if (response.data.token) {
-        // איפוס הודעת השגיאה במידה ואין שגיאה
         setErrorMessage('')
-
-        // קבלת נתוני המשתמש
         const userResponse = await axios.post('http://localhost:2001/api/users/userid', { email })
-        console.log('response.data in Login:', userResponse.data)
-
         if (userResponse.data && userResponse.data.userid) {
           const user = userResponse.data.userid[0]
           setUserName(`${user.fname} ${user.lname}`)
           setUserEmail(user.email)
-          await setUserId(user._id)
+          setUserId(user._id)
           setDetailsId(user.giftsId)
         }
 
-        // ניווט לפי סוג המשתמש
-        if (props.a === 'manager') {
-          //בודק אם המנהל מוגדר ב database כמנהל
+        const managerResponse = await axios.post('http://localhost:2001/api/users/isManager', { _id: userResponse.data.userid[0]._id })
+        setIsEventManager(Boolean(managerResponse.data)) // True/False
 
-          const managerResponse = await axios.post('http://localhost:2001/api/users/isManeger', { _id: userResponse.data.userid[0]._id })
-          if (managerResponse.data) {
-            setIsEventManager(true)
-            setEventNumber('')
-            sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Login', 'handleSubmit', userId, null, null)
-            navigate('/EventManager')
-          } else {
-            sendLog('error', 'user', '❌ אין הרשאה לכניסה כמנהל', 'client', '/Login', 'handleSubmit', userId, null, null)
-            setErrorMessage('אין הרשאה לכניסה כמנהל.')
-          }
-        } else {
-          setIsEventManager(false)
-          sendLog('success', 'pages', 200, '✅ Details_page עבר לדף', 'client', '/Login', 'handleSubmit', userId, null, null)
+        // if (managerResponse.data) {
+        //   setIsEventManager(true) // עדכון ההרשאות
+        //   setEventNumber('')
+        //   sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Login', 'handleSubmit', userId, null, null)
+        //   navigate('/EventManager')
+        // } else {
+        //   setIsEventManager(false)
+        //   sendLog('success', 'pages', 200, '✅ Details_page עבר לדף', 'client', '/Login', 'handleSubmit', userId._id, null, null)
+        //   navigate('/Details_page') // מעבר לממשק משתמש רגיל
+        // }
+        if (eventNumber) {
           navigate('/Details_page')
+        } else if (managerResponse.data) {
+          navigate('/EventManager')
+        } else {
+          navigate('/History')
         }
       } else {
         // טיפול במקרה של שגיאה מהשרת
@@ -106,28 +99,15 @@ const Login = props => {
           sendLog('error', 'user', '❌ התחברות נכשלה', 'client', '/Login', 'handleSubmit', null, null, null)
           setErrorMessage(response.data || 'התחברות נכשלה. נסה שוב.')
         }
-        console.log('התחברות נכשלה:', response.data)
       }
     } catch (error) {
-      // טיפול בשגיאות רשת או שגיאות בלתי צפויות
       if (error.response) {
-        if (error.response.data === 'not exist') {
-          sendLog('error', 'user', '❌ המייל לא קיים במערכת', 'client', '/Login', 'handleSubmit', null, null, null)
-          setErrorMessage('המייל לא קיים במערכת.')
-        } else if (error.response.data === 'password not correct') {
-          sendLog('error', 'user', '❌ הסיסמה שגויה', 'client', '/Login', 'handleSubmit', null, null, null)
-          setErrorMessage('הסיסמה שגויה.')
-        } else {
-          sendLog('error', 'user', '❌ התחברות נכשלה', 'client', '/Login', 'handleSubmit', null, null, null)
-          setErrorMessage(error.response.data || 'אירעה שגיאה. אנא נסה שוב.')
-        }
+        setErrorMessage(error.response.data || 'אירעה שגיאה. אנא נסה שוב.')
       } else {
-        sendLog('error', 'user', '❌ התחברות נכשלה', 'client', '/Login', 'handleSubmit', null, null, null)
         setErrorMessage('אירעה שגיאה. אנא נסה שוב.')
       }
-      console.error('Error during login:', error)
     } finally {
-      setIsSubmitting(false) // סיום טעינה
+      setIsSubmitting(false)
     }
   }
 
@@ -145,31 +125,17 @@ const Login = props => {
             direction: 'rtl' // הגדרת כיוון מימין לשמאל
           }}
         >
-          {props.a === 'manager' ? (
-            <Typography
-              variant="h2"
-              padding={3}
-              textAlign="center"
-              sx={{
-                fontWeight: '600',
-                color: '#FF9800'
-              }} // טקסט כחול ובולט
-            >
-              התחבר כמנהל
-            </Typography>
-          ) : (
-            <Typography
-              variant="h2"
-              padding={3}
-              textAlign="center"
-              sx={{
-                fontWeight: '600',
-                color: '#1976D2'
-              }} // טקסט כחול ובולט
-            >
-              התחברות
-            </Typography>
-          )}
+          <Typography
+            variant="h2"
+            padding={3}
+            textAlign="center"
+            sx={{
+              fontWeight: '600',
+              color: '#1976D2'
+            }} // טקסט כחול ובולט
+          >
+            התחברות
+          </Typography>
 
           <TextField
             onChange={handleChange}
@@ -268,7 +234,7 @@ const Login = props => {
           />
           {/* הצגת הודעת השגיאה אם קיימת */}
           {errorMessage && (
-            <Typography variant="body2" color="error" sx={{ mb: 2 }} textAlign="center" role="alert">
+            <Typography variant="body2" color="error" sx={{ mb: 2, fontWeight: 'bold' }} textAlign="center" role="alert">
               {errorMessage}
             </Typography>
           )}
@@ -278,7 +244,8 @@ const Login = props => {
             disabled={isSubmitting}
             sx={{
               cursor: isSubmitting ? 'not-allowed' : 'pointer', // שינוי סמן העכבר בזמן טעינה
-              margin: 3,
+              marginTop: 2,
+              marginBottom: 0,
               borderRadius: 3,
               fontWeight: '600', // פונט בולט
               fontFamily: 'Roboto, sans-serif',
@@ -293,7 +260,7 @@ const Login = props => {
           >
             {isSubmitting ? 'מתבצע...' : 'התחברות'} {/* הצגת טקסט בזמן טעינה */}
           </Button>
-          <Button onClick={() => setForgotPasswordOpen(true)} color="primary" sx={{ fontWeight: '600' }}>
+          <Button onClick={() => setForgotPasswordOpen(true)} sx={{ fontWeight: '600', color: 'rgb(105, 192, 250)' }}>
             שכחתי סיסמה
           </Button>
           <ForgotPassword open={forgotPasswordOpen} handleClose={() => setForgotPasswordOpen(false)} />

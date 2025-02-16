@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { Box, Button, Link as MuiLink, Typography, Divider } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { Box, Button, Link as MuiLink, Typography, Divider, TextField } from '@mui/material'
 import localImage from '../assets/ben-white-vJz7tkHncFk-unsplash.jpg'
 import { Context } from '../App' // או היכן שהקונטקסט מיוצא
 import StarIcon from '@mui/icons-material/Star'
@@ -11,24 +10,30 @@ import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import Manager from '../Components/Register/Event_manager'
 import Login from '../Components/Register/Login'
 import Signup from '../Components/Register/Singup'
+import axios from 'axios'
 
 const LoginPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { eventNumber, setEventNumber, eventId } = useContext(Context) // נקרא את ערך ה-eventId
+  const { isEventManager, setIsEventManager, eventNumber, setEventNumber, eventId } = useContext(Context) // נקרא את ערך ה-eventId
   const [IsLogin, setIsLogin] = useState(true)
   const [IsSignup, setIsSignup] = useState(false)
-  const [IsManager, setIsManager] = useState(false)
+  const [isManager, setisManager] = useState(false)
   const [errorMessage, setErrorMessage] = useState('') // מצב לשגיאות
+  const [isGuest, setIsGuest] = useState(false) // האם המשתמש ממשיך כאורח
+  const [guestEventNumber, setGuestEventNumber] = useState(eventNumber || '') // סטייט למספר האירוע
+  const [isGuestClicked, setIsGuestClicked] = useState(false)
 
   React.useEffect(() => {
     const params = new URLSearchParams(location.search)
     const userType = params.get('userType')
 
-    if (userType === 'manager') {
+    if (userType === 'guest') {
+      setIsGuest(true)
+    } else if (userType === 'manager') {
       setIsLogin(false)
-      setIsSignup(false)
-      setIsManager(true)
+      setIsSignup(true)
+      setisManager(false)
     }
   }, [location.search])
 
@@ -40,7 +45,7 @@ const LoginPage = () => {
     setErrorMessage('')
     setIsLogin(false)
     setIsSignup(false)
-    setIsManager(false)
+    setisManager(false)
     switch (e.target.name) {
       case 'Login':
         setIsLogin(true)
@@ -49,7 +54,7 @@ const LoginPage = () => {
         setIsSignup(true)
         break
       case 'Event':
-        setIsManager(true)
+        setisManager(true)
         break
       default:
         break
@@ -57,21 +62,23 @@ const LoginPage = () => {
   }
 
   const handleGuestContinue = () => {
-    if (!eventNumber) {
-      setErrorMessage('מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע.')
+    if (!guestEventNumber.trim()) {
+      setErrorMessage('יש להזין מספר אירוע כדי להמשיך כאורח.')
+      setIsGuestClicked(true) // מציג את השדה
       return
     }
-    navigate('/Details_page')
-  }
 
-  // שימוש ב-useEffect לשמירה על ההודעה
-  // React.useEffect(() => {
-  //   if (!eventNumber) {
-  //     setErrorMessage(
-  //       'מספר אירוע נדרש כדי להמשיך כאורח. חזור לדף הבית למלא מספר אירוע.'
-  //     )
-  //   }
-  // }, [eventNumber])
+    axios.post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: guestEventNumber }).then(response => {
+      console.log('✅ תגובה מהשרת:', response.data)
+      if (response.data && response.data._id) {
+        setEventNumber(guestEventNumber) // שמירת מספר האירוע ב־Context
+        navigate('/Details_page') // ניווט לעמוד הבא
+      } else {
+        console.log('❌ מספר האירוע לא נמצא')
+        setErrorMessage('❌ אירוע לא נמצא, בדוק את המספר שהוזן')
+      }
+    })
+  }
 
   return (
     <Box
@@ -297,16 +304,9 @@ const LoginPage = () => {
           </Box>
         </Box>
       </Box>
-      <Divider
-        sx={{
-          maxWidth: 700,
-          margin: 'auto',
-          my: 3
-        }}
-      />
-      {/* במקום "קובייה אחת" גדולה רק לטופס, ניצור 2 עמודות: 
-          מצד אחד תוכן ויזואלי/תדמיתי, ומצד שני הטופס */}
-      <form>
+      <Divider sx={{ maxWidth: 700, margin: 'auto', my: 3 }} />
+
+      <form onSubmit={e => e.preventDefault()}>
         <Box
           display="flex"
           flexDirection={{
@@ -365,7 +365,6 @@ const LoginPage = () => {
               הצטרפו לאלפי משתמשים שכבר נהנים מניהול אירועים פשוט, ברור ומפנק! <br />
               בין אם אתם מתכננים מסיבה קטנה או אירוע גדול, EASY GIFT כאן להפוך את החוויה לקלה ונוחה.
             </Typography>
-            {/* אפשר להחליף את ה-"תוכן" כאן בתמונה או כל דבר אחר */}
             <Box
               sx={{
                 display: 'flex',
@@ -385,9 +384,15 @@ const LoginPage = () => {
             </Box>
           </Box>
 
-          {/* עמודה 2: טופס ההתחברות/הרשמה */}
-          <Box flex={1} display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={{ xs: 2, md: 4 }}>
-            {/* כפתורי ניווט ראשיים */}
+          <Box
+            flex={1}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              p: { xs: 2, md: 4 },
+              alignItems: 'center'
+            }}
+          >
             <Box display="flex" flexDirection="row" justifyContent="space-between" width="100%" marginBottom={3}>
               <Button
                 onClick={handleChange}
@@ -432,119 +437,82 @@ const LoginPage = () => {
               >
                 רישום
               </Button>
-
-              <Button
-                onClick={handleChange}
-                name="Event"
-                sx={{
-                  margin: 1,
-                  borderRadius: 3,
-                  backgroundColor: '#FF9800',
-                  color: '#fff',
-                  '&:hover': {
-                    backgroundColor: '#F57C00',
-                    transform: 'scale(1.05)'
-                  },
-                  flex: 1,
-                  marginLeft: 0.5,
-                  fontWeight: 'bold',
-                  transition: '0.3s'
-                }}
-                variant="contained"
-              >
-                מנהל אירועים
-              </Button>
             </Box>
+
             <Typography variant="h8" sx={{ color: '#FFF' }}>
               מספר אירוע: {eventNumber || 'לא הוזן'}{' '}
             </Typography>
-            {/* הצגת הטפסים בהתאם לבחירה */}
-            {IsLogin && <Login />}
-            {IsSignup && <Signup />}
-            {IsManager && <Manager />}
 
-            {/* קישור "המשך כאורח" בתחתית העמודה */}
-            <Box display="flex" flexDirection="column" alignItems="center" marginTop={2} width="100%">
-              <Typography
-                align="center"
+            {IsLogin && <Login />}
+            {IsSignup && <Signup defaultManager={true} />}
+            {isManager && <Manager />}
+
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              {/* כפתור המשך כאורח */}
+              <MuiLink
+                component="button"
+                onClick={handleGuestContinue}
+                underline="hover"
                 sx={{
-                  marginTop: '10px',
-                  fontSize: '1.2rem',
-                  fontWeight: 'bold',
-                  color: '#E0E1DD',
-                  textShadow: '1px 1px #000'
+                  color: '#F0A500',
+                  cursor: 'pointer',
+                  '&:hover': { textDecoration: 'underline', color: '#F0C040' },
+                  fontSize: '1.2rem'
                 }}
               >
-                {errorMessage && (
-                  <Typography
+                המשך כאורח
+              </MuiLink>
+
+              {/* הצגת שדה למספר אירוע רק אם המשתמש ניסה להמשיך ללא מספר */}
+              {isGuestClicked && (
+                <Box mt={2} sx={{ width: '100%', maxWidth: 300, mx: 'auto' }}>
+                  <TextField
+                    fullWidth
+                    label="מספר אירוע"
+                    variant="outlined"
+                    value={guestEventNumber}
+                    onChange={e => setGuestEventNumber(e.target.value)}
                     sx={{
-                      width: '330px',
-                      lineHeight: 1,
-                      color: 'red',
-                      marginBottom: '10px',
-                      fontSize: '20px', // גודל גופן גדול יותר
-                      fontWeight: 'bold' // טקסט מודגש
-                      //textShadow: "1px 1px 2px rgba(0,0,0,0.3)", // צל קטן לטקסט (לא חובה)
+                      backgroundColor: '#22303C',
+                      borderRadius: '8px',
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '8px',
+                        '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' },
+                        '&:hover fieldset': { borderColor: '#F0A500', borderWidth: '2px' },
+                        '&.Mui-focused fieldset': { borderColor: '#F0A500', borderWidth: '2px' }
+                      },
+                      '& .MuiInputLabel-root': { color: '#E0E1DD' },
+                      '& .MuiInputBase-input': { color: '#E0E1DD' }
+                    }}
+                  />
+
+                  {/* הודעת שגיאה במידה ולא הוזן מספר אירוע */}
+                  {errorMessage && <Typography sx={{ color: 'red', fontSize: '0.9rem', mt: 1 }}>{errorMessage}</Typography>}
+
+                  {/* כפתור שליחה לאחר מילוי המספר */}
+                  <Button
+                    onClick={handleGuestContinue}
+                    sx={{
+                      mt: 2,
+                      backgroundColor: '#F0A500',
+                      color: '#1B263B',
+                      fontSize: '1rem',
+                      fontWeight: 'bold',
+                      padding: '8px 16px',
+                      borderRadius: '20px',
+                      transition: '0.3s',
+                      '&:hover': { backgroundColor: '#FFD700' }
                     }}
                   >
-                    {errorMessage}
-                  </Typography>
-                )}
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color: '#FFF',
-                    fontWeight: 'bold',
-                    mb: 2
-                  }}
-                >
-                  מספר אירוע: {eventNumber || 'לא הוזן'}
-                </Typography>
-                <MuiLink
-                  component="button"
-                  onClick={handleGuestContinue}
-                  underline="hover"
-                  type="button"
-                  sx={{
-                    color: '#F0A500',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      textDecoration: 'underline',
-                      color: '#F0C040'
-                    },
-                    fontSize: '1.2rem'
-                  }}
-                >
-                  המשך כאורח
-                </MuiLink>
-              </Typography>
+                    שלח מספר אירוע
+                  </Button>
+                </Box>
+              )}
             </Box>
           </Box>
         </Box>
       </form>
 
-      {/* Footer פשוט בתחתית העמוד */}
-      {/* <Box
-        sx={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          textAlign: 'center',
-          py: 1.5,
-          backgroundColor: 'rgba(0,0,0,0.3)',
-          color: '#E0E1DD'
-        }}
-      >
-        <Typography
-          variant="body2"
-          sx={{ fontSize: '0.9rem' }}
-        >
-          &copy; {new Date().getFullYear()} EASY
-          GIFT | כל הזכויות שמורות
-        </Typography>
-      </Box> */}
-      {/* סגנון CSS לאנימציית הרקע */}
       <style>
         {`
           @keyframes animateBg {
