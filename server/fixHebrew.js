@@ -1,3 +1,5 @@
-export function fixHebrewText(text, icon = '') {
-  return `${icon} ${text.split('').reverse().join('')}`
+function fixHebrewText(text, icon = '') {
+  return text.split('').reverse().join('') + icon
 }
+
+module.exports = { fixHebrewText }
