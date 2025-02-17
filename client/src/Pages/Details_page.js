@@ -27,10 +27,12 @@ const Details = () => {
   const [uploadedAudio, setUploadedAudio] = useState(false)
 
   useEffect(() => {
+    window.scrollTo(0, window.scrollY) // שומר את המיקום הנוכחי
     console.log('🎉 מזהה האירוע:', eventNumber)
   }, [eventNumber])
 
   const handleChange = e => {
+    e.preventDefault()
     const { name, value } = e.target
     setGiftDetails(prev => {
       const updatedDetails = { ...prev, [name]: value }
@@ -108,6 +110,7 @@ const Details = () => {
   }
 
   const handleImageUpload = e => {
+    e.preventDefault()
     const file = e.target.files[0]
     if (file && file.size <= 10 * 1024 * 1024) {
       setUploadedImage(true)
@@ -123,6 +126,7 @@ const Details = () => {
   }
 
   const handleVideoUpload = e => {
+    e.preventDefault()
     const file = e.target.files[0]
     if (file && file.size <= 10 * 1024 * 1024) {
       setUploadedVideo(true)
@@ -138,6 +142,7 @@ const Details = () => {
   }
 
   const handleAudioUpload = e => {
+    e.preventDefault()
     const file = e.target.files[0]
     if (file && file.size <= 10 * 1024 * 1024) {
       setUploadedAudio(true)

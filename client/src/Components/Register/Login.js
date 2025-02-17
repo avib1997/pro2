@@ -8,7 +8,7 @@ import sendLog from '../../LogSend'
 import ForgotPassword from './ForgotPassword' // ייבוא הקומפוננטה החדשה
 
 const Login = props => {
-  const { isEventManager, setUserId, setDetailsId, setIsEventManager, setUserName, setUserEmail, setEventNumber, userId, eventNumber } = useContext(Context)
+  const { isManager, setUserId, setDetailsId, setIsManager, setUserName, setUserEmail, setEventNumber, userId, eventNumber } = useContext(Context)
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
@@ -68,18 +68,7 @@ const Login = props => {
         }
 
         const managerResponse = await axios.post('http://localhost:2001/api/users/isManager', { _id: userResponse.data.userid[0]._id })
-        setIsEventManager(Boolean(managerResponse.data)) // True/False
-
-        // if (managerResponse.data) {
-        //   setIsEventManager(true) // עדכון ההרשאות
-        //   setEventNumber('')
-        //   sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Login', 'handleSubmit', userId, null, null)
-        //   navigate('/EventManager')
-        // } else {
-        //   setIsEventManager(false)
-        //   sendLog('success', 'pages', 200, '✅ Details_page עבר לדף', 'client', '/Login', 'handleSubmit', userId._id, null, null)
-        //   navigate('/Details_page') // מעבר לממשק משתמש רגיל
-        // }
+        setIsManager(Boolean(managerResponse.data)) // True/False
         if (eventNumber) {
           navigate('/Details_page')
         } else if (managerResponse.data) {

@@ -516,15 +516,14 @@ function Navbar() {
                   </MenuItem>
                 ))}
 
-                {/* כפתור התחברות ורישום במובייל */}
-                <MenuItem
+                {/* <MenuItem
                   onClick={() => {
                     navigate('/LoginPage')
                     handleCloseNavMenu()
                   }}
                 >
                   התחברות ורישום
-                </MenuItem>
+                </MenuItem> */}
               </Menu>
             </Box>
 
