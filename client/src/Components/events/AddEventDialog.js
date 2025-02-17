@@ -10,7 +10,7 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
     NameOfGroom: '',
     NameOfBride: '',
     NameOfManager: '',
-    Event_number: Math.floor(1000 + Math.random() * 9000),
+    Event_number: '',
     TypeOfEvent: '',
     phone: '',
     DateOfEvent: '',
@@ -50,7 +50,7 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
         NameOfGroom: '',
         NameOfBride: '',
         NameOfManager: '',
-        Event_number: Math.floor(1000 + Math.random() * 9000), // יצירת מספר חדש
+        Event_number: '', // יצירת מספר חדש
         TypeOfEvent: '',
         phone: '',
         DateOfEvent: '',

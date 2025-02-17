@@ -1,5 +1,5 @@
 //client/src/Components/Navbar/Navbar.js
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, MenuItem, Container, Button, Avatar, Tooltip, Divider, styled } from '@mui/material'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard'
@@ -8,9 +8,11 @@ import { Context } from '../../App'
 import axios from 'axios'
 //import { useSnackbar } from 'notistack'
 //import { fadeIn, pop, pulse } from '../../styles/animations'
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
+import { Select, FormControl, InputLabel, InputAdornment, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CloseIcon from '@mui/icons-material/Close'
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const menuBgColor = '#2B3A47' // רקע תפריט אווטאר
 
@@ -40,24 +42,18 @@ const pagesManager = [
 ]
 
 function Navbar() {
-  const { isManager, userId, eventNumber, isEventManager, setEventNumber, userName, userEmail, setUserId, setUserEmail, setIsEventManager } = useContext(Context)
+  const { isManager, userId, eventNumber, setEventNumber, userName, setUserName, userEmail, setUserId, setUserEmail, setIsManager } = useContext(Context)
   const location = useLocation() // קבלת הנתיב הנוכחי
   const navigate = useNavigate()
   const [editUserDialogOpen, setEditUserDialogOpen] = useState(false)
   const [editedUser, setEditedUser] = useState({ fname: '', lname: '', email: '', password: '', isManager: '' })
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [userRank, setUserRank] = useState('אורח')
   const [anchorNav, setAnchorNav] = useState(null)
   const [anchorUser, setAnchorUser] = useState(null)
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false); // דיאלוג אישור למחיקה
 
-  let navigationPages = userId === '' ? pagesGuest : isEventManager ? pagesManager : pagesRegistered
-
-  // הגדרת הדרגה
-  let userRank = 'אורח'
-  if (isEventManager) {
-    userRank = 'מנהל אירוע'
-  } else if (userId) {
-    userRank = 'משתמש רשום'
-  }
+  let navigationPages = userId === '' ? pagesGuest : isManager ? pagesManager : pagesRegistered
 
   // סגנון ללוגו
   const logoStyle = {
@@ -76,22 +72,55 @@ function Navbar() {
     }
   }
 
+  useEffect(() => {
+    // הגדרת הדרגה
+    setUserRank(isManager ? "מנהל אירוע" : userId ? "משתמש רשום" : "אורח");
+    console.log(userName)
+  }, [isManager, userId, eventNumber, isManager, userName, userEmail, userRank]);
   // פונקציות לפתיחת וסגירת הדיאלוג
   const handleOpenEditUserDialog = () => {
+    setShowPassword(false)
     setAnchorUser(null) // נסגור את תפריט המשתמש קודם
     setEditUserDialogOpen(true) // פותחים את הדיאלוג
+    try {
+      // קריאה לשרת לקבלת פרטי המשתמש
+      const email = userEmail
+      axios.post(`http://localhost:2001/api/users/userid`, { email }).then(response => {
+        console.log('response.data:', response.data)
+        const user = response.data.userid[0]
+        setEditedUser({
+          fname: user.fname,
+          lname: user.lname,
+          email: user.email,
+          password: user.password,
+          isManager: user.isManager
+        })
+      })
+    } catch (error) {
+      console.error('שגיאה בקריאת פרטי המשתמש:', error)
+    }
   }
   const handleCloseEditUserDialog = () => {
     setEditUserDialogOpen(false) // סוגרים את הדיאלוג
   }
 
+  const handleSaveChanges = () => {
+    handleCloseEditUserDialog()
+    // קריאה לשרת לעדכון המשתמש
+    axios.put(`http://localhost:2001/api/users/${userId}`, editedUser).then(response => {
+      // עדכון הפרטים ב-context
+      setUserEmail(editedUser.email)
+      setIsManager(editedUser.isManager)
+      setUserName(`${editedUser.fname} ${editedUser.lname}`)
+    })
+  }
   // פונקציית התנתקות
   const handleLogout = () => {
     // איפוס כל הפרטים מה-context
     setUserId('')
     setUserEmail('')
     setEventNumber('')
-    setIsEventManager(false)
+    setIsManager(false)
     // אפשר לאפס גם פרטים נוספים בהתאם למבנה הפרויקט שלך
 
     // סוגרים תפריט
@@ -115,6 +144,21 @@ function Navbar() {
   const handleCloseUserMenu = () => {
     setAnchorUser(null)
   }
+
+  const handleDeleteAccount = () => {
+    // כאן תוסיף קריאה ל-API למחיקת המשתמש
+    try {
+      axios.delete(`http://localhost:2001/api/users/${userId}`).then(response => {
+        console.log('response.data:', response.data)
+        handleLogout()
+      })
+    }
+    catch (error) {
+      console.error('שגיאה במחיקת המשתמש:', error)
+    }
+    console.log("🗑️ Deleting account...");
+    setConfirmDeleteOpen(false);
+  };
 
   {
     /* --- דיאלוג עריכת משתמש --- */
@@ -634,6 +678,7 @@ function Navbar() {
                     >
                       התנתק
                     </MenuItem>
+
                   </>
                 )}
               </Menu>
@@ -692,8 +737,8 @@ function Navbar() {
           <TextField
             label="שם פרטי"
             variant="outlined"
-            // value={editedUser.fname || ''}
-            // onChange={(e) => setEditedUser({ ...editedUser, fname: e.target.value })}
+            value={editedUser.fname || ''}
+            onChange={(e) => setEditedUser({ ...editedUser, fname: e.target.value })}
             sx={{
               backgroundColor: '#22303C',
               borderRadius: '8px',
@@ -705,12 +750,27 @@ function Navbar() {
               '& .MuiInputBase-input': { color: '#E0E1DD' }
             }}
           />
-
+          <TextField
+            label="שם משפחה"
+            variant="outlined"
+            value={editedUser.lname || ''}
+            onChange={(e) => setEditedUser({ ...editedUser, lname: e.target.value })}
+            sx={{
+              backgroundColor: '#22303C',
+              borderRadius: '8px',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '8px',
+                '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
+              },
+              '& .MuiInputLabel-root': { color: '#E0E1DD' },
+              '& .MuiInputBase-input': { color: '#E0E1DD' }
+            }}
+          />
           <TextField
             label="אימייל"
             variant="outlined"
-            // value={editedUser.email || ''}
-            // onChange={(e) => setEditedUser({ ...editedUser, email: e.target.value })}
+            value={editedUser.email || ''}
+            onChange={(e) => setEditedUser({ ...editedUser, email: e.target.value })}
             sx={{
               backgroundColor: '#22303C',
               borderRadius: '8px',
@@ -725,8 +785,9 @@ function Navbar() {
           <TextField
             label="סיסמה"
             variant="outlined"
-            // value={editedUser.password || ''}
-            // onChange={(e) => setEditedUser({ ...editedUser, password: e.target.value })}
+            type={showPassword ? 'text' : 'password'} // משנה את סוג השדה בהתאם למצב
+            value={editedUser.password || ''}
+            onChange={(e) => setEditedUser({ ...editedUser, password: e.target.value })}
             sx={{
               backgroundColor: '#22303C',
               borderRadius: '8px',
@@ -737,23 +798,43 @@ function Navbar() {
               '& .MuiInputLabel-root': { color: '#E0E1DD' },
               '& .MuiInputBase-input': { color: '#E0E1DD' }
             }}
-          />
-          <TextField
-            label="מנהל?"
-            variant="outlined"
-            // value={editedUser.isManager || ''}
-            // onChange={(e) => setEditedUser({ ...editedUser, isManager: e.target.value })}
-            sx={{
-              backgroundColor: '#22303C',
-              borderRadius: '8px',
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '8px',
-                '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
-              },
-              '& .MuiInputLabel-root': { color: '#E0E1DD' },
-              '& .MuiInputBase-input': { color: '#E0E1DD' }
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    edge="end"
+                    sx={{ color: '#E0E1DD' }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
             }}
           />
+
+          <FormControl fullWidth variant="outlined" sx={{ backgroundColor: "#22303C", borderRadius: "8px" }}>
+            <InputLabel sx={{ color: "#E0E1DD" }}>מנהל?</InputLabel>
+            <Select
+              value={editedUser.isManager}
+              onChange={(e) => setEditedUser({ ...editedUser, isManager: e.target.value })}
+              label="מנהל?"
+              sx={{
+                borderRadius: "8px",
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: "8px",
+                  '& fieldset': { borderColor: "#E0E1DD", borderWidth: "1px" }
+                },
+                '& .MuiInputLabel-root': { color: "#E0E1DD" },
+                '& .MuiSelect-icon': { color: "#E0E1DD" },
+                '& .MuiInputBase-input': { color: "#E0E1DD" }
+              }}
+            >
+              <MenuItem value={true}>כן</MenuItem>
+              <MenuItem value={false}>לא</MenuItem>
+            </Select>
+          </FormControl>
+
 
           {/* ...שדות נוספים לעריכה... */}
         </DialogContent>
@@ -764,17 +845,48 @@ function Navbar() {
             ביטול
           </Button>
           <Button
-            onClick={() => {
-              // שמירה/שליחה לשרת וכו'...
-              // לאחר מכן סגירה
-              handleCloseEditUserDialog()
-            }}
+            onClick={handleSaveChanges}
             variant="contained"
             sx={{ backgroundColor: 'blue' }}
           >
             שמור
           </Button>
+          <Button
+            onClick={() => setConfirmDeleteOpen(true)}
+            variant="contained"
+            sx={{
+              backgroundColor: 'red',
+              ':hover': { backgroundColor: '#d32f2f' },
+               mx: 2,
+               marginRight: 'auto'
+            }}
+          >
+            מחק חשבון
+          </Button>
         </DialogActions>
+
+        {/* דיאלוג אישור למחיקת החשבון */}
+        <Dialog open={confirmDeleteOpen} onClose={() => setConfirmDeleteOpen(false)}>
+          <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+            האם אתה בטוח שאתה רוצה למחוק את החשבון?
+          </DialogTitle>
+          <DialogActions sx={{ justifyContent: 'center' }}>
+            <Button onClick={() => setConfirmDeleteOpen(false)} sx={{ backgroundColor: 'gray', color: 'white' }}>
+              ביטול
+            </Button>
+            <Button
+              onClick={handleDeleteAccount}
+              sx={{
+                backgroundColor: 'red',
+                color: 'white',
+                ':hover': { backgroundColor: '#d32f2f' }
+              }}
+            >
+              כן, מחק את החשבון
+            </Button>
+
+          </DialogActions>
+        </Dialog>
       </Dialog>
       <Box sx={{ marginBottom: 8 }} />
     </Box>
