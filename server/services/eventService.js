@@ -16,17 +16,37 @@ async function getEventNumber(reqNum) {
 
 async function addevent(eventFields) {
   if (!eventFields.NameOfGroom || !eventFields.NameOfManager || !eventFields.TypeOfEvent || !eventFields.phone || !eventFields.DateOfEvent || !eventFields.userid_event) {
-    throw { code: 400, message: 'missing data' }
+    throw { code: 400, message: 'missing data' };
   }
-  let number = Math.floor(Math.random() * (999 - 10 + 1)) + 10 // טווח המספרים: 10 עד 999;
-  eventFields.Event_number = number
-  console.log('eventFields: ', eventFields)
-  let newEvent = await eventController.create(eventFields)
-  console.log('newEvent: ', newEvent)
-  await userController.update({ _id: eventFields.userid_event }, { $push: { eventId: newEvent._id } })
-  console.log('eventFields.userid_event', eventFields.userid_event)
-  return newEvent
+
+  let number;
+  let isUnique = false;
+
+  // בדיקת מספר ייחודי
+  while (!isUnique) {
+    number = Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000; // טווח המספרים: 1000 עד 9999
+    const existingEvent = await eventController.readOne({ Event_number: number });
+
+    if (!existingEvent) {
+      isUnique = true;
+    }
+  }
+
+  eventFields.Event_number = number;
+  console.log('eventFields:', eventFields);
+
+  let newEvent = await eventController.create(eventFields);
+  console.log('newEvent:', newEvent);
+
+  await userController.update(
+    { _id: eventFields.userid_event },
+    { $push: { eventId: newEvent._id } }
+  );
+  
+  console.log('eventFields.userid_event', eventFields.userid_event);
+  return newEvent;
 }
+
 
 async function updateEvent(eventId, updateFields) {
   if (!eventId) {

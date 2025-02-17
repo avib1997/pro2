@@ -20,6 +20,7 @@ function App() {
   const [state, setState] = useState()
   const [event, setEvent] = useState('')
   const [eventId, setEventId] = useState('')
+  const [isManager, setIsManager] = useState(false)
 
   const getSavedGiftDetails = () => {
     try {
@@ -45,6 +46,8 @@ function App() {
       value={{
         giftDetails,
         setGiftDetails,
+        isManager,
+        setIsManager,
         isEventManager,
         setIsEventManager, // הוספת הפונקציה לקונטקסט
         IsEvent,
