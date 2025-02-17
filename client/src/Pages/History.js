@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { Context } from '../App'
 import axios from 'axios'
-import { Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Collapse, IconButton, CircularProgress, Button } from '@mui/material'
+import { Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Collapse, IconButton, CircularProgress, Button, Dialog } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Link } from 'react-router-dom'
 import ImageIcon from '@mui/icons-material/Image'
@@ -15,15 +15,16 @@ const GiftHistory = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [expandedRows, setExpandedRows] = useState({})
   const [loading, setLoading] = useState(true)
+  const [openFile, setOpenFile] = useState(false)
 
   // הפונקציה בוחרת איקון לפי סוג הקובץ עם הצבע המבוקש
   const getIcon = fileType => {
     switch (fileType) {
-      case 'תמונה':
+      case 'image':
         return <ImageIcon style={{ color: '#4A90E2', fontSize: '1.4rem' }} /> // כחול מודרני
-      case 'הקלטה':
+      case 'audio':
         return <MicIcon style={{ color: '#2ECC71', fontSize: '1.4rem' }} /> // ירוק בהיר ונעים
-      case 'וידאו':
+      case 'video':
         return <VideocamIcon style={{ color: '#F39C12', fontSize: '1.4rem' }} /> // כתום זהוב
       default:
         return <ErrorIcon style={{ color: '#E74C3C', fontSize: '1.4rem' }} /> // אדום קלאסי
@@ -45,14 +46,7 @@ const GiftHistory = () => {
         }
 
         if (res.data && res.data.length > 0) {
-          const fileTypes = ['הקלטה', 'וידאו', 'סרטה']
-          // מפזרים באופן רנדומלי לכל מתנה סוג קובץ אחד
-          setGifts(
-            res.data.map(gift => ({
-              ...gift,
-              fileType: fileTypes[Math.floor(Math.random() * fileTypes.length)]
-            }))
-          )
+          setGifts(res.data)
         } else {
           setErrorMessage('אין מתנות להצגה.')
         }
@@ -78,6 +72,10 @@ const GiftHistory = () => {
       ...prev,
       [id]: !prev[id]
     }))
+  }
+
+  const handleClickFile = () => {
+    setOpenFile(true)
   }
 
   return (
@@ -216,7 +214,27 @@ const GiftHistory = () => {
                           <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{gift.toEventName}</TableCell>
                           <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{gift.amount} ₪</TableCell>
                           <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{new Date(gift.entryDate).toLocaleDateString()}</TableCell>
-                          <TableCell sx={{ textAlign: 'center' }}> {getIcon(gift.fileType)}</TableCell>
+                          <TableCell sx={{ textAlign: 'center', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                            {getIcon(gift.fileType)}
+                            <Button
+                              variant="contained"
+                              sx={{
+                                margin: '8px',
+                                backgroundColor: 'transparent',
+                                color: 'lightskyblue',
+                                boxShadow: 'none',
+                                borderRadius: '20px',
+                                transition: 'transform 0.4s ease-in-out',
+                                '&:hover': {
+                                  backgroundColor: 'transparent',
+                                  transform: 'scale(1.2)',
+                                }
+                              }}
+                              onClick={() => handleClickFile(gift.fileUrl)}
+                            >
+                              פתח קובץ
+                            </Button>
+                          </TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell colSpan={6} sx={{ p: 0 }}>
@@ -240,6 +258,11 @@ const GiftHistory = () => {
           </>
         )}
       </Container>
+      <Dialog open={openFile} onClose={() => setOpenFile(false)} maxWidth="md" fullWidth>
+        <Box sx={{ padding: 2, textAlign: 'center' }}>
+          <iframe width="100%" height="500px" title="קובץ מצורף"></iframe>
+        </Box>
+      </Dialog>
 
       <style>
         {`
