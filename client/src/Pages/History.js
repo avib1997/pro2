@@ -4,6 +4,10 @@ import axios from 'axios'
 import { Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Collapse, IconButton, CircularProgress, Button } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Link } from 'react-router-dom'
+import ImageIcon from '@mui/icons-material/Image'
+import MicIcon from '@mui/icons-material/Mic'
+import VideocamIcon from '@mui/icons-material/Videocam'
+import ErrorIcon from '@mui/icons-material/Error'
 
 const GiftHistory = () => {
   const { userId, eventId } = useContext(Context)
@@ -11,6 +15,20 @@ const GiftHistory = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [expandedRows, setExpandedRows] = useState({})
   const [loading, setLoading] = useState(true)
+
+  // הפונקציה בוחרת איקון לפי סוג הקובץ עם הצבע המבוקש
+  const getIcon = fileType => {
+    switch (fileType) {
+      case 'תמונה':
+        return <ImageIcon style={{ color: '#4A90E2', fontSize: '1.4rem' }} /> // כחול מודרני
+      case 'הקלטה':
+        return <MicIcon style={{ color: '#2ECC71', fontSize: '1.4rem' }} /> // ירוק בהיר ונעים
+      case 'וידאו':
+        return <VideocamIcon style={{ color: '#F39C12', fontSize: '1.4rem' }} /> // כתום זהוב
+      default:
+        return <ErrorIcon style={{ color: '#E74C3C', fontSize: '1.4rem' }} /> // אדום קלאסי
+    }
+  }
 
   useEffect(() => {
     const fetchGifts = async () => {
@@ -27,7 +45,14 @@ const GiftHistory = () => {
         }
 
         if (res.data && res.data.length > 0) {
-          setGifts(res.data)
+          const fileTypes = ['הקלטה', 'וידאו', 'סרטה']
+          // מפזרים באופן רנדומלי לכל מתנה סוג קובץ אחד
+          setGifts(
+            res.data.map(gift => ({
+              ...gift,
+              fileType: fileTypes[Math.floor(Math.random() * fileTypes.length)]
+            }))
+          )
         } else {
           setErrorMessage('אין מתנות להצגה.')
         }
@@ -161,6 +186,7 @@ const GiftHistory = () => {
                       <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}>שם האירוע</TableCell>
                       <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}>סכום</TableCell>
                       <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}>תאריך</TableCell>
+                      <TableCell sx={{ color: '#E0E1DD', fontWeight: 'bold', textAlign: 'center' }}>קובץ מצורף</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -186,44 +212,21 @@ const GiftHistory = () => {
                               <ExpandMoreIcon />
                             </IconButton>
                           </TableCell>
-                          <TableCell
-                            sx={{
-                              color: '#E0E1DD',
-                              textAlign: 'center'
-                            }}
-                          >
-                            {index + 1}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: '#E0E1DD',
-                              textAlign: 'center'
-                            }}
-                          >
-                            {gift.toEventName}
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: '#E0E1DD',
-                              textAlign: 'center'
-                            }}
-                          >
-                            {gift.amount} ₪
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: '#E0E1DD',
-                              textAlign: 'center'
-                            }}
-                          >
-                            {new Date(gift.entryDate).toLocaleDateString()}
-                          </TableCell>
+                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{index + 1}</TableCell>
+                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{gift.toEventName}</TableCell>
+                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{gift.amount} ₪</TableCell>
+                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{new Date(gift.entryDate).toLocaleDateString()}</TableCell>
+                          <TableCell sx={{ textAlign: 'center' }}> {getIcon(gift.fileType)}</TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell colSpan={5} sx={{ p: 0 }}>
+                          <TableCell colSpan={6} sx={{ p: 0 }}>
                             <Collapse in={expandedRows[gift._id]} timeout="auto" unmountOnExit>
-                              <Box margin={1} sx={{ color: '#E0E1DD', textAlign: 'center', pt: 1 }}>
-                                <Typography variant="body1">ברכה: {gift.blessing}</Typography>
+                              <Box margin={2} sx={{ color: '#E0E1DD', textAlign: 'center', pt: 0 }}>
+                                <Typography
+                                  variant="body1"
+                                >
+                                  ברכה: {gift.blessing}
+                                </Typography>
                               </Box>
                             </Collapse>
                           </TableCell>
