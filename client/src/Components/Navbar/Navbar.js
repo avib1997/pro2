@@ -83,35 +83,14 @@ function Navbar() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const navigationPages = userId === '' ? pagesGuest : isManager ? pagesManager : pagesRegistered
-
-  const logoStyle = {
-    mr: 2,
-    ml: 10,
-    display: { xs: 'flex', md: 'flex' },
-    fontFamily: 'Roboto, sans-serif',
-    fontWeight: 700,
-    letterSpacing: '.3rem',
-    color: 'inherit',
-    textDecoration: 'none',
-    textTransform: 'uppercase',
-    '&:hover': {
-      color: '#f0f0f0',
-      transition: 'color 0.3s'
-    },
-    whiteSpace: 'nowrap', // שהטקסט לא יישבר
-    '@media (max-width: 600px)': {
-      fontSize: '1rem',
-      ml: 1,
-      mr: 1
-    }
-  }
-
   useEffect(() => {
     // הגדרת הדרגה
     setUserRank(isManager ? 'מנהל אירוע' : userId ? 'משתמש רשום' : 'אורח')
     console.log(userName)
+    console.log(isManager)
   }, [isManager, userId, eventNumber, userName, userEmail])
+
+  const navigationPages = userId === '' ? pagesGuest : isManager ? pagesManager : pagesRegistered
 
   const handleOpenEditUserDialog = () => {
     setShowPassword(false)
