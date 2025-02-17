@@ -78,6 +78,38 @@ const GiftHistory = () => {
     setOpenFile(true)
   }
 
+  const viewFile = (fileId) => {
+    try {
+      axios.get(`http://localhost:2001/api/files/view/${fileId}`)
+        .then((response) => {
+          console.log(response)
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+    }
+    catch (error) {
+      console.error(error)
+    }
+  }
+
+  const downloadFile = (fileId) => {
+    //להביא ב axios את הקובץ ולהציג אותו
+    try {
+      axios.get(`http://localhost:2001/api/files/download/${fileId}`)
+        .then((response) => {
+          console.log(response)
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+
+    }
+    catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -216,24 +248,52 @@ const GiftHistory = () => {
                           <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{new Date(gift.entryDate).toLocaleDateString()}</TableCell>
                           <TableCell sx={{ textAlign: 'center', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
                             {getIcon(gift.fileType)}
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <Button
                               variant="contained"
                               sx={{
-                                margin: '8px',
+                                margin: '-5px 10px -5px 10px',
+                                padding: '0px',
                                 backgroundColor: 'transparent',
                                 color: 'lightskyblue',
                                 boxShadow: 'none',
                                 borderRadius: '20px',
                                 transition: 'transform 0.4s ease-in-out',
                                 '&:hover': {
-                                  backgroundColor: 'transparent',
+                                  margin: '-5px 10px -5px 10px',
+                                padding: '0px',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
                                   transform: 'scale(1.2)',
+                                  boxShadow: 'none'
                                 }
                               }}
-                              onClick={() => handleClickFile(gift.fileUrl)}
+                              onClick={() => downloadFile(gift.file.fileId)}
                             >
-                              פתח קובץ
+                              הורד קובץ
                             </Button>
+                            <Button
+                              variant="contained"
+                              sx={{
+                                margin: '-5px 10px -5px 10px',
+                                padding: '0px',
+                                backgroundColor: 'transparent',
+                                color: 'lightskyblue',
+                                boxShadow: 'none',
+                                borderRadius: '20px',
+                                transition: 'transform 0.4s ease-in-out',
+                                '&:hover': {
+                                  margin: '-5px 10px -5px 10px',
+                                padding: '0px',
+                                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                                  transform: 'scale(1.2)',
+                                  boxShadow: 'none'
+                                }
+                              }}
+                              onClick={() => viewFile(gift.file.fileId)}
+                            >
+                              הצג קובץ
+                              </Button>
+                              </Box>
                           </TableCell>
                         </TableRow>
                         <TableRow>
