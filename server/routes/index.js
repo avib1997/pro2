@@ -4,6 +4,11 @@ const router = express.Router()
 const giftRouter = require('./giftRoutes')
 const usersRouter = require('./usersRoutes')
 const eventRouter = require('./eventRoutes')
+const fileRouter = require('./filesRouters')
+const paypalRouter = require('./paypalRoutes')
+const forgotPasswordRouter = require('./password/forgotPassword')
+const resetPasswordRouter = require('./password/resetPassword')
+
 
 const { deleteAllEvents, deleteAllGifts, deleteAllUsers } = require('../controllers/delAll') // וודא שיש קובץ שמכיל את הפונקציות
 const { saveLog } = require('../controllers/saveLogController') // ייבוא הפונקציה ששומרת לוגים
@@ -39,5 +44,10 @@ router.post('/addLog', async (req, res) => {
 router.use('/gift', giftRouter)
 router.use('/users', usersRouter)
 router.use('/events', eventRouter)
+router.use('/files', fileRouter)
+router.use('/paypal', paypalRouter)
+router.use('/password', forgotPasswordRouter)
+router.use('/password', resetPasswordRouter)
+
 
 module.exports = router

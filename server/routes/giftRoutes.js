@@ -9,11 +9,11 @@ router.post('/addGift', async (req, res) => {
   console.log(fixHebrewText('📩 נתונים שהתקבלו:'), req.body) // ✅ הדפסת הנתונים שהתקבלו
   try {
     if (req.body.userid_gift) {
-      const newGift = await giftService.addgift(req.body)
+      const newGift = await giftService.addGift(req.body)
       console.log(fixHebrewText('✅ מתנה נשמרה:'), newGift) // ✅ הדפסת המתנה שנשמרה
       return res.status(200).send({ message: fixHebrewText('✅ מתנה נוספה בהצלחה'), gift: newGift })
     } else {
-      const newGift = await giftService.addgiftG(req.body)
+      const newGift = await giftService.addGiftG(req.body)
       console.log(fixHebrewText('✅ מתנה כללית נשמרה:'), newGift) // ✅ הדפסת המתנה שנשמרה
       return res.status(200).send({ message: fixHebrewText('✅ מתנה כללית נוספה בהצלחה'), gift: newGift })
     }

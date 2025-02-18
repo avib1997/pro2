@@ -1,5 +1,4 @@
-//server/models/giftModel.js
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const giftSchema = new mongoose.Schema({
   name: { type: String, required: true }, // ✅ חובה לוודא ששדה זה מתקבל
@@ -11,10 +10,11 @@ const giftSchema = new mongoose.Schema({
   toEventName: { type: String },
   entryDate: { type: Date, default: Date.now },
 
-  // שדות חדשים לקבצים (Buffer)
-  imageFile: { type: Buffer },
-  videoFile: { type: Buffer },
-  audioFile: { type: Buffer }
-})
+  // 🔹 שמירת פרטי הקובץ שמצורף למתנה
+  file: {
+    fileId: { type: mongoose.Schema.Types.ObjectId, ref: 'files' }, // 🔗 קשר לקובץ
+    fileType: { type: String } // סוג הקובץ (image, video, audio וכו')
+  }
+});
 
-module.exports = mongoose.model('gift', giftSchema)
+module.exports = mongoose.model('gift', giftSchema);

@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import sendLog from '../LogSend'
 
 const Home = () => {
+
   const navigate = useNavigate()
   const { setEventNumber, setEvent, eventId, setEventId } = useContext(Context) // נעדכן את ה-ID של האירוע בקונטקסט
   const [EventNum, setEventNum] = useState('') // ניהול הסטייט של השדה

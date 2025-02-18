@@ -12,6 +12,7 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
     NameOfManager: '',
     Event_number: '',
     TypeOfEvent: '',
+    emailPaypal: '',
     phone: '',
     DateOfEvent: '',
     NumOfGuests: ''
@@ -27,7 +28,7 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
   const handleAddEventClick = async e => {
     e.preventDefault()
 
-    if (!input.TypeOfEvent || !input.DateOfEvent || !input.NameOfManager || !input.phone || !userId) {
+    if (!input.TypeOfEvent || !input.emailPaypal || !input.DateOfEvent || !input.NameOfManager || !input.phone || !userId) {
       console.error('❌ Missing required fields:', input)
       alert('נא למלא את כל השדות החיוניים')
       return
@@ -53,6 +54,7 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
         Event_number: '', // יצירת מספר חדש
         TypeOfEvent: '',
         phone: '',
+        emailPaypal: '',
         DateOfEvent: '',
         NumOfGuests: ''
       })
@@ -237,6 +239,7 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
         )}
         <TextField label="מנהל האירוע" name="NameOfManager" value={input.NameOfManager} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
         <TextField label="טלפון" name="phone" value={input.phone} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
+        <TextField label="אימייל לקבלת תשלום" name="emailPaypal" value={input.emailPaypal} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
         <TextField
           label="תאריך האירוע"
           type="date"

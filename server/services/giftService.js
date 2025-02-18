@@ -6,132 +6,107 @@ const mongoose = require('mongoose')
 
 const { fixHebrewText } = require('../fixHebrew.js')
 
-module.exports.addgift = async giftFields => {
-  console.log(fixHebrewText('נתוני מתנה:', '📥'), giftFields)
 
-  if (!giftFields.phone || !giftFields.amount || !giftFields.EventId) {
-    console.error(fixHebrewText('שדה טלפון, סכום או מזהה אירוע חסר!', '❌'))
-    throw { code: 400, message: '❌ שדה טלפון, סכום או מזהה אירוע חסר!' }
-  }
-
+module.exports.addGift = async (giftFields) => {
   try {
+    console.log('📥 נתוני מתנה שהתקבלו:', giftFields);
+
+    // בדיקות חובה
+    if (!giftFields.phone || !giftFields.amount || !giftFields.EventId) {
+      console.error('❌ שדה טלפון, סכום או מזהה אירוע חסר!');
+      throw { code: 400, message: '❌ שדה טלפון, סכום או מזהה אירוע חסר!' };
+    }
+
+    // בדיקה אם מזהה האירוע תקין
     if (!mongoose.Types.ObjectId.isValid(giftFields.EventId)) {
-      console.error(fixHebrewText('מזהה האירוע לא תקין:', '❌'), giftFields.EventId)
-      throw new Error('❌ מזהה האירוע לא תקין!')
+      console.error('❌ מזהה האירוע לא תקין:', giftFields.EventId);
+      throw new Error('❌ מזהה האירוע לא תקין!');
     }
 
-    // 🔍 בדיקה האם המשתמש קיים
-    const user = await userController.readOne({ _id: giftFields.userid_gift })
-    if (!user) {
-      throw { code: 404, message: '❌ המשתמש לא נמצא במסד הנתונים!' }
-    }
-
-    console.log(fixHebrewText('מחפש אירוע עם ID:', '🔍'), giftFields.EventId)
-    const event = await eventController.readById(giftFields.EventId)
-
+    // שליפת אירוע מהמסד
+    const event = await eventController.readById(giftFields.EventId);
     if (!event) {
-      console.error(fixHebrewText('האירוע לא נמצא!', '❌'))
-      throw { code: 404, message: '❌ האירוע לא נמצא במסד הנתונים!' }
+      console.error('❌ האירוע לא נמצא במסד הנתונים!');
+      throw { code: 404, message: '❌ האירוע לא נמצא במסד הנתונים!' };
     }
 
-    console.log(fixHebrewText('האירוע נמצא:', '✅'), event)
-    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`
-    console.log(fixHebrewText('שם האירוע שנמצא:', '📌'), eventName)
+    console.log('✅ האירוע נמצא:', event);
+    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`;
+    
+    // 🔹 הכנת הנתונים של המתנה
+    const giftData = {
+      name: giftFields.name,
+      phone: giftFields.phone,
+      blessing: giftFields.blessing,
+      amount: giftFields.amount,
+      userid_gift: giftFields.userid_gift,
+      EventId: giftFields.EventId,
+      toEventName: eventName || '',
+      file: giftFields.file ? { fileId: giftFields.file.fileId, fileType: giftFields.file.fileType } : undefined
+    };
 
-    // המרת Base64 (אם קיים) ל-Buffer
-    let imageBuffer = null
-    if (giftFields.imageBase64) {
-      const base64WithoutPrefix = giftFields.imageBase64.replace(/^data:.*;base64,/, '')
-      imageBuffer = Buffer.from(base64WithoutPrefix, 'base64')
-    }
+    // 🔹 שליחת הנתונים ל-giftController ליצירת המתנה
+    const newGift = await giftController.create(giftData);
 
-    let videoBuffer = null
-    if (giftFields.videoBase64) {
-      const base64WithoutPrefix = giftFields.videoBase64.replace(/^data:.*;base64,/, '')
-      videoBuffer = Buffer.from(base64WithoutPrefix, 'base64')
-    }
+    console.log('✅ מתנה נשמרה בהצלחה:', newGift);
 
-    let audioBuffer = null
-    if (giftFields.audioBase64) {
-      const base64WithoutPrefix = giftFields.audioBase64.replace(/^data:.*;base64,/, '')
-      audioBuffer = Buffer.from(base64WithoutPrefix, 'base64')
-    }
+    // עדכון רשימת המתנות באירוע
+    await eventController.update(giftFields.EventId, { $push: { giftsId: newGift._id.toString() } });
 
-    const newGift = await giftController.create({
-      ...giftFields,
-      toEventName: eventName,
-      imageFile: imageBuffer,
-      videoFile: videoBuffer,
-      audioFile: audioBuffer
-    })
-
-    console.log(fixHebrewText('מתנה נוספה בהצלחה:', '✅'), newGift)
-
-    if (giftFields.userid_gift) {
-      console.log(fixHebrewText('מחפש משתמש עם ID:', '🔍'), giftFields.userid_gift)
-      const user = await userController.readOne({ _id: giftFields.userid_gift })
-
-      if (!user) {
-      } else {
-        await userController.update({ _id: giftFields.userid_gift }, { $push: { giftsId: newGift._id } })
-      }
-    }
-
-    console.log(fixHebrewText('מעודכן אירוע עם המתנה החדשה:', '🔄'), giftFields.EventId)
-    const updatedEvent = await eventController.update(giftFields.EventId, { $push: { giftsId: newGift._id.toString() } }, { new: true })
-    console.log(fixHebrewText('אירוע לאחר עדכון:', '✅'), updatedEvent)
-    console.log(fixHebrewText('המתנה נוספה לאירוע בהצלחה', '✅'))
-
-    return { message: '✅ מתנה נוספה בהצלחה', gift: newGift }
+    console.log('✅ המתנה נוספה לאירוע בהצלחה');
+    return { message: '✅ מתנה נוספה בהצלחה', gift: newGift };
   } catch (error) {
-    console.error(fixHebrewText('שגיאה בהוספת המתנה:', '❌'), error)
-    throw error
+    console.error('❌ שגיאה בהוספת המתנה:', error);
+    throw error;
   }
-}
+};
 
-module.exports.addgiftG = async giftFields => {
-  if (!giftFields.phone || !giftFields.amount) {
-    throw { code: 400, message: '❌ שדה טלפון או סכום חסר!' }
-  }
-
+module.exports.addGiftG = async (giftFields) => {
   try {
-    let imageBuffer = null
-    if (giftFields.imageBase64) {
-      // מורידים את header "data:image/png;base64," אם יש
-      const base64WithoutPrefix = giftFields.imageBase64.replace(/^data:.*;base64,/, '')
-      imageBuffer = Buffer.from(base64WithoutPrefix, 'base64')
+    console.log('📥 נתוני מתנה מאורח שהתקבלו:', giftFields);
+
+    // בדיקות חובה
+    if (!giftFields.phone || !giftFields.amount) {
+      console.error('❌ שדה טלפון או סכום חסר!');
+      throw { code: 400, message: '❌ שדה טלפון או סכום חסר!' };
+    }
+    const event = await eventController.readById(giftFields.EventId);
+    if (!event) {
+      console.error('❌ האירוע לא נמצא במסד הנתונים!');
+      throw { code: 404, message: '❌ האירוע לא נמצא במסד הנתונים!' };
     }
 
-    let videoBuffer = null
-    if (giftFields.videoBase64) {
-      const base64WithoutPrefix = giftFields.videoBase64.replace(/^data:.*;base64,/, '')
-      videoBuffer = Buffer.from(base64WithoutPrefix, 'base64')
-    }
+    console.log('✅ האירוע נמצא:', event);
+    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`;
+    // יצירת המתנה ושמירה במסד
+    // 🔹 הכנת הנתונים של המתנה
+    const giftData = {
+      name: giftFields.name,
+      phone: giftFields.phone,
+      blessing: giftFields.blessing,
+      amount: giftFields.amount,
+      EventId: giftFields.EventId,
+      toEventName: eventName || '',
+      file: giftFields.file ? { fileId: giftFields.file.fileId, fileType: giftFields.file.fileType } : undefined
+    };
 
-    let audioBuffer = null
-    if (giftFields.audioBase64) {
-      const base64WithoutPrefix = giftFields.audioBase64.replace(/^data:.*;base64,/, '')
-      audioBuffer = Buffer.from(base64WithoutPrefix, 'base64')
-    }
+    // 🔹 שליחת הנתונים ל-giftController ליצירת המתנה
+    const newGift = await giftController.create(giftData);
 
-    const newGift = await giftController.create({
-      ...giftFields,
-      imageFile: imageBuffer,
-      videoFile: videoBuffer,
-      audioFile: audioBuffer
-    })
+    console.log('✅ מתנה מאורח נשמרה בהצלחה:', newGift);
 
+    // עדכון האירוע עם המתנה החדשה (אם יש EventId)
     if (giftFields.EventId) {
-      const updatedEvent = await eventController.update(giftFields.EventId, { $push: { giftsId: newGift._id.toString() } }, { new: true })
-      console.log(fixHebrewText('אירוע לאחר עדכון (אורח):', '✅'), updatedEvent)
+      await eventController.update(giftFields.EventId, { $push: { giftsId: newGift._id.toString() } });
+      console.log('✅ המתנה נוספה לאירוע בהצלחה');
     }
 
-    return { message: '✅ מתנה נוספה בהצלחה', gift: newGift }
+    return { message: '✅ מתנה נוספה בהצלחה', gift: newGift };
   } catch (error) {
-    console.error(fixHebrewText('שגיאה בהוספת המתנה (אורח):', '❌'), error)
-    throw error
+    console.error('❌ שגיאה בהוספת המתנה (אורח):', error);
+    throw error;
   }
-}
+};
 
 module.exports.getgift = async giftsId => {
   let giftId = Object.values(giftsId)

@@ -12,6 +12,7 @@ const AddEvent = () => {
     NameOfManager: '',
     Event_number: Math.floor(1000 + Math.random() * 9000), // מספר אירוע אוטומטי
     TypeOfEvent: '',
+    emailPaypal: '',
     phone: '',
     DateOfEvent: '',
     NumOfGuests: ''
@@ -27,7 +28,7 @@ const AddEvent = () => {
   const handleAddEventClick = async e => {
     e.preventDefault()
 
-    if (!input.TypeOfEvent || !input.DateOfEvent || !input.phone) {
+    if (!input.TypeOfEvent || !input.DateOfEvent || !input.phone || !input.emailPaypal) {
       alert('אנא מלא את כל השדות החיוניים')
       return
     }

@@ -20,6 +20,7 @@ const Details = () => {
   const { giftDetails, setGiftDetails, userId, event, eventId, setEvent, eventNumber, setEventId, setEventNumber } = useContext(Context)
   const [amount, setAmount] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
+  const [file, setFile] = useState(null)
 
   // מצבים עבור הקבצים שהועלו
   const [uploadedImage, setUploadedImage] = useState(false)
@@ -43,46 +44,50 @@ const Details = () => {
   }
 
   const handleClick = async e => {
-    e.preventDefault()
-    const errors = []
+    e.preventDefault();
+    const errors = [];
 
-    // בדיקה עבור שדה שם: חובה, ואין בו מספרים
+    // בדיקות אימות נתונים
     if (!giftDetails.name.trim()) {
-      errors.push('יש למלא את שדה השם')
+      errors.push('יש למלא את שדה השם');
     } else if (/\d/.test(giftDetails.name)) {
-      errors.push('שם לא יכול להכיל מספרים')
+      errors.push('שם לא יכול להכיל מספרים');
     }
 
-    // בדיקה עבור שדה טלפון: חובה, ורק מספרים
     if (!giftDetails.phone.trim()) {
-      errors.push('יש למלא את שדה הטלפון')
+      errors.push('יש למלא את שדה הטלפון');
     } else if (!/^\d+$/.test(giftDetails.phone)) {
-      errors.push('טלפון חייב להכיל רק מספרים')
+      errors.push('טלפון חייב להכיל רק מספרים');
     }
 
-    // בדיקה עבור שדה ברכה: אם הוא לא ריק – אין לכלול מספרים
     if (giftDetails.blessing.trim() && /\d/.test(giftDetails.blessing)) {
-      errors.push('ברכה לא יכולה להכיל מספרים')
+      errors.push('ברכה לא יכולה להכיל מספרים');
     }
 
-    // בדיקה עבור שדה סכום: חובה, ומכיל רק מספרים
     if (!giftDetails.amount.trim()) {
-      errors.push('יש למלא את שדה הסכום לתשלום')
+      errors.push('יש למלא את שדה הסכום לתשלום');
     } else if (isNaN(giftDetails.amount)) {
-      errors.push('סכום לתשלום חייב להיות מספר בלבד')
+      errors.push('סכום לתשלום חייב להיות מספר בלבד');
     }
 
     if (errors.length > 0) {
-      // אם יש שגיאות – מציגים את כל הודעות השגיאה, כאשר כל הודעה בשורה נפרדת
-      setErrorMessage(errors.join('\n'))
-      return
+      setErrorMessage(errors.join('\n'));
+      return;
     }
 
-    // אם הכל תקין – מנקים את הודעות השגיאה ועוברים לדף הבא
-    setErrorMessage('')
+    setErrorMessage('');
 
-    console.log('📌 event object:', event) // ✅ נבדוק אם event מוגדר
+    console.log('📌 event object:', event);
 
+    let fileDetails = null;
+    if (uploadedImage || uploadedVideo || uploadedAudio) {
+      fileDetails = await uploadFile(); // ✅ מחכים שהקובץ יעלה לפני שנמשיך
+      console.log('📌 fileDetails:', fileDetails);
+    }
+
+    const fileId = fileDetails ? fileDetails.file.fileId : null;
+    const fileType = fileDetails ? fileDetails.file.fileType : null;
+    
     const newGift = {
       name: giftDetails.name,
       phone: giftDetails.phone,
@@ -90,36 +95,62 @@ const Details = () => {
       amount: giftDetails.amount,
       userid_gift: userId,
       EventId: eventId,
-      toEventName: event.NameOfGroom,
-      imageBase64: giftDetails.imageBase64,
-      videoBase64: giftDetails.videoBase64,
-      audioBase64: giftDetails.audioBase64
-    }
-    //sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Signup', 'handleSubmit', userId, null, null)
-    sendLog('success', 'pages', 200, '✅ Payment עבר לדף', 'client', '/Details_page', 'handleClick', userId, null, null)
-    navigate('/Payment', { state: { newGift } }) // שולח את הסכום לעמוד PayPalPayment
+      toEventName: event.nameOfGroom,
+      file: fileId ? { fileId, fileType } : undefined // 🔹 שמירת הקובץ רק אם קיים
+    };
+    console.log('event:', eventId);
+    sendLog('success', 'pages', 200, '✅ Payment עבר לדף', 'client', '/Details_page', 'handleClick', userId, null, null);
+    navigate('/Payment', { state: { newGift } });
 
     setGiftDetails({
       name: '',
       phone: '',
       blessing: '',
-      amount: ''
-    })
+      amount: '',
+    });
 
-    localStorage.removeItem('giftDetails') // מחיקת הנתונים מה-LocalStorage
-  }
+    localStorage.removeItem('giftDetails'); // מחיקת הנתונים מה-LocalStorage
+  };
+
+
+  const uploadFile = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('eventId', eventId);
+      if (userId) formData.append('userId', userId);
+
+      console.log('📌 formData:', [...formData.entries()]);
+
+      const response = await axios.post('http://localhost:2001/api/files/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      console.log('✅ קובץ הועלה בהצלחה:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ שגיאה בהעלאת הקובץ:', error);
+      return null; // ✅ אם יש שגיאה, נחזיר null ולא undefined
+    }
+  };
+
+
+
+
 
   const handleImageUpload = e => {
     e.preventDefault()
+    setFile(e.target.files[0])
+    console.log('📸 התמונה שנבחרה:', e.target.files[0])
     const file = e.target.files[0]
-    if (file && file.size <= 10 * 1024 * 1024) {
-      setUploadedImage(true)
+    if (file && file.size <= 5 * 1024 * 1024) {
       const reader = new FileReader()
       reader.onloadend = () => {
         // reader.result יהיה "data:image/png;base64,...."
         setGiftDetails(prev => ({ ...prev, imageBase64: reader.result }))
       }
       reader.readAsDataURL(file)
+          setUploadedImage(true)
     } else {
       alert('הקובץ גדול מדי! ניתן להעלות עד 10MB בלבד.')
     }
@@ -127,35 +158,44 @@ const Details = () => {
 
   const handleVideoUpload = e => {
     e.preventDefault()
+    setFile(e.target.files[0])
+    console.log('🎥 הוידאו שנבחר:', e.target.files[0])
     const file = e.target.files[0]
-    if (file && file.size <= 10 * 1024 * 1024) {
-      setUploadedVideo(true)
+    if (file && file.size <= 5 * 1024 * 1024) {
       const reader = new FileReader()
       reader.onloadend = () => {
         // reader.result יהיה "data:image/png;base64,...."
         setGiftDetails(prev => ({ ...prev, videoBase64: reader.result }))
       }
       reader.readAsDataURL(file)
+      setUploadedVideo(true)
     } else {
-      alert('הקובץ גדול מדי! ניתן להעלות עד 10MB בלבד.')
+      alert('הקובץ גדול מדי! ניתן להעלות עד 5MB בלבד.')
     }
   }
 
   const handleAudioUpload = e => {
     e.preventDefault()
+    setFile(e.target.files[0])
+    console.log('🎤 ההקלטה שנבחרה:', e.target.files[0])
     const file = e.target.files[0]
-    if (file && file.size <= 10 * 1024 * 1024) {
-      setUploadedAudio(true)
+    if (file && file.size <= 5 * 1024 * 1024) {
+      
       const reader = new FileReader()
       reader.onloadend = () => {
         // reader.result יהיה "data:image/png;base64,...."
-        setGiftDetails(prev => ({ ...prev, audioBase64: reader.result }))
+        setGiftDetails(prev => ({ ...prev, videoBase64: reader.result }))
       }
       reader.readAsDataURL(file)
+      setUploadedAudio(true)
     } else {
       alert('הקובץ גדול מדי! ניתן להעלות עד 10MB בלבד.')
     }
   }
+
+
+
+
 
   const handleClickEventNumber = async e => {
     e.preventDefault()
@@ -225,7 +265,7 @@ const Details = () => {
           }}
         >
           {/* כותרת מעל הפירוט */}
-          {}
+          { }
           <Typography
             variant="h3"
             gutterBottom
