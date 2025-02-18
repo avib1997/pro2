@@ -6,6 +6,7 @@ import axios from 'axios'
 import { Context } from '../../App'
 import sendLog from '../../LogSend'
 import ForgotPassword from './ForgotPassword' // ייבוא הקומפוננטה החדשה
+import ForgotPasswordPopup from './ForgotPasswordPopup'; // ייבוא הקומפוננטה החדשה
 
 const Login = props => {
   const { isManager, setUserId, setDetailsId, setIsManager, setUserName, setUserEmail, setEventNumber, userId, eventNumber } = useContext(Context)
@@ -70,16 +71,7 @@ const Login = props => {
         const managerResponse = await axios.post('http://localhost:2001/api/users/isManager', { _id: userResponse.data.userid[0]._id })
         setIsManager(Boolean(managerResponse.data)) // True/False
 
-        // if (managerResponse.data) {
-        //   setIsEventManager(true) // עדכון ההרשאות
-        //   setEventNumber('')
-        //   sendLog('success', 'pages', 200, '✅ EventManager עבר לדף', 'client', '/Login', 'handleSubmit', userId, null, null)
-        //   navigate('/EventManager')
-        // } else {
-        //   setIsEventManager(false)
-        //   sendLog('success', 'pages', 200, '✅ Details_page עבר לדף', 'client', '/Login', 'handleSubmit', userId._id, null, null)
-        //   navigate('/Details_page') // מעבר לממשק משתמש רגיל
-        // }
+
         if (eventNumber) {
           navigate('/Details_page')
         } else if (managerResponse.data) {
@@ -263,7 +255,8 @@ const Login = props => {
           <Button onClick={() => setForgotPasswordOpen(true)} sx={{ fontWeight: '600', color: 'rgb(105, 192, 250)' }}>
             שכחתי סיסמה
           </Button>
-          <ForgotPassword open={forgotPasswordOpen} handleClose={() => setForgotPasswordOpen(false)} />
+
+          <ForgotPasswordPopup open={forgotPasswordOpen} handleClose={() => setForgotPasswordOpen(false)} />
         </Box>
       </form>
     </div>

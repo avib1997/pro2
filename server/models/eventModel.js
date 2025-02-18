@@ -11,6 +11,7 @@ const eventSchema = new mongoose.Schema({
   TypeOfEvent: { type: String, required: false },
   Event_number: { type: Number, required: true, unique: true },
   phone: { type: String, required: false },
+  emailPaypal: { type: String, required: true },
   userid_event: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
   DateOfEvent: { type: Date, required: false },
   giftsId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'gift' }],

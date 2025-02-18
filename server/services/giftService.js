@@ -41,7 +41,7 @@ module.exports.addGift = async (giftFields) => {
       amount: giftFields.amount,
       userid_gift: giftFields.userid_gift,
       EventId: giftFields.EventId,
-      toEventName: eventName,
+      toEventName: eventName || '',
       file: giftFields.file ? { fileId: giftFields.file.fileId, fileType: giftFields.file.fileType } : undefined
     };
 
@@ -70,7 +70,14 @@ module.exports.addGiftG = async (giftFields) => {
       console.error('❌ שדה טלפון או סכום חסר!');
       throw { code: 400, message: '❌ שדה טלפון או סכום חסר!' };
     }
+    const event = await eventController.readById(giftFields.EventId);
+    if (!event) {
+      console.error('❌ האירוע לא נמצא במסד הנתונים!');
+      throw { code: 404, message: '❌ האירוע לא נמצא במסד הנתונים!' };
+    }
 
+    console.log('✅ האירוע נמצא:', event);
+    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`;
     // יצירת המתנה ושמירה במסד
     // 🔹 הכנת הנתונים של המתנה
     const giftData = {
@@ -79,7 +86,7 @@ module.exports.addGiftG = async (giftFields) => {
       blessing: giftFields.blessing,
       amount: giftFields.amount,
       EventId: giftFields.EventId,
-      toEventName: eventName,
+      toEventName: eventName || '',
       file: giftFields.file ? { fileId: giftFields.file.fileId, fileType: giftFields.file.fileType } : undefined
     };
 
