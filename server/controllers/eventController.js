@@ -52,26 +52,14 @@ const create = async data => {
   }
 }
 
-const update = async (id, data) => {
+const update = async (filter, newData) => {
+  console.log('filter:', filter)
+  console.log('newData:', newData)
   try {
-    if (!id || typeof id !== 'string') {
-      console.error('❌ eventId שהתקבל אינו מחרוזת:', id)
-      throw new Error('Invalid ObjectId format: ' + JSON.stringify(id)) // הדפס בדיוק מה הגיע
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error('Invalid ObjectId format: ' + id)
-    }
-
-    return await eventModel.findByIdAndUpdate(
-      mongoose.Types.ObjectId(id), // המרה ל-ObjectId
-      { $set: data },
-      { new: true }
-    )
-    // return await eventModel.findByIdAndUpdate(id, { $set: data }, { new: true })
+    const result = await eventModel.updateOne(filter, newData)
+    return result
   } catch (error) {
-    console.error('❌ Error updating event:', error)
-    throw new Error('Failed to update event')
+    throw error
   }
 }
 

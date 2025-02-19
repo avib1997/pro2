@@ -15,13 +15,12 @@ import axios from 'axios'
 const LoginPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { isEventManager, setIsEventManager, eventNumber, setEventNumber, eventId } = useContext(Context) // נקרא את ערך ה-eventId
+  const { eventNumber, setEventNumber } = useContext(Context) // נקרא את ערך ה-eventId
   const [IsLogin, setIsLogin] = useState(true)
   const [IsSignup, setIsSignup] = useState(false)
   const [isManager, setisManager] = useState(false)
   const [errorMessage, setErrorMessage] = useState('') // מצב לשגיאות
-  const [isGuest, setIsGuest] = useState(false) // האם המשתמש ממשיך כאורח
-  const [guestEventNumber, setGuestEventNumber] = useState(eventNumber || '') // סטייט למספר האירוע
+  const [setIsGuest] = useState(false) // האם המשתמש ממשיך כאורח
   const [isGuestClicked, setIsGuestClicked] = useState(false)
 
   React.useEffect(() => {
@@ -62,16 +61,16 @@ const LoginPage = () => {
   }
 
   const handleGuestContinue = () => {
-    if (!guestEventNumber.trim()) {
+    if (!eventNumber.trim()) {
       setErrorMessage('יש להזין מספר אירוע כדי להמשיך כאורח.')
       setIsGuestClicked(true) // מציג את השדה
       return
     }
 
-    axios.post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: guestEventNumber }).then(response => {
+    axios.post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: eventNumber }).then(response => {
       console.log('✅ תגובה מהשרת:', response.data)
       if (response.data && response.data._id) {
-        setEventNumber(guestEventNumber) // שמירת מספר האירוע ב־Context
+        setEventNumber(eventNumber) // שמירת מספר האירוע ב־Context
         navigate('/Details_page') // ניווט לעמוד הבא
       } else {
         console.log('❌ מספר האירוע לא נמצא')
@@ -187,18 +186,6 @@ const LoginPage = () => {
         >
           מספר אירוע: {eventNumber || 'לא הוזן'}{' '}
         </Typography>
-        {/* <Typography
-          variant="h3"
-          gutterBottom
-          sx={{
-            fontWeight: "bold",
-            color: "#E0E1DD",
-            textShadow: "2px 2px #000",
-            marginBottom: 1,
-          }}
-        >
-          ברוכים הבאים - אירוע #{eventNumber}
-        </Typography> */}
         <Box
           display="flex"
           flexDirection={{
@@ -470,8 +457,8 @@ const LoginPage = () => {
                     fullWidth
                     label="מספר אירוע"
                     variant="outlined"
-                    value={guestEventNumber}
-                    onChange={e => setGuestEventNumber(e.target.value)}
+                    value={eventNumber}
+                    onChange={e => setEventNumber(e.target.value)}
                     sx={{
                       backgroundColor: '#22303C',
                       borderRadius: '8px',

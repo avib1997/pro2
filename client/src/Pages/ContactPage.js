@@ -34,15 +34,13 @@ function ContactPage() {
     alert('הנתונים הודפסו בקונסול!\n(פתח/י את כלי המפתחים >> Console)')
   }
 
-  // שליחה אמיתית לשרת
   const handleSendToServer = async () => {
     try {
-      console.log('Data would be sent to server:', formData)
-      await axios.post('http://localhost:4000/api/contact', formData)
-      alert('נשלח לשרת בהצלחה!')
+      await axios.post('http://localhost:2001/api/contact/send-email', formData)
+      alert('ההודעה נשלחה למייל שלך בהצלחה!')
     } catch (error) {
-      console.error('Error sending to server:', error)
-      alert('אירעה שגיאה בעת שליחה לשרת')
+      console.error('שגיאה בשליחת המייל:', error)
+      alert('אירעה שגיאה בשליחה, נסה שוב מאוחר יותר')
     }
   }
 
@@ -300,7 +298,7 @@ function ContactPage() {
             >
               שליחה לשרת
             </Button> */}
-            <Button variant="contained" color="primary" onClick={handleSendToConsole}>
+            <Button variant="contained" color="primary" onClick={handleSendToServer}>
               שלח
             </Button>
           </Box>

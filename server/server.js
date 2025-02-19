@@ -9,9 +9,9 @@ const jwt = require('jsonwebtoken')
 const path = require('path')
 const { GridFSBucket } = require('mongodb')
 
-dotenv.config();
+dotenv.config()
 
-const app = express();
+const app = express()
 
 // Middlewares
 app.use(express.json())
@@ -34,19 +34,22 @@ app.get('*', (req, res) => {
 })
 
 const connectDB = async () => {
-  
   try {
-    await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    // await mongoose.connect(process.env.DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    await mongoose.connect(process.env.DB_URI)
     console.log('✅ MongoDB Connected Successfully')
     global.gridFSBucket = new GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' })
     console.log('✅ GridFSBucket מוכן לשימוש')
   } catch (error) {
-    console.error('❌ Error Connecting to MongoDB:', error);
-    process.exit(1);
+    console.error('❌ Error Connecting to MongoDB:', error)
+    process.exit(1)
   }
-};
+}
 
-connectDB();
+connectDB()
+
+const contactRoutes = require('./routes/contactRoutes')
+app.use('/contact', contactRoutes)
 
 const PORT = process.env.PORT || 2001
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`))

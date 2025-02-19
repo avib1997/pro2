@@ -16,6 +16,7 @@ const GiftHistory = () => {
   const [expandedRows, setExpandedRows] = useState({})
   const [loading, setLoading] = useState(true)
   const [openFile, setOpenFile] = useState(false)
+  const [imageSrc, setImageSrc] = useState('')
 
   // הפונקציה בוחרת איקון לפי סוג הקובץ עם הצבע המבוקש
   const getIcon = fileType => {
@@ -38,9 +39,10 @@ const GiftHistory = () => {
       try {
         const response = await axios.post('http://localhost:2001/api/users/giftsById', { _id: userId })
         const res = await axios.post('http://localhost:2001/api/gift/getgift', { _id: response.data })
+        console.log(res.data[0].file)
 
         const elapsedTime = Date.now() - startTime
-        const delay = 3000 - elapsedTime
+        const delay = 10000 - elapsedTime
         if (delay > 0) {
           await new Promise(resolve => setTimeout(resolve, delay))
         }
@@ -48,15 +50,15 @@ const GiftHistory = () => {
         if (res.data && res.data.length > 0) {
           setGifts(res.data)
         } else {
-          setErrorMessage('אין מתנות להצגה.')
+          setErrorMessage(res.data.length === 0 ? 'אין מתנות להצגה' : 'שגיאה בקבלת המתנות')
         }
       } catch (error) {
         const elapsedTime = Date.now() - startTime
-        const delay = 3000 - elapsedTime
+        const delay = 5000 - elapsedTime
         if (delay > 0) {
           await new Promise(resolve => setTimeout(resolve, delay))
         }
-        setErrorMessage('שגיאה בטעינת הנתונים מהשרת.')
+        setErrorMessage('')
       } finally {
         setLoading(false)
       }
@@ -78,35 +80,49 @@ const GiftHistory = () => {
     setOpenFile(true)
   }
 
-  const viewFile = (fileId) => {
-    try {
-      axios.get(`http://localhost:2001/api/files/view/${fileId}`)
-        .then((response) => {
-          console.log(response)
-        })
-        .catch((error) => {
-          console.error(error)
-        })
+  const viewFile = fileId => {
+    if (!fileId) {
+      console.error('❌ fileId חסר!')
+      return
     }
-    catch (error) {
-      console.error(error)
-    }
+    const fileUrl = `http://localhost:2001/api/files/view/${fileId}`
+    console.log('📂 פותח קובץ:', fileUrl)
+    window.open(fileUrl, '_blank') // ✅ פותח את הקובץ בחלון חדש
   }
 
-  const downloadFile = (fileId) => {
-    //להביא ב axios את הקובץ ולהציג אותו
-    try {
-      axios.get(`http://localhost:2001/api/files/download/${fileId}`)
-        .then((response) => {
-          console.log(response)
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-
+  const downloadFile = async fileId => {
+    if (!fileId) {
+      console.error('❌ fileId חסר!')
+      return
     }
-    catch (error) {
-      console.error(error)
+
+    try {
+      console.log('📥 מוריד קובץ:', fileId)
+
+      const response = await axios.get(`http://localhost:2001/api/files/download/${fileId}`, {
+        responseType: 'blob' // ✅ קבלת הקובץ כ-Blob
+      })
+
+      // יצירת URL זמני להורדה
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+
+      // קביעת שם הקובץ
+      const fileName = response.headers['content-disposition']?.split('filename=')[1] || `downloaded_file`
+      link.setAttribute('download', fileName.replace(/"/g, '')) // ✅ הוספת שם לקובץ
+
+      // סימולציה של לחיצה להורדת הקובץ
+      document.body.appendChild(link)
+      link.click()
+
+      // ניקוי ה-URL הזמני
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      console.log('✅ הקובץ ירד בהצלחה!')
+    } catch (error) {
+      console.error('❌ שגיאה בהורדת הקובץ:', error)
     }
   }
 
@@ -125,7 +141,7 @@ const GiftHistory = () => {
       }}
     >
       <Container
-        maxWidth="md"
+        maxWidth="lg"
         sx={{
           marginTop: '80px',
           fontFamily: 'Poppins, sans-serif'
@@ -171,8 +187,7 @@ const GiftHistory = () => {
         ) : (
           <>
             {errorMessage && <Typography sx={{ color: 'red', textAlign: 'center' }}>{errorMessage}</Typography>}
-            {/* אם אין מתנות להצגה */}
-            {!errorMessage && gifts.length === 0 ? (
+            {!errorMessage?.trim() && gifts.length === 0 && (
               <Typography
                 variant="h6"
                 sx={{
@@ -192,9 +207,11 @@ const GiftHistory = () => {
                 <br />
                 😄
               </Typography>
-            ) : (
+            )}
+            {gifts.length > 0 && (
               <TableContainer
                 component={Paper}
+                size="lg"
                 sx={{
                   textAlign: 'center',
                   background: 'linear-gradient(135deg, #1B263B, #415A77)',
@@ -246,65 +263,65 @@ const GiftHistory = () => {
                           <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{gift.toEventName}</TableCell>
                           <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{gift.amount} ₪</TableCell>
                           <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{new Date(gift.entryDate).toLocaleDateString()}</TableCell>
+
                           <TableCell sx={{ textAlign: 'center', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
-                            {getIcon(gift.fileType)}
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <Button
-                              variant="contained"
-                              sx={{
-                                margin: '-5px 10px -5px 10px',
-                                padding: '0px',
-                                backgroundColor: 'transparent',
-                                color: 'lightskyblue',
-                                boxShadow: 'none',
-                                borderRadius: '20px',
-                                transition: 'transform 0.4s ease-in-out',
-                                '&:hover': {
-                                  margin: '-5px 10px -5px 10px',
-                                padding: '0px',
-                                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                                  transform: 'scale(1.2)',
-                                  boxShadow: 'none'
-                                }
-                              }}
-                              onClick={() => downloadFile(gift.file.fileId)}
-                            >
-                              הורד קובץ
-                            </Button>
-                            <Button
-                              variant="contained"
-                              sx={{
-                                margin: '-5px 10px -5px 10px',
-                                padding: '0px',
-                                backgroundColor: 'transparent',
-                                color: 'lightskyblue',
-                                boxShadow: 'none',
-                                borderRadius: '20px',
-                                transition: 'transform 0.4s ease-in-out',
-                                '&:hover': {
-                                  margin: '-5px 10px -5px 10px',
-                                padding: '0px',
-                                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                                  transform: 'scale(1.2)',
-                                  boxShadow: 'none'
-                                }
-                              }}
-                              onClick={() => viewFile(gift.file.fileId)}
-                            >
-                              הצג קובץ
-                              </Button>
+                            {getIcon(gift.file?.fileType)}
+                            {gift.file && (
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <Button
+                                  variant="contained"
+                                  sx={{
+                                    margin: '-5px 10px -5px 10px',
+                                    padding: '0px',
+                                    backgroundColor: 'transparent',
+                                    color: 'lightskyblue',
+                                    boxShadow: 'none',
+                                    borderRadius: '20px',
+                                    transition: 'transform 0.4s ease-in-out',
+                                    '&:hover': {
+                                      margin: '-5px 10px -5px 10px',
+                                      padding: '0px',
+                                      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                                      transform: 'scale(1.2)',
+                                      boxShadow: 'none'
+                                    }
+                                  }}
+                                  onClick={() => downloadFile(gift.file.fileId)}
+                                >
+                                  הורד קובץ
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  sx={{
+                                    margin: '-5px 10px -5px 10px',
+                                    padding: '0px',
+                                    backgroundColor: 'transparent',
+                                    color: 'lightskyblue',
+                                    boxShadow: 'none',
+                                    borderRadius: '20px',
+                                    transition: 'transform 0.4s ease-in-out',
+                                    '&:hover': {
+                                      margin: '-5px 10px -5px 10px',
+                                      padding: '0px',
+                                      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                                      transform: 'scale(1.2)',
+                                      boxShadow: 'none'
+                                    }
+                                  }}
+                                  onClick={() => viewFile(gift.file.fileId, setImageSrc)}
+                                >
+                                  הצג קובץ
+                                </Button>
+                                {imageSrc && <img src={imageSrc} alt="Fetched File" />}
                               </Box>
+                            )}
                           </TableCell>
                         </TableRow>
                         <TableRow>
                           <TableCell colSpan={6} sx={{ p: 0 }}>
                             <Collapse in={expandedRows[gift._id]} timeout="auto" unmountOnExit>
                               <Box margin={2} sx={{ color: '#E0E1DD', textAlign: 'center', pt: 0 }}>
-                                <Typography
-                                  variant="body1"
-                                >
-                                  ברכה: {gift.blessing}
-                                </Typography>
+                                <Typography variant="body1">ברכה: {gift.blessing}</Typography>
                               </Box>
                             </Collapse>
                           </TableCell>

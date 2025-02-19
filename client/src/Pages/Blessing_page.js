@@ -3,19 +3,11 @@ import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined' //
 import { Box, Container, Grid, IconButton, List, ListItem, Paper, Tooltip, Typography } from '@mui/material'
 import { keyframes, styled } from '@mui/material/styles'
 import React, { useState } from 'react'
-import Navbar from '../Components/Navbar/Navbar'
 
-// אנימציה קטנה לאייקונים
 const pulse = keyframes`
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 `
 
 // סגנון מותאם אישית ל-IconButton
@@ -109,28 +101,29 @@ export default function BlessingsPage() {
 
   return (
     <div dir="rtl">
-      {/* <Navbar /> */}
       <Box
         sx={{
-          position: 'absolute',
+          paddingTop: '100px',
+          position: 'fixed',
           top: 0,
           right: 0,
           width: '100%',
           height: '350%',
           zIndex: -1,
-          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
+          background: 'linear-gradient(135deg, #1B263B, #1B263B)',
           backgroundSize: '400% 400%',
           animation: 'animateBg 15s ease infinite'
         }}
       />
       <Typography
-        variant="h1"
+        variant="h3"
         gutterBottom
         align="center"
         sx={{
           fontWeight: 'bold',
           fontFamily: 'Roboto, sans-serif',
-          marginTop: '120px',
+          marginTop: '200px',
+          marginBottom: '100px',
           color: '#1976D2'
         }}
       >
@@ -139,7 +132,7 @@ export default function BlessingsPage() {
       <Container
         maxWidth="lg"
         sx={{
-          marginTop: '50px',
+          marginTop: '30px',
           marginBottom: '50px',
           display: 'flex',
           flexDirection: 'column',
@@ -151,13 +144,14 @@ export default function BlessingsPage() {
           elevation={6}
           sx={{
             width: '100%',
-            padding: '50px',
+            padding: '40px',
             borderRadius: '20px',
             boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2)',
-            background: 'linear-gradient(135deg, #ffffff, #e0f7fa)',
+            background: 'linear-gradient(135deg, #1B263B, #415A77)',
             transition: 'transform 0.3s, box-shadow 0.3s',
             '&:hover': {
-              transform: 'translateY(-5px)',
+              transform: 'scale(1.01)',
+              background: 'linear-gradient(135deg, #1B263B,rgb(81, 113, 148))',
               boxShadow: '0px 12px 30px rgba(0, 0, 0, 0.3)'
             },
             marginBottom: '30px'
@@ -172,12 +166,17 @@ export default function BlessingsPage() {
                   sx={{
                     marginBottom: '20px',
                     borderRadius: '15px',
-                    padding: '10px',
-                    position: 'relative',
-                    backgroundColor: '#e3f2fd' // צבע רקע אחיד
+                    overflow: 'hidden'
                   }}
                 >
-                  <ListItem>
+                  <ListItem
+                    sx={{
+                      background: 'linear-gradient(135deg, rgb(100, 130, 160), rgb(140, 180, 220))',
+                      '&:before': {
+                        display: 'none'
+                      }
+                    }}
+                  >
                     <Grid container alignItems="center">
                       <Grid item xs={11}>
                         <Typography
@@ -185,6 +184,7 @@ export default function BlessingsPage() {
                           sx={{
                             fontSize: '1.1rem',
                             textAlign: 'right',
+                            fontWeight: 'bold',
                             color: '#0d47a1'
                           }}
                         >
@@ -194,7 +194,11 @@ export default function BlessingsPage() {
                       <Grid item xs={1} textAlign="left">
                         <Tooltip title={copiedBlessingId === blessing.id ? 'הועתק!' : 'העתק'} arrow placement="top">
                           <StyledIconButton edge="end" aria-label="העתק" onClick={() => copyToClipboard(blessing.id, blessing.text)}>
-                            {copiedBlessingId === blessing.id ? <CheckCircleIcon sx={{ color: 'green' }} /> : <ContentCopyOutlinedIcon sx={{ color: '#1976D2' }} />}
+                            {copiedBlessingId === blessing.id ? (
+                              <CheckCircleIcon sx={{ color: '#00E676', fontSize: '2rem' }} />
+                            ) : (
+                              <ContentCopyOutlinedIcon sx={{ color: '#0d47a1', fontSize: '1.8rem' }} />
+                            )}
                           </StyledIconButton>
                         </Tooltip>
                       </Grid>
@@ -206,20 +210,6 @@ export default function BlessingsPage() {
           </Box>
         </Paper>
       </Container>
-      {/* Footer פשוט בתחתית העמוד */}
-      <Box
-        sx={{
-          marginTop: 5,
-          textAlign: 'center',
-          py: 1.5,
-          backgroundColor: 'rgba(0,0,0,0.3)',
-          color: '#E0E1DD'
-        }}
-      >
-        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
-        </Typography>
-      </Box>
     </div>
   )
 }

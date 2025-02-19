@@ -34,6 +34,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import MenuIcon from '@mui/icons-material/Menu' // אייקון המבורגר
 import ModernLogo from './ModernLogo.jsx' // או הנתיב הנכון לפי מיקום הקובץ
 import ModernColorfulUserIcon from './ModernColorfulUserIcon.jsx' // או הנתיב הנכון לפי מיקום הקובץ
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew' // 🔹 ייבוא האייקון
 
 const menuBgColor = '#2B3A47' // רקע תפריט אווטאר
 
@@ -41,7 +42,7 @@ const pagesGuest = [
   { name: 'מתנה', path: '/Details_page' },
   { name: 'ברכות', path: '/Blessing' },
   { name: 'שאלות ותשובות', path: '/Fqa' },
-  { name: 'התחברות ורישום', path: '/Login_page' }
+  { name: 'התחברות ורישום', path: '/LoginPage' }
 ]
 
 const pagesRegistered = [
@@ -63,21 +64,15 @@ const pagesManager = [
 ]
 
 function Navbar() {
-  // קונטקסט
   const { isManager, userId, eventNumber, setEventNumber, userName, setUserName, userEmail, setUserId, setUserEmail, setIsManager } = useContext(Context)
-
-  // מצבים
   const [editUserDialogOpen, setEditUserDialogOpen] = useState(false)
   const [editedUser, setEditedUser] = useState({ fname: '', lname: '', email: '', password: '', isManager: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [userRank, setUserRank] = useState('אורח')
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
-
-  // תפריט משתמש (פרופיל)
+  const [eventNum, setEventNum] = useState('')
   const [anchorUser, setAnchorUser] = useState(null)
-
-  // ---------- חדש: תפריט המבורגר למסכים קטנים ---------- //
-  // במקום anchorNav ו‑anchorElNav מפצלים:
+  const [errorMessage, setErrorMessage] = useState('') // הודעת שגיאה
   const [anchorElNav, setAnchorElNav] = useState(null)
 
   const location = useLocation()
@@ -86,11 +81,39 @@ function Navbar() {
   useEffect(() => {
     // הגדרת הדרגה
     setUserRank(isManager ? 'מנהל אירוע' : userId ? 'משתמש רשום' : 'אורח')
-    console.log(userName)
-    console.log(isManager)
+    console.log('📌 מצב נוכחי:')
+    console.log('userId:', userId)
+    console.log('eventNumber:', eventNumber)
+    console.log('isManager:', isManager)
   }, [isManager, userId, eventNumber, userName, userEmail])
 
   const navigationPages = userId === '' ? pagesGuest : isManager ? pagesManager : pagesRegistered
+
+  const handleNewEventNumber = () => {
+    if (!eventNum || eventNum.trim() === '') {
+      setEventNum('')
+      setErrorMessage('❌ אנא הכנס מספר אירוע תקין')
+      return
+    }
+
+    axios
+      .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: eventNum })
+      .then(response => {
+        console.log('✅ תגובה מהשרת:', response.data)
+        if (response.data && response.data._id) {
+          setEventNumber(eventNum) // שמירת מספר האירוע ב־Context
+          setErrorMessage('') // איפוס הודעת השגיאה
+        } else {
+          setEventNum('')
+          console.log('❌ מספר האירוע לא נמצא')
+          setErrorMessage('אירוע לא נמצא')
+        }
+      })
+      .catch(error => {
+        console.error('❌ שגיאה בבדיקת מספר האירוע:', error)
+        setErrorMessage('❌ שגיאה בחיבור לשרת, נסה שוב מאוחר יותר.')
+      })
+  }
 
   const handleOpenEditUserDialog = () => {
     setShowPassword(false)
@@ -133,12 +156,13 @@ function Navbar() {
 
   // פונקציית התנתקות
   const handleLogout = () => {
+    setEventNumber('')
+    setEventNum('')
     setUserId('')
     setUserEmail('')
-    setEventNumber('')
     setIsManager(false)
     handleCloseUserMenu()
-    navigate('/LoginPage')
+    setTimeout(() => navigate('/LoginPage'), 100)
   }
 
   const handleDeleteAccount = () => {
@@ -159,13 +183,23 @@ function Navbar() {
     setAnchorElNav(event.currentTarget)
   }
 
-  const handleCloseNavMenu = () => {
+  const handleCloseNavMenu = path => {
     setAnchorElNav(null)
+
+    // ✅ רק אם המשתמש לחץ על "התחברות ורישום" דרך Navbar
+    if (path === '/LoginPage') {
+      console.log('🔹 לחיצה על התחברות ורישום מהניווט - איפוס מזהה אירוע')
+      //setEventNumber('')
+      setEventNum('')
+    }
+
+    navigate(path)
   }
 
   // פונקציה לנווט לדף הבית ולסגור את התפריט
   const handleBackToHome = () => {
     setEventNumber('')
+    setEventNum('')
     handleCloseNavMenu()
     navigate('/Home')
   }
@@ -180,6 +214,7 @@ function Navbar() {
   }
 
   const navButtonStyle = {
+    color: '#ECEFF1',
     margin: '15px 5px',
     fontWeight: 'bold',
     transition: '0.3s',
@@ -190,7 +225,7 @@ function Navbar() {
     borderRadius: '20px',
     '&.active': {
       backgroundColor: 'rgba(255,255,255,0.25)',
-      color: 'yellow'
+      color: '#1A73E8'
     }
   }
 
@@ -515,15 +550,6 @@ function Navbar() {
                     {page.name}
                   </MenuItem>
                 ))}
-
-                {/* <MenuItem
-                  onClick={() => {
-                    navigate('/LoginPage')
-                    handleCloseNavMenu()
-                  }}
-                >
-                  התחברות ורישום
-                </MenuItem> */}
               </Menu>
             </Box>
 
@@ -557,50 +583,72 @@ function Navbar() {
               {navigationPages.map(page => (
                 <Button
                   key={page.name}
-                  component={Link}
-                  to={page.path}
+                  onClick={() => handleCloseNavMenu(page.path)} // ✅ מעביר את הנתיב לפונקציה
                   sx={{
                     ...navButtonStyle,
                     backgroundColor: location.pathname === page.path ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.07)',
-                    color: location.pathname === page.path ? 'skyblue' : '#ECEFF1'
+                    color: location.pathname === page.path ? '#74b9ff' : '#ECEFF1'
                   }}
                 >
                   {page.name}
                 </Button>
               ))}
-              {/* כפתור בולט להוספה */}
-              <Button
-                onClick={handleBackToHome}
-                component={Link}
-                to="/LoginPage"
+              <TextField
+                label="הכנסת מזהה"
+                variant="outlined"
+                size="small"
+                value={eventNum}
+                onChange={e => setEventNum(e.target.value)} // שינוי זמני
                 sx={{
-                  ...navButtonStyle,
-                  color: '#fff',
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  fontSize: '1.1rem',
-                  fontWeight: 'bold',
-                  px: 3,
-                  py: 1,
-                  ml: 2,
-                  '@media (max-width: 600px)': {
-                    fontSize: '0.8rem',
-                    px: 2,
-                    py: 0.5
+                  mr: 1,
+                  width: '140px',
+                  backgroundColor: 'transparent',
+                  border: '1px solid #ECEFF1', // גבול לבן
+                  borderRadius: '8px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    color: '#ECEFF1',
+                    '& fieldset': { borderColor: '#ECEFF1' },
+                    '&:hover fieldset': { borderColor: '#FFFFFF' },
+                    '&.Mui-focused fieldset': { borderColor: '#FFFFFF' }
                   },
+                  '& .MuiInputBase-input': {
+                    textAlign: 'center',
+                    color: '#ECEFF1'
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontSize: 'x-small',
+                    color: '#ECEFF1', // ✅ לייבל לבן
+                    '&.Mui-focused': { color: '#2196F3' } // ✅ לייבל כחול במצב focus
+                  }
+                }}
+              />
+
+              {/* כפתור לשינוי מזהה האירוע */}
+              <IconButton
+                onClick={handleNewEventNumber} // ✅ שינוי בפועל של המזהה
+                sx={{
+                  color: '#2196F3',
+                  ml: 1,
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
                   '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    transform: 'scale(1.05)'
+                    backgroundColor: 'rgba(255, 255, 255, 0.3)'
                   }
                 }}
               >
-                התחברות ורישום
-              </Button>
-
+                <ArrowBackIosNewIcon fontSize="small" />
+              </IconButton>
+              {errorMessage && (
+                <Typography variant="caption" sx={{ color: 'red', fontSize: '0.5rem', mt: 1, fontWeight: 'bold' }}>
+                  {errorMessage}
+                </Typography>
+              )}
               {eventNumber ? (
                 <Typography
                   sx={{
-                    color: 'goldenrod',
-                    ml: 3,
+                    marginRight: '20px',
+                    color: '#66BB6A',
+                    ml: 0,
                     fontWeight: 'bold',
                     fontSize: '1.4rem',
                     fontFamily: 'serif',
@@ -610,20 +658,38 @@ function Navbar() {
                   מזהה אירוע: {eventNumber}
                 </Typography>
               ) : (
-                <Box sx={{ width: '20%', ml: 3, textAlign: 'center' }}>
+                <Box sx={{ width: '20%', ml: 0, textAlign: 'center' }}>
                   <Typography
                     variant="caption"
                     sx={{
+                      marginRight: '40px',
                       color: 'red',
                       fontSize: '1.2rem',
                       fontStyle: 'italic',
-                      lineHeight: 1
+                      lineHeight: 1,
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     כניסה ללא מספר מזהה אירוע
                   </Typography>
                 </Box>
               )}
+            </Box>
+            <Box>
+              <Button
+                component={Link}
+                to="/contact"
+                sx={{
+                  ...navButtonStyle,
+                  color: '#FFC107',
+                  marginLeft: '20px',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255,193,7,0.15)'
+                  }
+                }}
+              >
+                צור קשר
+              </Button>
             </Box>
 
             {/* אווטאר משתמש */}
@@ -657,13 +723,13 @@ function Navbar() {
                 }}
                 PaperProps={{
                   sx: {
-                    mt: '45px',
+                    mt: '55px',
                     backgroundColor: menuBgColor,
                     color: '#fff',
                     minWidth: 220,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                    borderRadius: 2,
-                    textAlign: 'center'
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                    textAlign: 'center',
+                    borderRadius: '25px'
                   }
                 }}
               >
@@ -685,12 +751,37 @@ function Navbar() {
 
                 {userId && (
                   <>
-                    <MenuItem onClick={handleOpenEditUserDialog} sx={{ color: '#ECEFF1', fontWeight: 'bold', fontSize: '1rem' }}>
-                      הגדרות חשבון
-                    </MenuItem>
-                    <MenuItem onClick={handleLogout} sx={{ color: '#ECEFF1', fontWeight: 'bold', fontSize: '1rem' }}>
-                      התנתק
-                    </MenuItem>
+                    <Box sx={{ justifyItems: 'center', textAlign: 'center' }}>
+                      <MenuItem
+                        onClick={handleOpenEditUserDialog}
+                        sx={{
+                          margin: '10px 0px',
+                          padding: '0px 20px',
+                          borderRadius: '20px',
+                          backgroundColor: 'rgba(0, 132, 255, 0.2)',
+                          color: '#ECEFF1',
+                          fontWeight: 'bold',
+                          fontSize: '1rem',
+                          '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' }
+                        }}
+                      >
+                        הגדרות חשבון
+                      </MenuItem>
+                      <MenuItem
+                        onClick={handleLogout}
+                        sx={{
+                          padding: '0px 50px',
+                          borderRadius: '20px',
+                          backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                          color: '#ECEFF1',
+                          fontWeight: 'bold',
+                          fontSize: '1rem',
+                          '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' }
+                        }}
+                      >
+                        התנתק
+                      </MenuItem>
+                    </Box>
                   </>
                 )}
               </Menu>

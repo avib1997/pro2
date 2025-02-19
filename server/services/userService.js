@@ -59,21 +59,34 @@ exports.createUser = userFields => {
 }
 
 module.exports.register = async userFields => {
-  if (Object.keys(userFields).length === 0) {
-    console.log('keys:', object.keys(userFields))
-    console.log('values:', Object.values(userFields))
-    throw { code: 400, message: 'there is no user fields' }
+  try {
+    if (Object.keys(userFields).length === 0) {
+      console.log('keys:', Object.keys(userFields))
+      console.log('values:', Object.values(userFields))
+      throw new Error('❌ Missing user fields')
+    }
+
+    console.log('userFields:', userFields)
+    const email = userFields.email
+
+    // בדיקה אם המשתמש כבר קיים
+    const existUser = await userController.readOne({ email: email })
+    if (existUser) {
+      throw new Error('❌ User already exists')
+    }
+
+    // יצירת משתמש חדש
+    const user = await userController.create(userFields)
+    console.log('✅ User created successfully:', user)
+
+    // יצירת טוקן עבור המשתמש
+    const token = jwtFn.createToken(user._id)
+
+    return { user, token }
+  } catch (error) {
+    console.error('❌ Error in register:', error.message)
+    throw error // הזרקת השגיאה החוצה כדי לטפל בה בראוטר
   }
-  console.log('userFields:', userFields)
-  const email = userFields.email
-  const existUser = await userController.readOne({ email: email })
-  if (existUser) {
-    return { message: 'user already exist' }
-  }
-  const user = await userController.create(userFields)
-  console.log('user in register:', user)
-  const token = jwtFn.createToken(user._id)
-  return { user: user, token: token }
 }
 
 //getisManager

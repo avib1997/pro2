@@ -1,7 +1,6 @@
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material'
 import { Accordion, AccordionDetails, AccordionSummary, Box, Container, Paper, Typography } from '@mui/material'
 import React from 'react'
-import Navbar from '../Components/Navbar/Navbar'
 
 const faqs = [
   {
@@ -210,7 +209,6 @@ const faqs = [
 export default function FaqPage() {
   return (
     <div dir="rtl">
-      <Navbar />
       <Box
         sx={{
           paddingTop: '100px',
@@ -220,21 +218,20 @@ export default function FaqPage() {
           width: '100%',
           height: '370%',
           zIndex: -1,
-          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
+          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)', // צבע רקע דף
           backgroundSize: '400% 400%',
           animation: 'animateBg 15s ease infinite'
         }}
       />
       <Typography
-        variant="h1"
-        gutterBottom
+        variant="h3"
         align="center"
         sx={{
-          paddingTop: '120px',
+          marginTop: '200px',
+          marginBottom: '100px',
           fontWeight: 'bold',
-          marginBottom: '40px',
-          color: '#1976D2',
-          fontFamily: 'Roboto, sans-serif'
+          color: '#1976D2', // צבע הטקסט
+          fontFamily: 'Roboto, sans-serif' // שינוי פונט
         }}
       >
         שאלות ותשובות נפוצות
@@ -257,10 +254,11 @@ export default function FaqPage() {
             padding: '40px',
             borderRadius: '20px',
             boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2)',
-            background: 'linear-gradient(135deg, #ffffff, #e0f7fa)',
+            background: 'linear-gradient(135deg, #1B263B, #415A77)',
             transition: 'transform 0.3s, box-shadow 0.3s',
             '&:hover': {
-              transform: 'translateY(-5px)',
+              transform: 'scale(1.01)',
+              background: 'linear-gradient(135deg, #1B263B,rgb(81, 113, 148))',
               boxShadow: '0px 12px 30px rgba(0, 0, 0, 0.3)'
             },
             marginBottom: '30px'
@@ -279,17 +277,17 @@ export default function FaqPage() {
               >
                 <Accordion
                   sx={{
-                    backgroundColor: '#e3f2fd',
+                    background: 'linear-gradient(135deg, rgb(100, 130, 160), rgb(140, 180, 220))',
                     '&:before': {
                       display: 'none'
                     }
                   }}
                 >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#1976D2' }} />} aria-controls={`faq-content-${faq.id}`} id={`faq-header-${faq.id}`}>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#0d47a1', fontSize: '3rem' }} />} aria-controls={`faq-content-${faq.id}`} id={`faq-header-${faq.id}`}>
                     <Typography sx={{ fontWeight: 'bold', color: '#0d47a1' }}>{faq.question}</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Typography sx={{ color: '#424242' }}>{faq.answer}</Typography>
+                    <Typography sx={{ color: 'black' }}>{faq.answer}</Typography>
                   </AccordionDetails>
                 </Accordion>
               </Paper>
@@ -297,20 +295,6 @@ export default function FaqPage() {
           </Box>
         </Paper>
       </Container>
-      {/* Footer פשוט בתחתית העמוד */}
-      <Box
-        sx={{
-          marginTop: 5,
-          textAlign: 'center',
-          py: 1.5,
-          backgroundColor: 'rgba(0,0,0,0.3)',
-          color: '#E0E1DD'
-        }}
-      >
-        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-          &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
-        </Typography>
-      </Box>
     </div>
   )
 }

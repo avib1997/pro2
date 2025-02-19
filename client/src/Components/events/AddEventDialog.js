@@ -3,9 +3,11 @@ import React, { useState, useContext } from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, MenuItem } from '@mui/material'
 import { Context } from '../../App'
 import axios from 'axios'
+import dayjs from 'dayjs'
 
 const AddEventDialog = ({ open, onClose, onAdd }) => {
   const { userId } = useContext(Context)
+  const [errors, setErrors] = useState({})
   const [input, setInput] = useState({
     NameOfGroom: '',
     NameOfBride: '',
@@ -18,6 +20,47 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
     NumOfGuests: ''
   })
 
+  const validateInputs = () => {
+    let newErrors = {}
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!input.emailPaypal || !emailPattern.test(input.emailPaypal)) {
+      newErrors.emailPaypal = 'נא להזין כתובת אימייל תקינה.'
+    }
+
+    // ✅ בדיקת מספר טלפון – חייב להכיל בדיוק 10 ספרות וללא תווים אחרים
+    const phonePattern = /^[0-9]{10}$/
+    if (!input.phone || !phonePattern.test(input.phone)) {
+      newErrors.phone = 'מספר טלפון חייב להכיל בדיוק 10 ספרות ללא רווחים או תווים נוספים.'
+    }
+
+    // בדיקה אם תאריך האירוע הוא בעבר
+    const selectedDate = dayjs(input.DateOfEvent)
+    const today = dayjs().startOf('day')
+    if (!input.DateOfEvent || selectedDate.isBefore(today)) {
+      newErrors.DateOfEvent = 'תאריך האירוע לא יכול להיות בעבר. אנא בחר תאריך עתידי.'
+    }
+
+    // בדיקה אם השמות מכילים מספרים
+    const namePattern = /^[\u0590-\u05FFa-zA-Z\s]+$/ // רק אותיות ורווחים
+    if (input.NameOfGroom && !namePattern.test(input.NameOfGroom)) {
+      newErrors.NameOfGroom = 'שם החתן חייב להכיל רק אותיות.'
+    }
+    if (input.NameOfBride && !namePattern.test(input.NameOfBride)) {
+      newErrors.NameOfBride = 'שם הכלה חייב להכיל רק אותיות.'
+    }
+    if (!namePattern.test(input.NameOfManager)) {
+      newErrors.NameOfManager = 'שם המנהל חייב להכיל רק אותיות.'
+    }
+
+    // בדיקת שדות חובה
+    if (!input.TypeOfEvent) newErrors.TypeOfEvent = 'חובה לבחור סוג אירוע.'
+    if (!input.NameOfManager) newErrors.NameOfManager = 'נא להזין שם מנהל האירוע.'
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0 // מחזיר true אם אין שגיאות
+  }
+
   const handleInputChange = e => {
     setInput(prevState => ({
       ...prevState,
@@ -28,10 +71,8 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
   const handleAddEventClick = async e => {
     e.preventDefault()
 
-    if (!input.TypeOfEvent || !input.emailPaypal || !input.DateOfEvent || !input.NameOfManager || !input.phone || !userId) {
-      console.error('❌ Missing required fields:', input)
-      alert('נא למלא את כל השדות החיוניים')
-      return
+    if (!validateInputs()) {
+      return // אם יש שגיאות, נעצור את המשך הפעולה
     }
 
     const newEvent = {
@@ -58,7 +99,7 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
         DateOfEvent: '',
         NumOfGuests: ''
       })
-
+      setErrors({})
       onClose() // סגירת הדיאלוג לאחר שמירה
     } catch (error) {
       console.error('❌ Error adding event:', error.response?.data || error.message)
@@ -231,15 +272,87 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
         </TextField>
         {input.TypeOfEvent === 'חתונה' ? (
           <>
-            <TextField label="שם החתן" name="NameOfGroom" value={input.NameOfGroom} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
-            <TextField label="שם הכלה" name="NameOfBride" value={input.NameOfBride} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
+            <TextField
+              label="שם החתן"
+              name="NameOfGroom"
+              value={input.NameOfGroom}
+              onChange={handleInputChange}
+              fullWidth
+              margin="normal"
+              error={!!errors.NameOfGroom}
+              helperText={
+                errors.NameOfGroom ? <span style={{ fontWeight: 'bold', color: 'white', backgroundColor: 'red', padding: '5px 15px 5px 15px', borderRadius: '20px' }}>{errors.NameOfGroom}</span> : ''
+              }
+              sx={commonTextFieldSX}
+            />
+            <TextField
+              label="שם הכלה"
+              name="NameOfBride"
+              value={input.NameOfBride}
+              onChange={handleInputChange}
+              fullWidth
+              margin="normal"
+              error={!!errors.NameOfBride}
+              helperText={
+                errors.NameOfBride ? <span style={{ fontWeight: 'bold', color: 'white', backgroundColor: 'red', padding: '5px 15px 5px 15px', borderRadius: '20px' }}>{errors.NameOfBride}</span> : ''
+              }
+              sx={commonTextFieldSX}
+            />
           </>
         ) : (
-          <TextField label="שם" name="NameOfGroom" value={input.NameOfGroom} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
+          <TextField
+            label="שם"
+            name="NameOfGroom"
+            value={input.NameOfGroom}
+            onChange={handleInputChange}
+            fullWidth
+            margin="normal"
+            error={!!errors.NameOfGroom}
+            helperText={
+              errors.NameOfGroom ? <span style={{ fontWeight: 'bold', color: 'white', backgroundColor: 'red', padding: '5px 15px 5px 15px', borderRadius: '20px' }}>{errors.NameOfGroom}</span> : ''
+            }
+            sx={commonTextFieldSX}
+          />
         )}
-        <TextField label="מנהל האירוע" name="NameOfManager" value={input.NameOfManager} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
-        <TextField label="טלפון" name="phone" value={input.phone} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
-        <TextField label="אימייל לקבלת תשלום" name="emailPaypal" value={input.emailPaypal} onChange={handleInputChange} fullWidth margin="normal" sx={commonTextFieldSX} />
+        <TextField
+          label="מנהל האירוע"
+          name="NameOfManager"
+          value={input.NameOfManager}
+          onChange={handleInputChange}
+          fullWidth
+          margin="normal"
+          error={!!errors.NameOfManager}
+          helperText={
+            errors.NameOfManager ? <span style={{ fontWeight: 'bold', color: 'white', backgroundColor: 'red', padding: '5px 15px 5px 15px', borderRadius: '20px' }}>{errors.NameOfManager}</span> : ''
+          }
+          sx={commonTextFieldSX}
+        />
+        <TextField
+          label="טלפון"
+          name="phone"
+          value={input.phone}
+          onChange={handleInputChange}
+          fullWidth
+          margin="normal"
+          error={!!errors.phone}
+          helperText={
+            errors.phone ? <span style={{ fontWeight: 'bold', color: 'white', backgroundColor: 'red', padding: '5px 15px 5px 15px', borderRadius: '20px' }}>{errors.NameOfManager}</span> : ''
+          }
+          sx={commonTextFieldSX}
+        />
+        <TextField
+          label="אימייל לקבלת תשלום"
+          name="emailPaypal"
+          value={input.emailPaypal}
+          onChange={handleInputChange}
+          fullWidth
+          margin="normal"
+          error={!!errors.emailPaypal}
+          helperText={
+            errors.emailPaypal ? <span style={{ fontWeight: 'bold', color: 'white', backgroundColor: 'red', padding: '5px 15px 5px 15px', borderRadius: '20px' }}>{errors.emailPaypal}</span> : ''
+          }
+          sx={commonTextFieldSX}
+        />
         <TextField
           label="תאריך האירוע"
           type="date"
@@ -248,19 +361,15 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
           onChange={handleInputChange}
           fullWidth
           margin="normal"
-          InputLabelProps={{
-            shrink: true,
-            sx: {
-              fontWeight: 600,
-              // במקום להשתמש בערכי העימוד מהעיצוב הכללי, כאן מגדירים ערכים שמתאימים לשדה התאריך:
-              left: 10, // מזיזים את הלייבל פנימה כך שלא יתנגש עם האייקון
-              right: 'auto', // מבטלים את הערך של right
-              backgroundColor: '#778DA9',
-              padding: '0 10px',
-              // התאמה של הטרנספורם – ניתן לשחק בערכים כדי לקבל את התוצאה הרצויה
-              transform: 'translate(10px, -6px) scale(0.75)'
-            }
-          }}
+          InputLabelProps={{ shrink: true }}
+          error={!!errors.DateOfEvent}
+          helperText={
+            errors.DateOfEvent ? (
+              <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'white', backgroundColor: 'red', padding: '5px 15px 5px 15px', borderRadius: '20px' }}>{errors.DateOfEvent}</span>
+            ) : (
+              ''
+            )
+          }
           sx={commonTextFieldSX}
         />
       </DialogContent>

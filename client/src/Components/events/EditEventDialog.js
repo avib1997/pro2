@@ -59,12 +59,9 @@ const EditEventDialog = ({ open, event, onClose, onSave }) => {
 
     try {
       const response = await axios.put(`http://localhost:2001/api/events/${String(event._id)}`, formData)
-      // const response = await axios.put(`http://localhost:2001/api/events/${event._id}`, formData)
       onSave(response.data)
       setSuccess(true)
       setSaved(true) // ✅ הצגת אייקון אישור ✔️
-
-      // ✅ השאר את הדיאלוג פתוח ל-2 שניות לפני סגירה
 
       setTimeout(() => {
         setSaved(false) // ❌ הסרת האייקון

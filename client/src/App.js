@@ -1,6 +1,7 @@
 //client/src/App.js
 import { createContext, useState, useEffect } from 'react'
 import React from 'react'
+import Logo from './Components/Logo'
 import { BrowserRouter, useLocation } from 'react-router-dom'
 import MainRouter from './routes/MainRouter' // או הנתיב למקום ששמרת את הקובץ
 import WhatsAppIcon from '@mui/icons-material/WhatsApp'
@@ -72,6 +73,17 @@ function App() {
     >
       <BrowserRouter>
         <MainRouter />
+
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: 36,
+            left: 36,
+            zIndex: 9999 // מעל כל האלמנטים
+          }}
+        >
+          <Logo />
+        </Box>
       </BrowserRouter>
 
       {/* Footer פשוט בתחתית העמוד */}

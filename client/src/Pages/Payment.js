@@ -15,14 +15,6 @@ const PayPalPayment = () => {
   const [emailPaypal, setEmailPaypal] = useState('')
   const [paymentSuccess, setPaymentSuccess] = useState(false)
 
-  // ספירה לאחור לאירוע (דוגמה):
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  })
-
   useEffect(() => {
     window.scrollTo(0, 0)
 
@@ -45,37 +37,7 @@ const PayPalPayment = () => {
     fetchEvent()
     console.log('eventId:', eventId)
     console.log('NEW GIFT:', newGift)
-
-    ////////////
-    // (דוגמה) תאריך היעד לאירוע
-    const targetDate = new Date('2025-12-31T00:00:00')
-
-    const interval = setInterval(() => {
-      const now = new Date()
-      const difference = targetDate - now
-
-      // אם כבר עברו את התאריך - אפשר לעצור
-      if (difference <= 0) {
-        clearInterval(interval)
-        return
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24)
-      const minutes = Math.floor((difference / (1000 * 60)) % 60)
-      const seconds = Math.floor((difference / 1000) % 60)
-
-      setTimeLeft({
-        days,
-        hours,
-        minutes,
-        seconds
-      })
-    }, 1000)
-
-    return () => clearInterval(interval)
-    /////////////
-  }, [location.state])
+  }, [location.state, eventId, newGift])
 
   // פה מעדכנים את המתנה בדאטה בייס עם הפרטים של התשלום
 
@@ -89,7 +51,6 @@ const PayPalPayment = () => {
       const response = await axios.post('http://localhost:2001/api/gift/addGift', newGift)
       console.log('✅ מתנה נוספה בהצלחה:', response.data)
       setPaymentSuccess(true)
-
     } catch (error) {
       console.error('❌ שגיאה בהוספת המתנה:', error.response?.data || error.message)
     }
@@ -124,64 +85,6 @@ const PayPalPayment = () => {
         }}
       />
 
-      {/* --- Hero Section עם רקע --- */}
-      <Box
-        sx={{
-          position: 'relative',
-          minHeight: '40vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundImage: `url('https://images.unsplash.com/photo-1578357078542-5ea13f5df4df')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        {/* שכבת אוברליי כדי להכהות את התמונה */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '90%',
-            backgroundColor: 'rgba(0,0,0,0.4)',
-            zIndex: 1
-          }}
-        />
-
-        {/* טקסט ב-Hero */}
-        <Box
-          sx={{
-            position: 'relative',
-            zIndex: 2,
-            textAlign: 'center',
-            color: '#fff',
-            p: 2
-          }}
-          component={motion.div}
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 'bold',
-              textShadow: '2px 2px #000',
-              mb: 2
-            }}
-          >
-            ברוכים הבאים לאירוע המרגש שלנו!
-          </Typography>
-          {/* ספירה לאחור */}
-          <Typography variant="h5" sx={{ textShadow: '1px 1px #000' }}>
-            האירוע יתחיל בעוד: {timeLeft.days} ימים, {timeLeft.hours} שעות, {timeLeft.minutes} דקות ו-
-            {timeLeft.seconds} שניות
-          </Typography>
-        </Box>
-      </Box>
-
       {/* תיבת תשלום */}
       <Container
         maxWidth="md"
@@ -190,7 +93,7 @@ const PayPalPayment = () => {
           textAlign: 'center',
           alignItems: 'center',
           alignContent: 'center',
-          mt: 0,
+          mt: 20,
           py: 5,
           px: 2,
           borderRadius: '20px',
@@ -200,8 +103,7 @@ const PayPalPayment = () => {
           '&:hover': {
             transform: 'translateY(-5px)',
             boxShadow: '0px 15px 20px rgba(0, 0, 0, 0.2)'
-          },
-          mt: 2
+          }
         }}
       >
         {paymentSuccess ? (
@@ -312,7 +214,7 @@ const PayPalPayment = () => {
                                 value: newGift.amount
                               },
                               payee: {
-                                email_address: 'sb-s8qld37448206@business.example.com'
+                                email_address: emailPaypal
                               }
                             }
                           ]
@@ -347,7 +249,6 @@ const PayPalPayment = () => {
 
 export default PayPalPayment
 
-
 //client/src/Pages/Payment.js
 // import { Context } from '../App'
 // import React, { useState, useContext, useEffect } from 'react'
@@ -378,7 +279,6 @@ export default PayPalPayment
 //   };
 
 //   useEffect(() => {
-  
 
 //     if (location.state?.newGift) {
 //       setNewGift(location.state.newGift)
@@ -698,4 +598,3 @@ export default PayPalPayment
 // }
 
 // export default PayPalPayment
-

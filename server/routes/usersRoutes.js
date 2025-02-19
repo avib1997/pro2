@@ -42,11 +42,21 @@ router.post('/register', async (req, res) => {
   console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
   try {
     const { user, token } = await userService.register(req.body)
-    console.log(fixHebrewText('משתמש חדש נוצר בהצלחה:'), user)
-    console.log(fixHebrewText('טוקן נוצר בהצלחה:'), token)
-    res.json({ user, token })
+    console.log(fixHebrewText('✅ משתמש חדש נוצר בהצלחה:'), user)
+    console.log(fixHebrewText('✅ טוקן נוצר בהצלחה:'), token)
+    res.status(201).json({ user, token }) // 201 - הצלחה ביצירת משאב חדש
   } catch (err) {
-    res.status(500).send({ error: err.message })
+    console.error('❌ Error in register route:', err.message)
+
+    // שליחת הודעת שגיאה למשתמש עם סטטוס קוד מתאים
+    if (err.message.includes('User already exists')) {
+      return res.status(409).json({ error: err.message }) // 409 - Conflict
+    }
+    if (err.message.includes('Missing user fields')) {
+      return res.status(400).json({ error: err.message }) // 400 - Bad Request
+    }
+
+    res.status(500).json({ error: '❌ Internal server error' })
   }
 })
 

@@ -11,6 +11,34 @@ import SecurityIcon from '@mui/icons-material/Security'
 
 const Signup = props => {
   const Navigate = useNavigate()
+  const [errors, setErrors] = useState({
+    fname: '',
+    lname: '',
+    email: '',
+    password: '',
+    isManager: ''
+  })
+  const [isValid, setIsValid] = useState({
+    fname: false,
+    lname: false,
+    email: false,
+    password: false,
+    isManager: false
+  })
+  const [newErrors, setNewErrors] = useState({
+    fname: '',
+    lname: '',
+    email: '',
+    password: '',
+    isManager: ''
+  })
+  const [newValidState, setNewValidState] = useState({
+    fname: false,
+    lname: false,
+    email: false,
+    password: false,
+    isManager: false
+  })
   const { isEventManager, setIsEventManager, userId, setUserId, eventNumber } = useContext(Context)
   const [input, setInput] = useState({
     fname: '',
@@ -86,68 +114,45 @@ const Signup = props => {
   // setErrors(newErrors)
   // setIsValid(newValidState)
 
-  const handeClick = async e => {
+  const handleClick = async e => {
     e.preventDefault()
-    switch (input) {
-      case 'fname':
-        if (!input.fname) {
-          console.log('יש להזין שם מלא')
-        } else if (/\d/.test(input.fname)) {
-          console.log('אין לכתוב מספרים בשם')
-        } else {
-          console.log('תקין')
-        }
-        break
+    let newErrors = {}
 
-      case 'lname':
-        if (!input.lname) {
-          console.log('יש להזין שם משפחה')
-        } else if (/\d/.test(input.lname)) {
-          console.log('אין לכתוב מספרים בשם המשפחה')
-        } else {
-          console.log('תקין')
-        }
-        break
-      case 'email':
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!input.email) {
-          console.log('יש להזין כתובת אימייל')
-        } else if (!emailRegex.test(input.email)) {
-          console.log('כתובת אימייל לא תקינה')
-        } else {
-          console.log('תקין')
-        }
-        break
-      case 'password':
-        if (!input.password) {
-          console.log('יש להזין סיסמה')
-        } else if (input.password.length < 3) {
-          console.log('סיסמה חייבת להכיל לפחות 3 תווים')
-        } else {
-          console.log('תקין')
-        }
-        break
-      default:
-        break
+    if (!input.fname) {
+      newErrors.fname = 'יש להזין שם'
+    } else if (/\d/.test(input.fname)) {
+      newErrors.fname = 'אין לכתוב מספרים בשם'
+    }
+
+    if (!input.lname) {
+      newErrors.lname = 'יש להזין שם משפחה'
+    } else if (/\d/.test(input.lname)) {
+      newErrors.lname = 'אין לכתוב מספרים בשם המשפחה'
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!input.email) {
+      newErrors.email = 'יש להזין כתובת אימייל'
+    } else if (!emailRegex.test(input.email)) {
+      newErrors.email = 'כתובת אימייל לא תקינה'
+    }
+
+    if (!input.password) {
+      newErrors.password = 'יש להזין סיסמה'
+    } else if (input.password.length < 3) {
+      newErrors.password = 'סיסמה חייבת להכיל לפחות 3 תווים'
+    }
+
+    // בדיקת שגיאות
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
     }
 
     try {
       const response = await axios.post('http://localhost:2001/api/users/register', input)
-      console.log('response in singup:', response)
       const { user, token } = response.data
 
-      // if (token) {
-      //   console.log('המשתמש נוצר בהצלחה')
-      //   if (input.isManager) {
-      //     console.log('המשתמש הוא מנהל')
-      //     Navigate('/EventManager')
-      //   } else {
-      //     console.log('המשתמש הוא לא מנהל')
-      //     Navigate('/Details_page')
-      //   }
-      // } else {
-      //   console.log('המשתמש לא נוצר')
-      // }
       if (token) {
         if (eventNumber) {
           Navigate('/Details_page')
@@ -160,7 +165,11 @@ const Signup = props => {
         console.log('המשתמש לא נוצר')
       }
     } catch (error) {
-      console.log(error)
+      if (error.response?.status === 409) {
+        setErrors({ email: 'המשתמש כבר קיים' })
+      } else {
+        console.log('שגיאה בהרשמה')
+      }
     }
   }
 
@@ -509,9 +518,17 @@ const Signup = props => {
               לא
             </MenuItem>
           </TextField>
+          {Object.values(errors).map(
+            (err, index) =>
+              err && (
+                <Typography key={index} variant="body2" color="error" sx={{ fontWeight: 600 }}>
+                  {err}
+                </Typography>
+              )
+          )}
           {/* {props.a === "manager" && <Button>change to login</Button>} */}
           <Button
-            onClick={handeClick}
+            onClick={handleClick}
             type="submit"
             sx={{
               margin: 3,

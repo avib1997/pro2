@@ -6,33 +6,32 @@ const mongoose = require('mongoose')
 
 const { fixHebrewText } = require('../fixHebrew.js')
 
-
-module.exports.addGift = async (giftFields) => {
+module.exports.addGift = async giftFields => {
   try {
-    console.log('📥 נתוני מתנה שהתקבלו:', giftFields);
+    console.log('📥 נתוני מתנה שהתקבלו:', giftFields)
 
     // בדיקות חובה
     if (!giftFields.phone || !giftFields.amount || !giftFields.EventId) {
-      console.error('❌ שדה טלפון, סכום או מזהה אירוע חסר!');
-      throw { code: 400, message: '❌ שדה טלפון, סכום או מזהה אירוע חסר!' };
+      console.error('❌ שדה טלפון, סכום או מזהה אירוע חסר!')
+      throw { code: 400, message: '❌ שדה טלפון, סכום או מזהה אירוע חסר!' }
     }
 
     // בדיקה אם מזהה האירוע תקין
     if (!mongoose.Types.ObjectId.isValid(giftFields.EventId)) {
-      console.error('❌ מזהה האירוע לא תקין:', giftFields.EventId);
-      throw new Error('❌ מזהה האירוע לא תקין!');
+      console.error('❌ מזהה האירוע לא תקין:', giftFields.EventId)
+      throw new Error('❌ מזהה האירוע לא תקין!')
     }
 
     // שליפת אירוע מהמסד
-    const event = await eventController.readById(giftFields.EventId);
+    const event = await eventController.readById(giftFields.EventId)
     if (!event) {
-      console.error('❌ האירוע לא נמצא במסד הנתונים!');
-      throw { code: 404, message: '❌ האירוע לא נמצא במסד הנתונים!' };
+      console.error('❌ האירוע לא נמצא במסד הנתונים!')
+      throw { code: 404, message: '❌ האירוע לא נמצא במסד הנתונים!' }
     }
 
-    console.log('✅ האירוע נמצא:', event);
-    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`;
-    
+    console.log('✅ האירוע נמצא:', event)
+    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`
+
     // 🔹 הכנת הנתונים של המתנה
     const giftData = {
       name: giftFields.name,
@@ -43,41 +42,57 @@ module.exports.addGift = async (giftFields) => {
       EventId: giftFields.EventId,
       toEventName: eventName || '',
       file: giftFields.file ? { fileId: giftFields.file.fileId, fileType: giftFields.file.fileType } : undefined
-    };
+    }
 
     // 🔹 שליחת הנתונים ל-giftController ליצירת המתנה
-    const newGift = await giftController.create(giftData);
+    const newGift = await giftController.create(giftData)
 
-    console.log('✅ מתנה נשמרה בהצלחה:', newGift);
+    console.log('✅ מתנה נשמרה בהצלחה:', newGift)
 
     // עדכון רשימת המתנות באירוע
-    await eventController.update(giftFields.EventId, { $push: { giftsId: newGift._id.toString() } });
+    try {
+      const res = await eventController.update({ _id: giftFields.EventId }, { $push: { giftsId: newGift._id } })
 
-    console.log('✅ המתנה נוספה לאירוע בהצלחה');
-    return { message: '✅ מתנה נוספה בהצלחה', gift: newGift };
+      console.log('the gift was added to the event', res)
+    } catch (error) {
+      console.error('❌ שגיאה בעדכון האירוע עם המתנה:', error)
+      throw error
+    }
+
+    //עדכון רשימת המתנות במשתמש
+    try {
+      const res = await userController.update({ _id: giftFields.userid_gift }, { $push: { giftsId: newGift._id } })
+      console.log('the gift was added to the user')
+    } catch (error) {
+      console.error('❌ שגיאה בעדכון המשתמש עם המתנה:', error)
+      throw error
+    }
+
+    console.log('✅ המתנה נוספה לאירוע בהצלחה')
+    return { message: '✅ מתנה נוספה בהצלחה', gift: newGift }
   } catch (error) {
-    console.error('❌ שגיאה בהוספת המתנה:', error);
-    throw error;
+    console.error('❌ שגיאה בהוספת המתנה:', error)
+    throw error
   }
-};
+}
 
-module.exports.addGiftG = async (giftFields) => {
+module.exports.addGiftG = async giftFields => {
   try {
-    console.log('📥 נתוני מתנה מאורח שהתקבלו:', giftFields);
+    console.log('📥 נתוני מתנה מאורח שהתקבלו:', giftFields)
 
     // בדיקות חובה
     if (!giftFields.phone || !giftFields.amount) {
-      console.error('❌ שדה טלפון או סכום חסר!');
-      throw { code: 400, message: '❌ שדה טלפון או סכום חסר!' };
+      console.error('❌ שדה טלפון או סכום חסר!')
+      throw { code: 400, message: '❌ שדה טלפון או סכום חסר!' }
     }
-    const event = await eventController.readById(giftFields.EventId);
+    const event = await eventController.readById(giftFields.EventId)
     if (!event) {
-      console.error('❌ האירוע לא נמצא במסד הנתונים!');
-      throw { code: 404, message: '❌ האירוע לא נמצא במסד הנתונים!' };
+      console.error('❌ האירוע לא נמצא במסד הנתונים!')
+      throw { code: 404, message: '❌ האירוע לא נמצא במסד הנתונים!' }
     }
 
-    console.log('✅ האירוע נמצא:', event);
-    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`;
+    console.log('✅ האירוע נמצא:', event)
+    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`
     // יצירת המתנה ושמירה במסד
     // 🔹 הכנת הנתונים של המתנה
     const giftData = {
@@ -88,25 +103,30 @@ module.exports.addGiftG = async (giftFields) => {
       EventId: giftFields.EventId,
       toEventName: eventName || '',
       file: giftFields.file ? { fileId: giftFields.file.fileId, fileType: giftFields.file.fileType } : undefined
-    };
-
-    // 🔹 שליחת הנתונים ל-giftController ליצירת המתנה
-    const newGift = await giftController.create(giftData);
-
-    console.log('✅ מתנה מאורח נשמרה בהצלחה:', newGift);
-
-    // עדכון האירוע עם המתנה החדשה (אם יש EventId)
-    if (giftFields.EventId) {
-      await eventController.update(giftFields.EventId, { $push: { giftsId: newGift._id.toString() } });
-      console.log('✅ המתנה נוספה לאירוע בהצלחה');
     }
 
-    return { message: '✅ מתנה נוספה בהצלחה', gift: newGift };
+    // 🔹 שליחת הנתונים ל-giftController ליצירת המתנה
+    const newGift = await giftController.create(giftData)
+
+    console.log('✅ מתנה מאורח נשמרה בהצלחה:', newGift)
+
+    // עדכון האירוע עם המתנה החדשה (אם יש EventId)
+    // עדכון רשימת המתנות באירוע
+    try {
+      const res = await eventController.update({ _id: giftFields.EventId }, { $push: { giftsId: newGift._id } })
+
+      console.log('the gift was added to the event', res)
+    } catch (error) {
+      console.error('❌ שגיאה בעדכון האירוע עם המתנה:', error)
+      throw error
+    }
+
+    return { message: '✅ מתנה נוספה בהצלחה', gift: newGift }
   } catch (error) {
-    console.error('❌ שגיאה בהוספת המתנה (אורח):', error);
-    throw error;
+    console.error('❌ שגיאה בהוספת המתנה (אורח):', error)
+    throw error
   }
-};
+}
 
 module.exports.getgift = async giftsId => {
   let giftId = Object.values(giftsId)

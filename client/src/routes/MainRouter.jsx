@@ -17,7 +17,9 @@ import ContactPage from '../Pages/ContactPage'
 import GlobalStyles from '@mui/material/GlobalStyles'
 import Test from '../Pages/test'
 import ResetPassword from '../Pages/ResetPassword'
-
+import Logo from '../Components/Logo'
+import HomeLogo from '../Components/HomeComponents/HomeLogo'
+import ModernLogo from '../Components/Navbar/ModernLogo'
 
 function MainRouter() {
   const location = useLocation()
@@ -35,11 +37,11 @@ function MainRouter() {
   console.log('location.pathname =', location.pathname)
 
   const shouldHideNavbar =
-    location.pathname.startsWith('/reset-password') || 
-    location.pathname === '/' || 
-    location.pathname === '/LoginPage' || 
-    location.pathname === '/Home' || 
-    location.pathname === '/ManagerSignup' || 
+    location.pathname.startsWith('/reset-password') ||
+    location.pathname === '/' ||
+    location.pathname === '/LoginPage' ||
+    location.pathname === '/Home' ||
+    location.pathname === '/ManagerSignup' ||
     location.pathname.startsWith('/admin')
 
   return (
@@ -75,6 +77,9 @@ function MainRouter() {
           <Route element={<TheEnd />} path="/TheEnd"></Route>
           <Route element={<Test />} path="/Test"></Route>
           <Route element={<ResetPassword />} path="/reset-password/:token" />
+          <Route element={<Logo />} path="/Logo" />
+          <Route element={<HomeLogo />} path="/HomeLogo" />
+          <Route element={<ModernLogo />} path="/ModernLogo" />
         </Routes>
       </>
     </>
