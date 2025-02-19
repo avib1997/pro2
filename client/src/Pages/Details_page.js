@@ -99,12 +99,12 @@ const Details = () => {
       amount: giftDetails.amount,
       userid_gift: userId,
       EventId: eventId,
-      toEventName: event.nameOfGroom,
+      toEventName: event.NameOfGroom,
       file: fileId ? { fileId, fileType } : undefined // 🔹 שמירת הקובץ רק אם קיים
-    }
-    console.log('event:', eventId)
-    sendLog('success', 'pages', 200, '✅ Payment עבר לדף', 'client', '/Details_page', 'handleClick', userId, null, null)
-    navigate('/Payment', { state: { newGift } })
+    };
+    console.log('eventId:', eventId);
+    sendLog('success', 'pages', 200, '✅ Payment עבר לדף', 'client', '/Details_page', 'handleClick', userId, null, null);
+    navigate('/Payment', { state: { newGift } });
 
     setGiftDetails({
       name: '',

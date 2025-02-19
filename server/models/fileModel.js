@@ -8,7 +8,7 @@ const fileSchema = new mongoose.Schema({
     fileName: { type: String }, // שם הקובץ המקורי
     fileSize: { type: Number }, // גודל הקובץ בבייטים
     uploadDate: { type: Date, default: Date.now }, // תאריך העלאה
-    userid_file: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true }, // מזהה המשתמש שהעלה
+    userid_file: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // מזהה המשתמש שהעלה
     EventId: { type: mongoose.Schema.Types.ObjectId, ref: 'events', required: true },
     giftid_file: { type: mongoose.Schema.Types.ObjectId, ref: 'gift', required: false },
     // מזהה האירוע שאליו הקובץ שייך

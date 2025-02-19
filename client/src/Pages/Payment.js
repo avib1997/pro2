@@ -274,10 +274,6 @@ export default PayPalPayment
 //     seconds: 0
 //   })
 
-//   window.onload = function () {
-//     window.scrollTo(0, 0);
-//   };
-
 //   useEffect(() => {
 
 //     if (location.state?.newGift) {
@@ -288,8 +284,10 @@ export default PayPalPayment
 //       console.log('eventId fetchEvent paymant:', eventId)
 //       try {
 //         const res = await axios.get(`http://localhost:2001/api/events/${eventId}`)
-//         console.log('event:',res.data.EmailPaypal)
-//         setEmailPaypal(res.data.EmailPaypal)
+//         console.log('event:', res.data)
+//         setEmailPaypal(res.data.emailPaypal)
+//         console.log('emailPaypal:', res.data.emailPaypal)
+//         console.log('REACT_APP_PAYPAL_CLIENT_ID:', process.env.REACT_APP_PAYPAL_CLIENT_ID)
 //       } catch (error) {
 //         console.error('❌ Error getting event:', error)
 //       }
@@ -323,7 +321,7 @@ export default PayPalPayment
 //         minutes,
 //         seconds
 //       })
-//     }, 1000, showPayPal)
+//     }, 1000)
 
 //     return () => clearInterval(interval)
 //     /////////////
@@ -332,16 +330,16 @@ export default PayPalPayment
 //   // פה מעדכנים את המתנה בדאטה בייס עם הפרטים של התשלום
 
 //   const handlePaymentSuccess = async details => {
-//     setShowPayPal(false)
-
 //     console.log('✅ תשלום הצליח!', details)
-//     // alert('✅ העסקה הושלמה בהצלחה על ידי ' + details.payer.name.given_name)
+//     setShowPayPal(false)
+//     alert('✅ העסקה הושלמה בהצלחה על ידי ' + details.payer.name.given_name)
 
 //     // **שליחת הנתונים לשרת כדי לעדכן את מסד הנתונים**
 //     try {
 //       const response = await axios.post('http://localhost:2001/api/gift/addGift', newGift)
 //       console.log('✅ מתנה נוספה בהצלחה:', response.data)
 //       setPaymentSuccess(true)
+
 //     } catch (error) {
 //       console.error('❌ שגיאה בהוספת המתנה:', error.response?.data || error.message)
 //     }
@@ -564,7 +562,7 @@ export default PayPalPayment
 //                                 value: newGift.amount
 //                               },
 //                               payee: {
-//                                 email_address: emailPaypal
+//                                 email_address: 'sb-w52kr36983624@business.example.com'
 //                               }
 //                             }
 //                           ]
@@ -586,12 +584,12 @@ export default PayPalPayment
 //       {/* אנימציית הרקע */}
 //       <style>
 //         {`
-//            @keyframes animateBg {
-//              0% { background-position: 0% 50%; }
-//              50% { background-position: 100% 50%; }
-//              100% { background-position: 0% 50%; }
-//            }
-//          `}
+//           @keyframes animateBg {
+//             0% { background-position: 0% 50%; }
+//             50% { background-position: 100% 50%; }
+//             100% { background-position: 0% 50%; }
+//           }
+//         `}
 //       </style>
 //     </Box>
 //   )

@@ -78,7 +78,7 @@ const Home = () => {
       .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: EventNum })
       .then(response => {
         if (response.data && response.data._id) {
-          setEvent(response.data._id) // שמירת האירוע בסטייט
+          setEvent(response.data) // שמירת האירוע בסטייט
           setEventNumber(EventNum) // שמירת ה-ID בקונטקסט
           setEventId(response.data._id) // שמירת ה-ID בסטייט
           sendLog('success', 'pages', 200, '✅ LoginPage עבר לדף', 'client', '/HomePage', 'handleStartClick', null, null, eventId)
@@ -109,7 +109,8 @@ const Home = () => {
       .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: EventNum })
       .then(response => {
         if (response.data && response.data._id) {
-          setEvent(response.data._id)
+          setEvent(response.data)
+          console.log('eventttt:', response.data)
           setEventNumber(EventNum)
           setEventId(response.data._id)
           navigate('/Details_page')

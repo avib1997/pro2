@@ -5,8 +5,8 @@ const giftSchema = new mongoose.Schema({
   phone: { type: String, required: true }, // ✅ ודא שזו מחרוזת (אם נשלח מספר זה יגרום לשגיאה)
   blessing: { type: String },
   amount: { type: Number, required: true }, // ✅ סכום חייב להיות מספר
-  userid_gift: { type: String },
-  EventId: { type: String, required: true }, // ✅ ודא שהאירוע קיים לפני שמנסים לשמור
+  userid_gift: { type: String , ref: 'User'},
+  EventId: { type: String, required: true, ref: 'events'}, // ✅ ודא שהאירוע קיים לפני שמנסים לשמור
   toEventName: { type: String },
   entryDate: { type: Date, default: Date.now },
 
