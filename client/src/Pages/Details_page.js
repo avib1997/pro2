@@ -18,7 +18,7 @@ import { useLayoutEffect } from 'react'
 const Details = () => {
   const navigate = useNavigate()
   const [eventNum, setEventNum] = useState('')
-  const { giftDetails, setGiftDetails, userId, event, eventId, setEvent, eventNumber, setEventId, setEventNumber } = useContext(Context)
+  const { eventName, setEventName, giftDetails, setGiftDetails, userId, event, eventId, setEvent, eventNumber, setEventId, setEventNumber } = useContext(Context)
   const [amount, setAmount] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
   const [file, setFile] = useState(null)
@@ -33,8 +33,12 @@ const Details = () => {
   }, [])
 
   useEffect(() => {
+    const eventType = event.TypeOfEvent || "אירוע";
+    setEventName(event.NameOfBride
+      ? `${eventType} של ${event.NameOfGroom} ו${event.NameOfBride}`
+      : `${eventType} של ${event.NameOfGroom}`);
     console.log('🎉 מזהה האירוע:', eventNumber)
-  }, [eventNumber])
+  }, [setEventNumber, eventNumber, event])
 
   const handleChange = e => {
     e.preventDefault()
@@ -92,6 +96,8 @@ const Details = () => {
     const fileId = fileDetails ? fileDetails.file.fileId : null
     const fileType = fileDetails ? fileDetails.file.fileType : null
 
+
+
     const newGift = {
       name: giftDetails.name,
       phone: giftDetails.phone,
@@ -99,7 +105,7 @@ const Details = () => {
       amount: giftDetails.amount,
       userid_gift: userId,
       EventId: eventId,
-      toEventName: event.NameOfGroom,
+      toEventName: event.NameOfBride ? `${event.NameOfGroom} & ${event.NameOfBride}` : event.NameOfGroom || '',
       file: fileId ? { fileId, fileType } : undefined // 🔹 שמירת הקובץ רק אם קיים
     };
     console.log('eventId:', eventId);
@@ -204,9 +210,10 @@ const Details = () => {
       .then(response => {
         console.log('✅ תגובה מהשרת:', response.data)
         if (response.data && response.data._id) {
-          setEvent(response.data._id) // שמירת האירוע בסטייט
+          setEvent(response.data) // שמירת האירוע בסטייט
           setEventNumber(eventNum) // שמירת ה-ID בקונטקסט
           setEventId(response.data._id) // שמירת ה-ID בסטייט
+          console.log('✅ מספר האירוע נמצא:', response.data)
         } else {
           console.log('❌ מספר האירוע לא נמצא')
           setErrorMessage('❌ אירוע לא נמצא, בדוק את המספר שהוזן')
@@ -256,8 +263,22 @@ const Details = () => {
             fontFamily: 'Roboto, sans-serif'
           }}
         >
-          {/* כותרת מעל הפירוט */}
-          {}
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: "bold",
+              textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
+              fontFamily: "serif",
+              mt: '60px',
+              color: 'rgba(240, 204, 0, 0.9)',
+              font: 'bold 2.5rem/3rem Poppins, sans-serif',
+              fontSize: { xs: '4rem', sm: '5rem' },
+              marginBottom: 4
+            }}
+          >
+            {eventName}
+          </Typography>
+
           <Typography
             variant="h3"
             gutterBottom
@@ -265,7 +286,7 @@ const Details = () => {
             sx={{
               fontWeight: 'bold',
               color: '#E0E1DD',
-              mt: '140px',
+              mt: '14px',
               marginBottom: 4,
               fontSize: {
                 xs: '2.5rem',
@@ -607,8 +628,8 @@ const Details = () => {
                   <Button
                     onClick={handleClick}
                     sx={{
-                      width: 150,
-                      height: 50,
+                      width: 90,
+                      height: 90,
                       margin: 1,
                       borderRadius: 3,
                       backgroundColor: '#F0A500',
@@ -620,21 +641,25 @@ const Details = () => {
                       fontSize: '1.2rem',
                       fontWeight: 'bold',
                       boxShadow: '0px 5px 15px rgba(240, 165, 0, 0.4)',
-                      transition: '0.3s'
+                      transition: '0.3s',
+                      display: 'flex', // 👈 חשוב
+                      alignItems: 'center', // 👈 ממרכז את התוכן אנכית
+                      justifyContent: 'center' // 👈 ממרכז את התוכן אופקית
                     }}
                     variant="contained"
-                    startIcon={
-                      <img
-                        src={PayPalIcon}
-                        alt="PayPal"
-                        style={{
-                          width: 100,
-                          height: 40
-                        }}
-                      />
-                    }
-                  ></Button>
-                  <Button
+                  >
+                    <img
+                      src={`https://logo.clearbit.com/paypal.com`}
+                      alt="PayPal"
+                      style={{
+                        width: 50, // 👈 כוונן את הגודל כך שיתאים
+                        height: 50,
+                        objectFit: 'contain'
+                      }}
+                    />
+                  </Button>
+
+                  {/* <Button
                     onClick={handleClick}
                     sx={{
                       width: 150,
@@ -693,7 +718,7 @@ const Details = () => {
                         }}
                       />
                     }
-                  ></Button>
+                  ></Button> */}
                 </Box>
               </Box>
             </form>

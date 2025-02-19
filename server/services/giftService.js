@@ -31,7 +31,10 @@ module.exports.addGift = async giftFields => {
     }
 
     console.log('✅ האירוע נמצא:', event);
-    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`;
+    const eventName = event.NameOfBride
+      ? `${event.NameOfGroom} & ${event.NameOfBride}`
+      : event.NameOfGroom;
+
 
     // 🔹 הכנת הנתונים של המתנה
     const giftData = {

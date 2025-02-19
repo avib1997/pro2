@@ -39,7 +39,7 @@ const Signup = props => {
     password: false,
     isManager: false
   })
-  const { isEventManager, setIsEventManager, userId, setUserId, eventNumber } = useContext(Context)
+  const { isManager, setUserId, setDetailsId, setIsManager, setUserName, setUserEmail, setEventNumber, userId, eventNumber } = useContext(Context)
   const [input, setInput] = useState({
     fname: '',
     lname: '',
@@ -61,58 +61,6 @@ const Signup = props => {
       setInput(prev => ({ ...prev, isManager: true }))
     }
   }, [props.defaultManager])
-
-  // switch (field) {
-  //   case 'name':
-  //     if (!value) {
-  //       newErrors.name = 'יש להזין שם מלא'
-  //       newValidState.name = false
-  //     } else {
-  //       newErrors.name = 'תקין'
-  //       newValidState.name = true
-  //     }
-  //     break
-  //   case 'email':
-  //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  //     if (!value) {
-  //       newErrors.email = 'יש להזין כתובת אימייל'
-  //       newValidState.email = false
-  //     } else if (!emailRegex.test(value)) {
-  //       newErrors.email = 'כתובת אימייל לא תקינה'
-  //       newValidState.email = false
-  //     } else {
-  //       newErrors.email = 'תקין'
-  //       newValidState.email = true
-  //       setEmailUser(value)
-  //     }
-  //     break
-  //   case 'phone':
-  //     const phoneRegex = /^[0-9]{10}$/
-  //     if (!value) {
-  //       newErrors.phone = 'יש להזין מספר טלפון'
-  //       newValidState.phone = false
-  //     } else if (!phoneRegex.test(value)) {
-  //       newErrors.phone = 'מספר טלפון חייב לכלול 10 ספרות'
-  //       newValidState.phone = false
-  //     } else {
-  //       newErrors.phone = 'תקין'
-  //       newValidState.phone = true
-  //     }
-  //     break
-  //   case 'additionalInfo':
-  //     if (!value) {
-  //       newErrors.additionalInfo = 'יש להזין מידע נוסף'
-  //       newValidState.additionalInfo = false
-  //     } else {
-  //       newErrors.additionalInfo = 'תקין'
-  //       newValidState.additionalInfo = true
-  //     }
-  //     break
-  //   default:
-  //     break
-  // }
-  // setErrors(newErrors)
-  // setIsValid(newValidState)
 
   const handleClick = async e => {
     e.preventDefault()
@@ -152,7 +100,11 @@ const Signup = props => {
     try {
       const response = await axios.post('http://localhost:2001/api/users/register', input)
       const { user, token } = response.data
-
+      setUserName(`${user.fname} ${user.lname}`)
+      setUserEmail(user.email)
+      setUserId(user._id)
+      console.log('המשתמש נוצר בהצלחה')
+      
       if (token) {
         if (eventNumber) {
           Navigate('/Details_page')

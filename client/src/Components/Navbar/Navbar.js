@@ -64,7 +64,7 @@ const pagesManager = [
 ]
 
 function Navbar() {
-  const { isManager, userId, eventNumber, setEventNumber, userName, setUserName, userEmail, setUserId, setUserEmail, setIsManager } = useContext(Context)
+  const { event, setEvent, eventName, setEventName, isManager, userId, eventNumber, setEventNumber, userName, setUserName, userEmail, setUserId, setUserEmail, setIsManager } = useContext(Context)
   const [editUserDialogOpen, setEditUserDialogOpen] = useState(false)
   const [editedUser, setEditedUser] = useState({ fname: '', lname: '', email: '', password: '', isManager: '' })
   const [showPassword, setShowPassword] = useState(false)
@@ -74,11 +74,18 @@ function Navbar() {
   const [anchorUser, setAnchorUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState('') // הודעת שגיאה
   const [anchorElNav, setAnchorElNav] = useState(null)
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
+
+
 
   const location = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
+    const eventType = event.TypeOfEvent || "אירוע";
+    setEventName(event.NameOfBride
+    ? `${eventType} של ${event.NameOfGroom} ו${event.NameOfBride}`
+    : `${eventType} של ${event.NameOfGroom}`);
     // הגדרת הדרגה
     setUserRank(isManager ? 'מנהל אירוע' : userId ? 'משתמש רשום' : 'אורח')
     console.log('📌 מצב נוכחי:')
@@ -95,13 +102,21 @@ function Navbar() {
       setErrorMessage('❌ אנא הכנס מספר אירוע תקין')
       return
     }
+    if (!eventNum || !/^[0-9]+$/.test(eventNum)) {  // בדיקה אם זה רק מספרים
+      setEventNum("");
+      setErrorMessage("❌ מספר האירוע חייב להכיל רק ספרות");
+      return;
+    }
 
     axios
       .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: eventNum })
       .then(response => {
         console.log('✅ תגובה מהשרת:', response.data)
         if (response.data && response.data._id) {
+          setEvent(response.data) // שמירת האירוע ב־Context
           setEventNumber(eventNum) // שמירת מספר האירוע ב־Context
+          setEventNum('') // איפוס הקלט
+          setEventDialogOpen(false) // סגירת הדיאלוג
           setErrorMessage('') // איפוס הודעת השגיאה
         } else {
           setEventNum('')
@@ -113,6 +128,12 @@ function Navbar() {
         console.error('❌ שגיאה בבדיקת מספר האירוע:', error)
         setErrorMessage('❌ שגיאה בחיבור לשרת, נסה שוב מאוחר יותר.')
       })
+  }
+
+  const handleCloseEventDialog = () => {
+    setEventDialogOpen(false)
+    setEventNum('')
+    setErrorMessage('')
   }
 
   const handleOpenEditUserDialog = () => {
@@ -593,58 +614,10 @@ function Navbar() {
                   {page.name}
                 </Button>
               ))}
-              <TextField
-                label="הכנסת מזהה"
-                variant="outlined"
-                size="small"
-                value={eventNum}
-                onChange={e => setEventNum(e.target.value)} // שינוי זמני
-                sx={{
-                  mr: 1,
-                  width: '140px',
-                  backgroundColor: 'transparent',
-                  border: '1px solid #ECEFF1', // גבול לבן
-                  borderRadius: '8px',
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: '8px',
-                    color: '#ECEFF1',
-                    '& fieldset': { borderColor: '#ECEFF1' },
-                    '&:hover fieldset': { borderColor: '#FFFFFF' },
-                    '&.Mui-focused fieldset': { borderColor: '#FFFFFF' }
-                  },
-                  '& .MuiInputBase-input': {
-                    textAlign: 'center',
-                    color: '#ECEFF1'
-                  },
-                  '& .MuiInputLabel-root': {
-                    fontSize: 'x-small',
-                    color: '#ECEFF1', // ✅ לייבל לבן
-                    '&.Mui-focused': { color: '#2196F3' } // ✅ לייבל כחול במצב focus
-                  }
-                }}
-              />
 
-              {/* כפתור לשינוי מזהה האירוע */}
-              <IconButton
-                onClick={handleNewEventNumber} // ✅ שינוי בפועל של המזהה
-                sx={{
-                  color: '#2196F3',
-                  ml: 1,
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                  }
-                }}
-              >
-                <ArrowBackIosNewIcon fontSize="small" />
-              </IconButton>
-              {errorMessage && (
-                <Typography variant="caption" sx={{ color: 'red', fontSize: '0.5rem', mt: 1, fontWeight: 'bold' }}>
-                  {errorMessage}
-                </Typography>
-              )}
               {eventNumber ? (
-                <Typography
+                <Button
+                  onClick={() => setEventDialogOpen(true)}
                   sx={{
                     marginRight: '20px',
                     color: '#66BB6A',
@@ -652,28 +625,55 @@ function Navbar() {
                     fontWeight: 'bold',
                     fontSize: '1.4rem',
                     fontFamily: 'serif',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    textTransform: 'none',
+                    backgroundColor: 'transparent',
+                    '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
                   }}
                 >
                   מזהה אירוע: {eventNumber}
-                </Typography>
+                </Button>
               ) : (
-                <Box sx={{ width: '20%', ml: 0, textAlign: 'center' }}>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      marginRight: '40px',
-                      color: 'red',
-                      fontSize: '1.2rem',
-                      fontStyle: 'italic',
-                      lineHeight: 1,
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    כניסה ללא מספר מזהה אירוע
-                  </Typography>
-                </Box>
+                <Button
+                  onClick={() => setEventDialogOpen(true)}
+                  sx={{
+                    width: '20%',
+                    ml: 0,
+                    textAlign: 'center',
+                    color: 'red',
+                    fontSize: '1.2rem',
+                    fontStyle: 'italic',
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                    textTransform: 'none',
+                    backgroundColor: 'transparent',
+                    '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
+                  }}
+                >
+                  כניסה ללא מספר מזהה אירוע
+                </Button>
               )}
+              {/* דיאלוג הכנסת מזהה אירוע */}
+              <Dialog open={eventDialogOpen} onClose={handleCloseEventDialog}>
+                <DialogTitle>הכנס מזהה אירוע</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    autoFocus
+                    label="מספר אירוע"
+                    variant="outlined"
+                    fullWidth
+                    value={eventNum}
+                    onChange={e => setEventNum(e.target.value)}
+                    error={!!errorMessage}
+                    helperText={errorMessage}
+                    sx={{ mt: 2 }}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleCloseEventDialog} color="secondary">ביטול</Button>
+                  <Button onClick={handleNewEventNumber} color="primary">אישור</Button>
+                </DialogActions>
+              </Dialog>
             </Box>
             <Box>
               <Button
