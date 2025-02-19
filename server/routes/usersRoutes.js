@@ -21,25 +21,9 @@ router.post('/login', async (req, res) => {
   }
 })
 
-// module.exports.register = async userFields => {
-//   if (Object.keys(userFields).length === 0) {
-//     console.log('keys:', object.keys(userFields))
-//     console.log('values:', Object.values(userFields))
-//     throw { code: 400, message: 'there is no user fields' }
-//   }
-//   console.log('userFields:', userFields)
-//   const email = userFields.email
-//   const existUser = await userController.readOne({ email: email })
-//   if (existUser) {
-//     return { message: 'user already exist' }
-//   }
-//   const user = await userController.create(userFields)
-//   const token = jwtFn.createToken(user._id)
-//   return { token: token, user: user }
-// }
 
 router.post('/register', async (req, res) => {
-  console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
+  console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body);
   try {
     const { user, token } = await userService.register(req.body)
     console.log(fixHebrewText('✅ משתמש חדש נוצר בהצלחה:'), user)
@@ -58,7 +42,8 @@ router.post('/register', async (req, res) => {
 
     res.status(500).json({ error: '❌ Internal server error' })
   }
-})
+});
+
 
 router.post('/userid', async (req, res) => {
   console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)

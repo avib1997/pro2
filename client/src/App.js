@@ -22,6 +22,7 @@ function App() {
   const [event, setEvent] = useState('')
   const [eventId, setEventId] = useState('')
   const [isManager, setIsManager] = useState(false)
+  const [eventName, setEventName] = useState('')
 
   const getSavedGiftDetails = () => {
     try {
@@ -68,7 +69,9 @@ function App() {
         userEmail,
         setUserEmail,
         eventNumber,
-        setEventNumber
+        setEventNumber,
+        eventName,
+        setEventName
       }}
     >
       <BrowserRouter>

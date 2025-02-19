@@ -85,7 +85,7 @@ const Admin = () => {
             zIndex: -1,
             background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
             backgroundSize: '400% 400%',
-            animation: 'animateBg 15s ease infinite'
+            animation: 'animateBg 15s ease infinite',
           }}
         />
 

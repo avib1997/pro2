@@ -5,6 +5,7 @@ const userController = require('../controllers/userController') // ייבוא נ
 const mongoose = require('mongoose')
 
 const { fixHebrewText } = require('../fixHebrew.js')
+const { version } = require('os')
 
 module.exports.addGift = async giftFields => {
   try {
@@ -29,8 +30,11 @@ module.exports.addGift = async giftFields => {
       throw { code: 404, message: '❌ האירוע לא נמצא במסד הנתונים!' }
     }
 
-    console.log('✅ האירוע נמצא:', event)
-    const eventName = `${event.NameOfGroom} & ${event.NameOfBride}`
+    console.log('✅ האירוע נמצא:', event);
+    const eventName = event.NameOfBride
+      ? `${event.NameOfGroom} & ${event.NameOfBride}`
+      : event.NameOfGroom;
+
 
     // 🔹 הכנת הנתונים של המתנה
     const giftData = {
@@ -51,13 +55,14 @@ module.exports.addGift = async giftFields => {
 
     // עדכון רשימת המתנות באירוע
     try {
-      const res = await eventController.update({ _id: giftFields.EventId }, { $push: { giftsId: newGift._id } })
+      const res = await eventController.update({ _id: giftFields.EventId }, { $push: { giftsId: newGift._id } });
 
       console.log('the gift was added to the event', res)
     } catch (error) {
-      console.error('❌ שגיאה בעדכון האירוע עם המתנה:', error)
-      throw error
+      console.error('❌ שגיאה בעדכון האירוע עם המתנה:', error);
+      throw error;
     }
+
 
     //עדכון רשימת המתנות במשתמש
     try {
@@ -75,6 +80,8 @@ module.exports.addGift = async giftFields => {
     throw error
   }
 }
+
+
 
 module.exports.addGiftG = async giftFields => {
   try {
@@ -103,22 +110,22 @@ module.exports.addGiftG = async giftFields => {
       EventId: giftFields.EventId,
       toEventName: eventName || '',
       file: giftFields.file ? { fileId: giftFields.file.fileId, fileType: giftFields.file.fileType } : undefined
-    }
+    };
 
     // 🔹 שליחת הנתונים ל-giftController ליצירת המתנה
-    const newGift = await giftController.create(giftData)
+    const newGift = await giftController.create(giftData);
 
-    console.log('✅ מתנה מאורח נשמרה בהצלחה:', newGift)
+    console.log('✅ מתנה מאורח נשמרה בהצלחה:', newGift);
 
     // עדכון האירוע עם המתנה החדשה (אם יש EventId)
     // עדכון רשימת המתנות באירוע
     try {
-      const res = await eventController.update({ _id: giftFields.EventId }, { $push: { giftsId: newGift._id } })
+      const res = await eventController.update({ _id: giftFields.EventId }, { $push: { giftsId: newGift._id } });
 
       console.log('the gift was added to the event', res)
     } catch (error) {
-      console.error('❌ שגיאה בעדכון האירוע עם המתנה:', error)
-      throw error
+      console.error('❌ שגיאה בעדכון האירוע עם המתנה:', error);
+      throw error;
     }
 
     return { message: '✅ מתנה נוספה בהצלחה', gift: newGift }

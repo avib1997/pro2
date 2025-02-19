@@ -75,7 +75,6 @@ const UsersTable = () => {
     axios
       .put(`http://localhost:2001/api/users/${editedUser._id}`, editedUser)
       .then(res => {
-        console.log('User updatedddddddddd:', res.data)
         // עדכון המשתמש ברשימה
         setUsers(prev => prev.map(u => (u._id === editedUser._id ? editedUser : u)))
       })
@@ -128,35 +127,40 @@ const UsersTable = () => {
     {
       field: '_id',
       headerName: 'מזהה משתמש',
-      width: 200,
+      // width: 200,
+      flex: 2,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'fname',
       headerName: 'שם פרטי',
-      width: 120,
+      // width: 120,
+      flex: 1.2,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'lname',
       headerName: 'שם משפחה',
-      width: 150,
+      // width: 150,
+      flex: 1.5,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'email',
       headerName: 'אימייל',
-      width: 230,
+      // width: 230,
+      flex: 2.3,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'entryDate',
       headerName: 'תאריך הצטרפות',
-      width: 200,
+      // width: 200,
+      flex: 2,
       headerAlign: 'center',
       align: 'center',
       renderCell: params => dayjs(params.row.entryDate).format('DD/MM/YYYY HH:mm')
@@ -164,7 +168,8 @@ const UsersTable = () => {
     {
       field: 'actions',
       headerName: 'פעולות',
-      width: 180,
+      // width: 180,
+      flex: 1.3,
       renderCell: params => (
         <Box sx={{ display: 'flex', gap: 1 }}>
           {/* כפתור עריכה */}
@@ -181,12 +186,13 @@ const UsersTable = () => {
     {
       field: 'more info',
       headerName: 'מידע נוסף',
-      width: 200,
+      // width: 200,
+      flex: 1.5,
       renderCell: params => (
-        // <Box sx={{ display: 'flex', gap: 1 }}>
-        <IconButton color="inherit" onClick={() => handleViewUserDetails(params.row)}>
-          <ExpandCircleDownIcon /> פירוט מלא
-        </IconButton>
+        // <Box sx={{marginLeft:20 , gap: 1 }}>
+          <IconButton color="inherit" onClick={() => handleViewUserDetails(params.row)}>
+            <ExpandCircleDownIcon /> פירוט מלא
+          </IconButton>
         // </Box>
       )
     }
@@ -197,42 +203,48 @@ const UsersTable = () => {
     {
       field: 'Event_number',
       headerName: 'מספר אירוע',
-      width: 120,
+      // width: 120,
+      flex: 1,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: '_id',
       headerName: 'מזהה אירוע',
-      width: 200,
+      // width: 200,
+      flex: 1.7,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'NameOfGroom',
       headerName: 'שם החתן',
-      width: 170,
+      // width: 170,
+      flex: 1.5,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'NameOfBride',
       headerName: 'שם הכלה',
-      width: 170,
+      // width: 170,
+      flex: 1.5,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'TypeOfEvent',
       headerName: 'סוג אירוע',
-      width: 100,
+      // width: 100,
+      flex: 1,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'DateOfEvent',
       headerName: 'תאריך',
-      width: 200,
+      // width: 200,
+      flex: 1,
       headerAlign: 'center',
       align: 'center',
       renderCell: params => dayjs(params.row.DateOfEvent).format('DD/MM/YYYY HH:mm')
@@ -244,42 +256,48 @@ const UsersTable = () => {
     {
       field: '_id',
       headerName: 'מזהה מתנה',
-      width: 200,
+      // width: 200,
+      flex: 2,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'name',
       headerName: 'שם נותן המתנה',
-      width: 170,
+      // width: 170,
+      flex: 1.7,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'phone',
       headerName: 'טלפון',
-      width: 170,
+      // width: 170,
+      flex: 1.7,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'amount',
       headerName: 'סכום',
-      width: 60,
+      // width: 60,
+      flex: 0.6,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'toEventName',
       headerName: 'לאירוע',
-      width: 210,
+      // width: 210,
+      flex: 2.1,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'entryDate',
       headerName: 'תאריך נתינה',
-      width: 200,
+      // width: 200,
+      flex: 2,
       headerAlign: 'center',
       align: 'center',
       renderCell: params => dayjs(params.row.entryDate).format('DD/MM/YYYY HH:mm')

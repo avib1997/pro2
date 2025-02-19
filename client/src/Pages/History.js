@@ -10,7 +10,7 @@ import VideocamIcon from '@mui/icons-material/Videocam'
 import ErrorIcon from '@mui/icons-material/Error'
 
 const GiftHistory = () => {
-  const { userId, eventId } = useContext(Context)
+  const { userId, eventId, detailsId } = useContext(Context)
   const [gifts, setGifts] = useState([])
   const [errorMessage, setErrorMessage] = useState('')
   const [expandedRows, setExpandedRows] = useState({})
@@ -37,15 +37,11 @@ const GiftHistory = () => {
       setLoading(true)
       const startTime = Date.now()
       try {
-        const response = await axios.post('http://localhost:2001/api/users/giftsById', { _id: userId })
-        const res = await axios.post('http://localhost:2001/api/gift/getgift', { _id: response.data })
+        // const response = await axios.post('http://localhost:2001/api/users/giftsById', { _id: userId })
+        // console.log('🎁 קיבלתי מתנות:', response.data)
+        console.log('setDetailsId:', detailsId)
+        const res = await axios.post('http://localhost:2001/api/gift/getgift', { _id: detailsId })
         console.log(res.data[0].file)
-
-        const elapsedTime = Date.now() - startTime
-        const delay = 10000 - elapsedTime
-        if (delay > 0) {
-          await new Promise(resolve => setTimeout(resolve, delay))
-        }
 
         if (res.data && res.data.length > 0) {
           setGifts(res.data)
@@ -53,11 +49,8 @@ const GiftHistory = () => {
           setErrorMessage(res.data.length === 0 ? 'אין מתנות להצגה' : 'שגיאה בקבלת המתנות')
         }
       } catch (error) {
-        const elapsedTime = Date.now() - startTime
-        const delay = 5000 - elapsedTime
-        if (delay > 0) {
-          await new Promise(resolve => setTimeout(resolve, delay))
-        }
+        console.error('❌ שגיאה בקבלת המתנות:', error)
+        setErrorMessage('שגיאה בקבלת המתנות')
         setErrorMessage('')
       } finally {
         setLoading(false)

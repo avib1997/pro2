@@ -60,6 +60,7 @@ router.post('/addEvent', async (req, res) => {
 })
 
 router.put('/:eventId', async (req, res) => {
+  console.log(';;;;;;;;;;;;;;;;;;' , req.params.eventId)
   try {
     console.log('📌 req.params.eventId:', typeof req.params.eventId, req.params.eventId)
     const updatedEvent = await eventService.updateEvent(req.params.eventId, req.body)

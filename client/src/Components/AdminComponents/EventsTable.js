@@ -94,42 +94,48 @@ const EventsTable = () => {
     {
       field: 'Event_number',
       headerName: 'מספר אירוע',
-      width: 150,
+      // width: 150,
+      flex: 1.5,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: '_id',
       headerName: 'מזהה אירוע',
-      width: 200,
+      // width: 200,
+      flex: 2,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'NameOfGroom',
       headerName: 'שם החתן',
-      width: 170,
+      // width: 170,
+      flex: 1.7,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'NameOfBride',
       headerName: 'שם הכלה',
-      width: 170,
+      // width: 170,
+      flex: 1.7,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'TypeOfEvent',
       headerName: 'סוג אירוע',
-      width: 120,
+      // width: 120,
+      flex: 1.2,
       headerAlign: 'center',
       align: 'center'
     },
     {
       field: 'DateOfEvent',
       headerName: 'תאריך האירוע',
-      width: 200,
+      // width: 200, 
+      flex: 2,
       headerAlign: 'center',
       align: 'center',
       renderCell: params => dayjs(params.row.DateOfEvent).format('DD/MM/YYYY HH:mm')
@@ -137,7 +143,8 @@ const EventsTable = () => {
     {
       field: 'actions',
       headerName: 'פעולות',
-      width: 100,
+      // width: 100,
+      flex: 1,
       headerAlign: 'center',
       align: 'center',
       renderCell: params => (
