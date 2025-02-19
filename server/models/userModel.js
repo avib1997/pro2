@@ -11,4 +11,4 @@ const userSchema = new mongoose.Schema({
   isManager: { type: Boolean, required: true }
 })
 
-module.exports = mongoose.model('User', userSchema) // CommonJS
+module.exports = mongoose.model('user', userSchema) // CommonJS
