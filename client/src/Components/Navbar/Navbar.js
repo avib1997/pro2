@@ -109,7 +109,7 @@ function Navbar() {
     }
 
     axios
-      .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: eventNum })
+      .post(`https://easygift-server.onrender.com/api/events/checkEventNumber`, { Event_number: eventNum })
       .then(response => {
         console.log('✅ תגובה מהשרת:', response.data)
         if (response.data && response.data._id) {
@@ -143,7 +143,7 @@ function Navbar() {
 
     try {
       const email = userEmail
-      axios.post(`http://localhost:2001/api/users/userid`, { email }).then(response => {
+      axios.post(`https://easygift-server.onrender.com/api/users/userid`, { email }).then(response => {
         console.log('response.data:', response.data)
         const user = response.data.userid[0]
         setEditedUser({
