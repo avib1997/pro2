@@ -7,10 +7,6 @@ import TheatersIcon from '@mui/icons-material/Theaters'
 import { Box, Button, Container, IconButton, Link, TextField, Tooltip, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Context } from '../App'
-import BitIcon from '../assets/bit.png'
-import PayPalIcon from '../assets/buy-logo-small-il.png'
-import PayBoxIcon from '../assets/paybox.png'
-import WarningIcon from '@mui/icons-material/Warning' // אייקון סימן קריאה אדום
 import sendLog from '../LogSend'
 import axios from 'axios'
 import { useLayoutEffect } from 'react'
@@ -131,7 +127,7 @@ const Details = () => {
 
       console.log('📌 formData:', [...formData.entries()])
 
-      const response = await axios.post('http://localhost:2001/api/files/upload', formData, {
+      const response = await axios.post('https://easygift-server.onrender.com/api/files/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
 
@@ -206,7 +202,7 @@ const Details = () => {
 
     // אם כן הוזן, נבצע את הקריאה לשרת
     axios
-      .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: eventNum })
+      .post(`https://easygift-server.onrender.com/api/events/checkEventNumber`, { Event_number: eventNum })
       .then(response => {
         console.log('✅ תגובה מהשרת:', response.data)
         if (response.data && response.data._id) {

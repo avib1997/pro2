@@ -28,9 +28,9 @@ const Admin = () => {
   const fetchAllData = async () => {
     try {
       const [usersRes, eventsRes, giftsRes] = await Promise.all([
-        axios.get('http://localhost:2001/api/users'),
-        axios.get('http://localhost:2001/api/events/getAll'),
-        axios.get('http://localhost:2001/api/gift/getAllGifts')
+        axios.get('https://easygift-server.onrender.com/api/users'),
+        axios.get('https://easygift-server.onrender.com/api/events/getAll'),
+        axios.get('https://easygift-server.onrender.com/api/gift/getAllGifts')
       ])
 
       if (JSON.stringify(usersRes.data) !== JSON.stringify(usersRef.current)) {

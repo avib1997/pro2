@@ -25,7 +25,7 @@ const PayPalPayment = () => {
     const fetchEvent = async () => {
       console.log('eventId fetchEvent paymant:', eventId)
       try {
-        const res = await axios.get(`http://localhost:2001/api/events/${eventId}`)
+        const res = await axios.get(`https://easygift-server.onrender.com/api/events/${eventId}`)
         console.log('event:', res.data)
         setEmailPaypal(res.data.emailPaypal)
         console.log('emailPaypal:', res.data.emailPaypal)

@@ -28,15 +28,9 @@ function ContactPage() {
     }))
   }
 
-  // שליחה דמה לקונסול
-  const handleSendToConsole = () => {
-    console.log('Data from contact form:', formData)
-    alert('הנתונים הודפסו בקונסול!\n(פתח/י את כלי המפתחים >> Console)')
-  }
-
   const handleSendToServer = async () => {
     try {
-      await axios.post('http://localhost:2001/api/contact/send-email', formData)
+      await axios.post('https://easygift-server.onrender.com/api/contact/send-email', formData)
       alert('ההודעה נשלחה למייל שלך בהצלחה!')
     } catch (error) {
       console.error('שגיאה בשליחת המייל:', error)

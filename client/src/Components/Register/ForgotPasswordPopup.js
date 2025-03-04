@@ -9,7 +9,7 @@ const ForgotPasswordPopup = ({ open, handleClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:2001/api/password/forgot-password', { email });
+            const response = await axios.post('https://easygift-server.onrender.com/api/password/forgot-password', { email })
             setMessage(response.data.message);
         } catch (error) {
             setMessage('שגיאה בשליחת המייל, נסה שנית.');

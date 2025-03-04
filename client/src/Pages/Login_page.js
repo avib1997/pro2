@@ -68,7 +68,7 @@ const LoginPage = () => {
       return
     }
 
-    axios.post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: eventNumber }).then(response => {
+    axios.post(`https://easygift-server.onrender.com/api/events/checkEventNumber`, { Event_number: eventNumber }).then(response => {
       console.log('✅ תגובה מהשרת:', response.data)
       if (response.data && response.data._id) {
         setEventNumber(eventNumber) // שמירת מספר האירוע ב־Context

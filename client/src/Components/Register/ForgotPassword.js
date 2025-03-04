@@ -33,7 +33,7 @@ const ForgotPassword = ({ open, handleClose }) => {
     }
 
     try {
-      const response = await axios.put('http://localhost:2001/api/users/reset-password', { email, newPassword })
+      const response = await axios.put('https://easygift-server.onrender.com/api/users/reset-password', { email, newPassword })
       if (response.data.success) {
         alert('הסיסמה שונתה בהצלחה!')
         handleClose()

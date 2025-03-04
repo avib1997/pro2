@@ -49,9 +49,9 @@ const UsersTable = () => {
     try {
       // קריאה לשרת (החלף לכתובות המתאימות שלך)
       const [usersRes, eventsRes, giftsRes] = await Promise.all([
-        axios.get('http://localhost:2001/api/users'),
-        axios.get('http://localhost:2001/api/events/getAll'), // אירועים
-        axios.get('http://localhost:2001/api/gift/getAllGifts') // מתנות
+        axios.get('https://easygift-server.onrender.com/api/users'),
+        axios.get('https://easygift-server.onrender.com/api/events/getAll'), // אירועים
+        axios.get('https://easygift-server.onrender.com/api/gift/getAllGifts') // מתנות
       ])
 
       setUsers(usersRes.data)
@@ -64,7 +64,7 @@ const UsersTable = () => {
 
   const handleSaveUser = async () => {
     axios
-      .put(`http://localhost:2001/api/users/${editedUser._id}`, editedUser)
+      .put(`https://easygift-server.onrender.com/api/users/${editedUser._id}`, editedUser)
       .then(res => {
         setUsers(prev => prev.map(u => (u._id === editedUser._id ? editedUser : u)))
       })
@@ -93,7 +93,7 @@ const UsersTable = () => {
   const handleDeleteUser = async id => {
     if (!window.confirm('למחוק את המשתמש?')) return
     try {
-      await axios.delete(`http://localhost:2001/api/users/${id}`)
+      await axios.delete(`https://easygift-server.onrender.com/api/users/${id}`)
       setUsers(prev => prev.filter(u => u._id !== id))
     } catch (error) {
       console.error('Error deleting user:', error)

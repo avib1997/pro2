@@ -4,10 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Context } from '../../App'
 import { Person as PersonIcon, PersonOutline as PersonOutlineIcon, Email as EmailIcon, Lock as LockIcon } from '@mui/icons-material'
-import sendLog from '../../LogSend'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
-import SecurityIcon from '@mui/icons-material/Security'
 
 const Signup = props => {
   const theme = useTheme()
@@ -99,7 +96,7 @@ const Signup = props => {
     }
 
     try {
-      const response = await axios.post('http://localhost:2001/api/users/register', input)
+      const response = await axios.post('https://easygift-server.onrender.com/api/users/register', input)
       const { user, token } = response.data
       setUserName(`${user.fname} ${user.lname}`)
       setUserEmail(user.email)

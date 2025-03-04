@@ -83,7 +83,7 @@ const AddEventDialog = ({ open, onClose, onAdd }) => {
 
     try {
       console.log('📡 Adding event:', newEvent)
-      const response = await axios.post('http://localhost:2001/api/events/addEvent', newEvent)
+      const response = await axios.post('https://easygift-server.onrender.com/api/events/addEvent', newEvent)
       console.log('✅ Event added:', response.data)
       onAdd(response.data) // הוספת האירוע לרשימה
 

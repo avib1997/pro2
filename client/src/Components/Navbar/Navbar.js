@@ -188,7 +188,7 @@ function Navbar() {
 
   const handleDeleteAccount = () => {
     try {
-      axios.delete(`http://localhost:2001/api/users/${userId}`).then(response => {
+      axios.delete(`https://easygift-server.onrender.com/api/users/${userId}`).then(response => {
         console.log('response.data:', response.data)
         handleLogout()
       })

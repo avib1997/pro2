@@ -36,7 +36,7 @@ const AddEvent = () => {
     const newEvent = { ...input, userid_event: userId }
 
     try {
-      const res = await axios.post('http://localhost:2001/api/events/addEvent', newEvent)
+      const res = await axios.post('https://easygift-server.onrender.com/api/events/addEvent', newEvent)
       console.log('✅ אירוע נוסף:', res.data)
       setIsEvent(!IsEvent)
     } catch (error) {

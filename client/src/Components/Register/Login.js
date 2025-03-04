@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Context } from '../../App'
 import sendLog from '../../LogSend'
-import ForgotPassword from './ForgotPassword' // ייבוא הקומפוננטה החדשה
 import ForgotPasswordPopup from './ForgotPasswordPopup' // ייבוא הקומפוננטה החדשה
 
 const Login = props => {
@@ -53,14 +52,14 @@ const Login = props => {
     setErrorMessage('')
 
     try {
-      const response = await axios.post('http://localhost:2001/api/users/login', {
+      const response = await axios.post('https://easygift-server.onrender.com/api/users/login', {
         email,
         password
       })
 
       if (response.data.token) {
         setErrorMessage('')
-        const userResponse = await axios.post('http://localhost:2001/api/users/userid', { email })
+        const userResponse = await axios.post('https://easygift-server.onrender.com/api/users/userid', { email })
         if (userResponse.data && userResponse.data.userid) {
           const user = userResponse.data.userid[0]
           setUserName(`${user.fname} ${user.lname}`)
@@ -69,7 +68,7 @@ const Login = props => {
           setDetailsId(user.giftsId)
         }
 
-        const managerResponse = await axios.post('http://localhost:2001/api/users/isManager', { _id: userResponse.data.userid[0]._id })
+        const managerResponse = await axios.post('https://easygift-server.onrender.com/api/users/isManager', { _id: userResponse.data.userid[0]._id })
         setIsManager(Boolean(managerResponse.data)) // True/False
 
         if (eventNumber) {

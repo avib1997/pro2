@@ -80,7 +80,7 @@ const Home = () => {
     }
 
     axios
-      .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: EventNum })
+      .post(`https://easygift-server.onrender.com/api/events/checkEventNumber`, { Event_number: EventNum })
       .then(response => {
         if (response.data && response.data._id) {
           setEvent(response.data) // שמירת האירוע בסטייט
@@ -105,7 +105,7 @@ const Home = () => {
     }
 
     axios
-      .post(`http://localhost:2001/api/events/checkEventNumber`, { Event_number: EventNum })
+      .post(`https://easygift-server.onrender.com/api/events/checkEventNumber`, { Event_number: EventNum })
       .then(response => {
         if (response.data && response.data._id) {
           setEvent(response.data)

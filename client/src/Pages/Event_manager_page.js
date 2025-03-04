@@ -19,7 +19,7 @@ const EventManager = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:2001/api/events/getAll')
+      .get('https://easygift-server.onrender.com/api/events/getAll')
       .then(res => {
         console.log('🎉 אירועים שהתקבלו:', res.data)
         setEvents(res.data.filter(event => event.userid_event === userId))
@@ -40,7 +40,7 @@ const EventManager = () => {
 
   const handleDeleteEvent = eventId => {
     axios
-      .delete(`http://localhost:2001/api/events/${eventId}`)
+      .delete(`https://easygift-server.onrender.com/api/events/${eventId}`)
       .then(() => setEvents(prevEvents => prevEvents.filter(event => event._id !== eventId)))
       .catch(error => console.error('❌ Error deleting event:', error))
   }
@@ -48,7 +48,7 @@ const EventManager = () => {
   const handleAddEvent = async newEvent => {
     try {
       // קבלת הנתונים המעודכנים מהשרת אחרי הוספה
-      const response = await axios.get('http://localhost:2001/api/events/getAll')
+      const response = await axios.get('https://easygift-server.onrender.com/api/events/getAll')
       const updatedEvents = response.data.filter(event => event.userid_event === userId)
 
       setEvents(updatedEvents) // עדכון ה-state עם הנתונים החדשים

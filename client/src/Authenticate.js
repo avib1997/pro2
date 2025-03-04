@@ -16,10 +16,10 @@ export const Authenticate = (props) => {
 
   const isLoginSuccess = async (email, password) => {
     try {
-      const res = await axios.post("http://localhost:2001/api/user/login", {
+      const res = await axios.post('https://easygift-server.onrender.com/api/user/login', {
         email,
-        password,
-      });
+        password
+      })
       if (res.name === "AxiosError") throw res;
       console.log(res.data);
     } catch (error) {

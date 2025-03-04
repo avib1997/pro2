@@ -58,7 +58,7 @@ const EditEventDialog = ({ open, event, onClose, onSave }) => {
     setSuccess(false)
 
     try {
-      const response = await axios.put(`http://localhost:2001/api/events/${String(event._id)}`, formData)
+      const response = await axios.put(`https://easygift-server.onrender.com/api/events/${String(event._id)}`, formData)
       onSave(response.data)
       setSuccess(true)
       setSaved(true) // ✅ הצגת אייקון אישור ✔️

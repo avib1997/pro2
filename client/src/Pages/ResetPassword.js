@@ -12,7 +12,7 @@ const ResetPassword = () => {
 
   const handleSubmit = async e => {
     e.preventDefault()
-    const res = await fetch(`http://localhost:2001/api/password/reset-password/${token}`, {
+    const res = await fetch(`https://easygift-server.onrender.com/api/password/reset-password/${token}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password, confirmPassword })
