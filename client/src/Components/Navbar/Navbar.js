@@ -177,7 +177,6 @@ function Navbar() {
 
   // פונקציית התנתקות
   const handleLogout = () => {
-    setEventNumber('')
     setEventNum('')
     setUserId('')
     setUserEmail('')
