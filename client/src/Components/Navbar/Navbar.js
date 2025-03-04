@@ -223,6 +223,7 @@ function Navbar() {
     setEventNum('')
     setUserId('')
     setUserEmail('')
+    setUserName('')
     setIsManager(false)
     handleCloseNavMenu()
     navigate('/Home')
