@@ -221,6 +221,9 @@ function Navbar() {
   const handleBackToHome = () => {
     setEventNumber('')
     setEventNum('')
+    setUserId('')
+    setUserEmail('')
+    setIsManager(false)
     handleCloseNavMenu()
     navigate('/Home')
   }
