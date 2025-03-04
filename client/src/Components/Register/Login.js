@@ -1,14 +1,15 @@
 import React, { useState, useContext } from 'react'
-import { Box, Button, TextField, Typography, InputAdornment } from '@mui/material'
+import { useTheme, Box, Button, TextField, Typography, InputAdornment } from '@mui/material'
 import { Email as EmailIcon, Lock as LockIcon } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { Context } from '../../App'
 import sendLog from '../../LogSend'
 import ForgotPassword from './ForgotPassword' // ייבוא הקומפוננטה החדשה
-import ForgotPasswordPopup from './ForgotPasswordPopup'; // ייבוא הקומפוננטה החדשה
+import ForgotPasswordPopup from './ForgotPasswordPopup' // ייבוא הקומפוננטה החדשה
 
 const Login = props => {
+  const theme = useTheme()
   const { isManager, setUserId, setDetailsId, setIsManager, setUserName, setUserEmail, setEventNumber, userId, eventNumber } = useContext(Context)
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -70,7 +71,6 @@ const Login = props => {
 
         const managerResponse = await axios.post('http://localhost:2001/api/users/isManager', { _id: userResponse.data.userid[0]._id })
         setIsManager(Boolean(managerResponse.data)) // True/False
-
 
         if (eventNumber) {
           navigate('/Details_page')
@@ -139,7 +139,8 @@ const Login = props => {
             placeholder="דואר אלקטרוני"
             label="דואר אלקטרוני"
             sx={{
-              width: '300px',
+              width: '80vw',
+              maxWidth: '350px',
               backgroundColor: '#fff',
               borderRadius: '20px', // רינוד פינות
               '& .MuiOutlinedInput-root': {
@@ -187,7 +188,8 @@ const Login = props => {
             placeholder="סיסמה"
             label="סיסמה"
             sx={{
-              width: '300px',
+              width: '80vw',
+              maxWidth: '350px',
               backgroundColor: '#fff',
               borderRadius: '20px', // רינוד פינות
               '& .MuiOutlinedInput-root': {
@@ -235,6 +237,8 @@ const Login = props => {
             onClick={handleSubmit} // הוספת onClick
             disabled={isSubmitting}
             sx={{
+              width: '80vw',
+              maxWidth: '350px',
               cursor: isSubmitting ? 'not-allowed' : 'pointer', // שינוי סמן העכבר בזמן טעינה
               marginTop: 2,
               marginBottom: 0,

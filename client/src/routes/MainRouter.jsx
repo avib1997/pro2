@@ -42,7 +42,7 @@ function MainRouter() {
     location.pathname === '/LoginPage' ||
     location.pathname === '/Home' ||
     location.pathname === '/ManagerSignup' ||
-    location.pathname.startsWith('/Admin')
+    location.pathname.startsWith('/admin')
 
   return (
     <>

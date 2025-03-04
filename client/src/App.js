@@ -5,11 +5,12 @@ import Logo from './Components/Logo'
 import { BrowserRouter, useLocation } from 'react-router-dom'
 import MainRouter from './routes/MainRouter' // או הנתיב למקום ששמרת את הקובץ
 import WhatsAppIcon from '@mui/icons-material/WhatsApp'
-import { Box, IconButton, Typography } from '@mui/material'
+import { useTheme, Box, IconButton, Typography } from '@mui/material'
 
 export const Context = createContext()
 
 function App() {
+  const theme = useTheme()
   const whatsappGroupLink = 'https://chat.whatsapp.com/KN1etpCLloyD1wbunuEwdX'
   const [IsEvent, setIsEvent] = useState(true)
   const [eventNumber, setEventNumber] = useState('') // סטייט עבור ה-ID של האירוע
@@ -76,12 +77,11 @@ function App() {
     >
       <BrowserRouter>
         <MainRouter />
-
         <Box
           sx={{
             position: 'fixed',
-            bottom: 36,
-            left: 36,
+            bottom: { xs: 16, sm: 36 },
+            left: { xs: 16, sm: 36 },
             zIndex: 9999 // מעל כל האלמנטים
           }}
         >
@@ -92,23 +92,23 @@ function App() {
       {/* Footer פשוט בתחתית העמוד */}
       <Box
         sx={{
-          marginTop: 5,
+          marginTop: { xs: 3, sm: 5 },
           textAlign: 'center',
-          py: 1.5,
+          py: { xs: 1, sm: 1.5 },
           backgroundColor: 'rgba(0,0,0,0.3)',
           color: '#E0E1DD',
           direction: 'rtl' // כיוון הטקסט (מימין לשמאל)
         }}
       >
-        <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
+        <Typography variant="body2" sx={{ fontSize: { xs: '0.75rem', sm: '0.9rem' } }}>
           &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
         </Typography>
       </Box>
       <Box
         sx={{
           position: 'fixed',
-          bottom: 36,
-          right: 36,
+          bottom: { xs: 16, sm: 36 },
+          right: { xs: 16, sm: 36 },
           zIndex: 9999 // מעל כל האלמנטים
         }}
       >
@@ -123,13 +123,13 @@ function App() {
             '&:hover': {
               backgroundColor: '#20b558'
             },
-            width: 76,
-            height: 76,
+            width: { xs: 56, sm: 76 },
+            height: { xs: 56, sm: 76 },
             borderRadius: '50%',
             boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
           }}
         >
-          <WhatsAppIcon fontSize="large" />
+          <WhatsAppIcon sx={{ fontSize: { xs: '1.8rem', sm: '2.5rem' } }} />
         </IconButton>
       </Box>
     </Context.Provider>

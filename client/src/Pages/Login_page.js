@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { Box, Button, Link as MuiLink, Typography, Divider, TextField } from '@mui/material'
+import { useTheme, Box, Button, Link as MuiLink, Typography, Divider, TextField } from '@mui/material'
 import localImage from '../assets/ben-white-vJz7tkHncFk-unsplash.jpg'
 import { Context } from '../App' // או היכן שהקונטקסט מיוצא
 import StarIcon from '@mui/icons-material/Star'
@@ -15,6 +15,7 @@ import axios from 'axios'
 const LoginPage = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const theme = useTheme()
   const { eventNumber, setEventNumber } = useContext(Context) // נקרא את ערך ה-eventId
   const [IsLogin, setIsLogin] = useState(true)
   const [IsSignup, setIsSignup] = useState(false)
@@ -23,7 +24,7 @@ const LoginPage = () => {
   const [setIsGuest] = useState(false) // האם המשתמש ממשיך כאורח
   const [isGuestClicked, setIsGuestClicked] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(location.search)
     const userType = params.get('userType')
 
@@ -85,8 +86,8 @@ const LoginPage = () => {
         position: 'relative',
         minHeight: '90vh', // גובה מסך כמעט מלא
         direction: 'rtl',
-        paddingTop: '80px',
-        paddingBottom: '120px', // מעט יותר מקום לתוכן תחתון (footer)
+        paddingTop: '10vh',
+        paddingBottom: '15vh',
         fontFamily: 'Roboto, sans-serif',
         overflowX: 'hidden' // למניעת גלילה אופקית מיותרת
       }}
@@ -112,14 +113,14 @@ const LoginPage = () => {
         to="/Home"
         sx={{
           position: 'absolute',
-          top: '15px',
-          left: '85%',
-          //transform: "translateX(100%)",
+          top: '2vh',
+          left: '50%',
           backgroundColor: '#1E90FF',
+          transform: 'translateX(-50%)',
           color: '#fff',
-          padding: '10px 20px',
+          padding: { xs: '1vh 10vw', sm: '1vh 3vw' },
           borderRadius: '30px',
-          fontSize: '1rem',
+          fontSize: { xs: '0.8rem', sm: '1rem' },
           fontWeight: 'bold',
           '&:hover': {
             backgroundColor: '#187bcd',
@@ -131,14 +132,7 @@ const LoginPage = () => {
         חזרה לדף הבית
       </Button>
       {/* כותרת */}
-      <Box
-        sx={{
-          textAlign: 'center',
-          margin: '0px',
-          color: '#E0E1DD',
-          fontFamily: 'Poppins, sans-serif'
-        }}
-      >
+      <Box textAlign="center" sx={{ mt: '5vh', color: '#E0E1DD', fontFamily: 'Poppins, sans-serif' }}>
         <Typography
           variant="h3"
           gutterBottom
@@ -156,144 +150,55 @@ const LoginPage = () => {
           sx={{
             color: '#E0E1DD',
             textShadow: '1px 1px #000',
-            marginBottom: 4
+            mb: '2vh'
           }}
         >
           דף התחברות ורישום ל-EASY GIFT
         </Typography>
       </Box>
       {/* בלוק "למה לבחור ב-EASY GIFT?" מעל הטופס */}
-      <Box
-        sx={{
-          maxWidth: 900,
-          margin: 'auto',
-          marginTop: 2,
-          marginBottom: 2,
-          padding: 2,
-          textAlign: 'center',
-          color: '#E0E1DD'
-        }}
-      >
-        <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold' }}>
+      <Box sx={{ maxWidth: '80vw', margin: 'auto', mt: '2vh', mb: '2vh', textAlign: 'center', color: '#E0E1DD' }}>
+        <Typography variant="h5" sx={{ mb: '2vh', fontWeight: 'bold' }}>
           למה לבחור ב-EASY GIFT?
         </Typography>
         <Typography
           variant="h6"
           sx={{
             color: '#FFF',
-            marginBottom: '20px'
+            mb: '2vh'
           }}
         >
           מספר אירוע: {eventNumber || 'לא הוזן'}{' '}
         </Typography>
-        <Box
-          display="flex"
-          flexDirection={{
-            xs: 'column',
-            sm: 'row'
-          }}
-          justifyContent="space-around"
-          alignItems="center"
-          gap={2}
-        >
-          {/* כרטיסון ראשון */}
-          <Box
-            sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              padding: 2,
-              borderRadius: 4,
-              width: { xs: '100%', sm: '30%' },
-              transition: '0.3s',
-              '&:hover': {
-                transform: 'scale(1.05)',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)'
-              }
-            }}
-          >
-            <StarIcon
+        <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} justifyContent="space-around" alignItems="center" gap={2}>
+          {[
+            { icon: <StarIcon sx={{ fontSize: 40, color: '#FFD700' }} />, title: 'קל לשימוש', text: ' ממשק פשוט ונוח שמאפשר לך להתחבר, להירשם ולנהל אירועים בקלות.' },
+            { icon: <FavoriteIcon sx={{ fontSize: 40, color: 'red' }} />, title: 'חוויה אישית', text: ' אפליקציה בנויה בקפידה, מעניקה חוויה מותאמת אישית לכל משתמש.' },
+            { icon: <EmojiEventsIcon sx={{ fontSize: 40, color: '#FFC107' }} />, title: 'ניהול אירועים', text: ' מערכת חכמה לניהול האירועים שלך, שעובדת ביעילות ומקצרת תהליכים.' }
+          ].map((item, index) => (
+            <Box
+              key={index}
               sx={{
-                fontSize: 40,
-                color: '#FFD700'
-              }}
-            />
-            <Typography
-              variant="h6"
-              sx={{
-                mt: 1,
-                mb: 0.5,
-                fontWeight: 'bold'
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                padding: 2,
+                borderRadius: 4,
+                width: { xs: '100%', sm: '30%' },
+                transition: '0.3s',
+                '&:hover': { transform: 'scale(1.05)', backgroundColor: 'rgba(255, 255, 255, 0.2)' }
               }}
             >
-              קל לשימוש
-            </Typography>
-            <Typography variant="body1">ממשק פשוט ונוח שמאפשר לך להתחבר, להירשם ולנהל אירועים בקלות.</Typography>
-          </Box>
-
-          {/* כרטיסון שני */}
-          <Box
-            sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              padding: 2,
-              borderRadius: 4,
-              width: { xs: '100%', sm: '30%' },
-              transition: '0.3s',
-              '&:hover': {
-                transform: 'scale(1.05)',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)'
-              }
-            }}
-          >
-            <FavoriteIcon sx={{ fontSize: 40, color: 'red' }} />
-            <Typography
-              variant="h6"
-              sx={{
-                mt: 1,
-                mb: 0.5,
-                fontWeight: 'bold'
-              }}
-            >
-              חוויה אישית
-            </Typography>
-            <Typography variant="body1">אפליקציה בנויה בקפידה, מעניקה חוויה מותאמת אישית לכל משתמש.</Typography>
-          </Box>
-
-          {/* כרטיסון שלישי */}
-          <Box
-            sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              padding: 2,
-              borderRadius: 4,
-              width: { xs: '100%', sm: '30%' },
-              transition: '0.3s',
-              '&:hover': {
-                transform: 'scale(1.05)',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)'
-              }
-            }}
-          >
-            <EmojiEventsIcon
-              sx={{
-                fontSize: 40,
-                color: '#FFC107'
-              }}
-            />
-            <Typography
-              variant="h6"
-              sx={{
-                mt: 1,
-                mb: 0.5,
-                fontWeight: 'bold'
-              }}
-            >
-              ניהול אירועים
-            </Typography>
-            <Typography variant="body1">מערכת חכמה לניהול האירועים שלך, שעובדת ביעילות ומקצרת תהליכים.</Typography>
-          </Box>
+              {item.icon}
+              <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold' }}>
+                {item.title}
+              </Typography>
+              <Typography variant="body1">{item.text}</Typography>
+            </Box>
+          ))}
         </Box>
       </Box>
       <Divider sx={{ maxWidth: 700, margin: 'auto', my: 3 }} />
 
-      <form onSubmit={e => e.preventDefault()}>
+      <form sx={{ borderRadius: 4 }} onSubmit={e => e.preventDefault()}>
         <Box
           display="flex"
           flexDirection={{
@@ -302,9 +207,9 @@ const LoginPage = () => {
           }}
           width={{ xs: '90%', md: '80%' }}
           margin="auto"
-          borderRadius={2}
           boxShadow="0px 8px 16px rgba(0, 0, 0, 0.5)"
           sx={{
+            borderRadius: 4,
             background: 'linear-gradient(135deg, #1B263B, #415A77)',
             transition: 'transform 0.3s, box-shadow 0.3s',
             '&:hover': {
@@ -322,10 +227,7 @@ const LoginPage = () => {
               justifyContent: 'center',
               p: { xs: 2, md: 4 },
               backgroundColor: 'rgba(255, 255, 255, 0.07)',
-              borderRadius: {
-                xs: '0px',
-                md: '2px 0 0 2px'
-              }
+              borderRadius: '20px 20px 0 0'
             }}
           >
             <Typography
@@ -364,7 +266,7 @@ const LoginPage = () => {
                 alt="Events"
                 style={{
                   maxWidth: '100%',
-                  borderRadius: '8px',
+                  borderRadius: 15,
                   boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
                 }}
               />
@@ -386,7 +288,7 @@ const LoginPage = () => {
                 name="Login"
                 sx={{
                   margin: 1,
-                  borderRadius: 3,
+                  borderRadius: 4,
                   backgroundColor: '#1976D2',
                   color: '#fff',
                   '&:hover': {
@@ -408,7 +310,7 @@ const LoginPage = () => {
                 name="Signup"
                 sx={{
                   margin: 1,
-                  borderRadius: 3,
+                  borderRadius: 4,
                   backgroundColor: '#4CAF50',
                   color: '#fff',
                   '&:hover': {
@@ -461,9 +363,9 @@ const LoginPage = () => {
                     onChange={e => setEventNumber(e.target.value)}
                     sx={{
                       backgroundColor: '#22303C',
-                      borderRadius: '8px',
+                      borderRadius: 4,
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: '8px',
+                        borderRadius: 4,
                         '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' },
                         '&:hover fieldset': { borderColor: '#F0A500', borderWidth: '2px' },
                         '&.Mui-focused fieldset': { borderColor: '#F0A500', borderWidth: '2px' }

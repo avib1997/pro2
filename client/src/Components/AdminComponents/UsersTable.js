@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
-import { Grid, Box, Typography, Paper, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material'
+import { useMediaQuery, useTheme, Grid, Box, Typography, Paper, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { keyframes } from '@emotion/react'
@@ -29,6 +29,7 @@ const pulse = keyframes`
 `
 
 const UsersTable = () => {
+  const theme = useTheme()
   const [users, setUsers] = useState([])
   const [events, setEvents] = useState([])
   const [gifts, setGifts] = useState([])
@@ -38,6 +39,7 @@ const UsersTable = () => {
   const [userDetailsDialogOpen, setUserDetailsDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [canceling, setCanceling] = useState(false)
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')) // בדיקה אם מסך קטן ממובייל
 
   useEffect(() => {
     fetchAllData()
@@ -61,27 +63,14 @@ const UsersTable = () => {
   }
 
   const handleSaveUser = async () => {
-    // router.put('/:userId', async (req, res) => {
-    //   console.log('(req.body):' + fixHebrewText(' נתוני הבקשה '), req.body)
-    //   try {
-    //     const updatedUser = await userService.updateUser(req.params.userId, req.body)
-    //     console.log('updatedUser in user Routes:', updatedUser)
-    //     res.send(updatedUser)
-    //   } catch (err) {
-    //     res.status(500).send({ error: err.message })
-    //   }
-    // })
-
     axios
       .put(`http://localhost:2001/api/users/${editedUser._id}`, editedUser)
       .then(res => {
-        // עדכון המשתמש ברשימה
         setUsers(prev => prev.map(u => (u._id === editedUser._id ? editedUser : u)))
       })
       .catch(error => console.error('Error updating user:', error))
 
     setSaving(true) // הפעלת מצב שמירה – תצוגת האנימציה
-    // סימולציה של תהליך שמירה (2 שניות)
     setTimeout(() => {
       setSaving(false)
       setEditUserDialogOpen(false) // סוגרים את הדיאלוג לאחר התהליך
@@ -104,9 +93,7 @@ const UsersTable = () => {
   const handleDeleteUser = async id => {
     if (!window.confirm('למחוק את המשתמש?')) return
     try {
-      // await axios.delete(`/api/users/${id}`)
       await axios.delete(`http://localhost:2001/api/users/${id}`)
-      // מחיקה מקומית (דוגמה)
       setUsers(prev => prev.filter(u => u._id !== id))
     } catch (error) {
       console.error('Error deleting user:', error)
@@ -122,7 +109,6 @@ const UsersTable = () => {
 
   const getUserGifts = userId => (!userId ? [] : gifts.filter(g => g.userid_gift === userId))
 
-  //      טבלת משתמשים
   const userColumns = [
     {
       field: '_id',
@@ -190,9 +176,9 @@ const UsersTable = () => {
       flex: 1.5,
       renderCell: params => (
         // <Box sx={{marginLeft:20 , gap: 1 }}>
-          <IconButton color="inherit" onClick={() => handleViewUserDetails(params.row)}>
-            <ExpandCircleDownIcon /> פירוט מלא
-          </IconButton>
+        <IconButton color="inherit" onClick={() => handleViewUserDetails(params.row)}>
+          <ExpandCircleDownIcon /> פירוט מלא
+        </IconButton>
         // </Box>
       )
     }
@@ -323,18 +309,15 @@ const UsersTable = () => {
         justifyContent="center" // מרכוז
         alignItems="center" // אופציונלי: יישור לאורך הציר האנכי
         spacing={3}
-        sx={{ px: 3, width: '100%' }}
+        sx={{ px: { xs: 1, sm: 3 }, width: '100%' }}
       >
         {/* --- טבלת משתמשים --- */}
-        <Grid item lg={10}>
+        <Grid item xs={12} md={10}>
           <Paper
             sx={{
-              alignContent: 'center',
-              alignItems: 'center',
-              justifyContent: 'center',
               textAlign: 'center',
               maxWidth: '100%',
-              p: 2,
+              p: { xs: 1, sm: 2 },
               backgroundColor: '#2B384D',
               direction: 'rtl',
               borderRadius: '25px',
@@ -342,32 +325,21 @@ const UsersTable = () => {
             }}
           >
             <Typography
-              variant="h5"
+              variant={isMobile ? 'h6' : 'h5'}
               sx={{
                 mb: 2,
                 color: '#FAF9F6', // כותרת בהירה
                 fontWeight: 'bold',
                 textAlign: 'center',
-                fontSize: 46
+                fontSize: isMobile ? '24px' : '46px'
               }}
             >
               משתמשים
             </Typography>
-            {/* <ThemeProvider theme={theme}>
-              <Box sx={{ height: 500 }}>
-                <DataGrid
-                  rows={users}
-                  columns={userColumns}
-                  pageSize={5}
-                  rowsPerPageOptions={[5, 10, 20]}
-                />
-              </Box>
-            </ThemeProvider> */}
-            {/* <ThemeProvider theme={theme}> */}
+
             <Box
               sx={{
-                height: 500,
-                // overflowX: 'auto',
+                height: 400,
                 '& .MuiDataGrid-root': {
                   direction: 'rtl'
                 }
@@ -377,7 +349,7 @@ const UsersTable = () => {
                 rows={users}
                 getRowId={row => row._id}
                 columns={userColumns}
-                pageSize={5}
+                pageSize={isMobile ? 3 : 5}
                 rowsPerPageOptions={[5, 10, 20]}
                 components={{
                   Toolbar: GridToolbar
@@ -397,7 +369,8 @@ const UsersTable = () => {
                   backgroundColor: '#0D1B2A',
                   // כותרת טבלה
                   '& .MuiDataGrid-columnHeaders': {
-                    backgroundColor: '#1B263B'
+                    backgroundColor: '#1B263B',
+                    fontSize: { xs: '0.8rem', sm: '1rem' }
                   },
                   '& .MuiDataGrid-columnHeaderTitle': {
                     color: '#1B263B',
@@ -414,7 +387,6 @@ const UsersTable = () => {
                 }}
               />
             </Box>
-            {/* </ThemeProvider> */}
           </Paper>
         </Grid>
       </Grid>
@@ -424,18 +396,19 @@ const UsersTable = () => {
         open={editUserDialogOpen}
         onClose={() => setEditUserDialogOpen(false)}
         dir="rtl"
+        fullScreen={isMobile}
         PaperProps={{
           sx: {
             borderRadius: '25px',
             backgroundColor: '#2B384D',
-            width: 600,
-            height: 800,
+            width: isMobile ? '100%' : 600,
+            height: isMobile ? '100%' : 800,
             padding: 2,
             color: '#E0E1DD'
           }
         }}
       >
-        <DialogTitle sx={{ textAlign: 'center', fontSize: 40 }}>עריכת משתמש</DialogTitle>
+        <DialogTitle sx={{ textAlign: 'center', fontSize: isMobile ? 24 : 40 }}>עריכת משתמש</DialogTitle>
         {saving || canceling ? (
           <Box
             sx={{

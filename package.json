@@ -1,47 +1,21 @@
 {
   "name": "easygift-monorepo",
   "version": "1.0.0",
+  "description": "",
+  "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
     "heroku-postbuild": "npm install --prefix client && npm install --prefix server && npm run build --prefix client",
-    "build": "concurrently \"npm run build --prefix server\" \"npm run build --prefix client\"",
-    "client": "npm start --prefix client",
-    "server": "npm start --prefix server",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "npm run start --prefix server",
+    "client": "npm run start --prefix client"
   },
-  "main": "server/server.js",
   "engines": {
     "node": "20.x",
     "npm": "10.x"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^7.0.0",
-    "dotenv": "^16.0.0",
-    "cors": "^2.8.5",
-    "morgan": "^1.10.0",
-    "concurrently": "^7.6.0",
-    "chalk": "^4.1.2",
-    "date-fns": "^2.30.0",
-    "lodash": "^4.17.21",
-    "rxjs": "^7.8.1",
-    "shell-quote": "^1.8.2",
-    "spawn-command": "^0.0.2",
-    "tree-kill": "^1.2.2",
-    "tslib": "^2.8.1",
-    "wrap-ansi": "^7.0.0",
-    "yargs": "^17.7.2",
-    "bcrypt": "^5.1.1",
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.3",
-    "joi": "^17.7.0",
-    "joi-password-complexity": "^5.1.0",
-    "jsonwebtoken": "^8.5.1",
-    "mongodb": "4.1",
-    "multer": "^1.4.5-lts.1",
-    "streamifier": "^0.1.1",
-    "react-scripts": "5.0.1"
+    "concurrently": "^7.6.0"
   },
   "repository": {
     "type": "git",
@@ -53,6 +27,5 @@
   "bugs": {
     "url": "https://github.com/avib1997/pro2/issues"
   },
-  "homepage": "https://github.com/avib1997/pro2#readme",
-  "description": ""
+  "homepage": "https://github.com/avib1997/pro2#readme"
 }
