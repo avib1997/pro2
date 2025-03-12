@@ -4,6 +4,10 @@ const jwtFn = require('../middleware/jwtMiddleware')
 const { fixHebrewText } = require('../fixHebrew.js')
 const { update } = require('../controllers/giftController.js')
 const { object } = require('joi')
+const bcrypt = require('bcrypt'); // או require('bcryptjs')
+
+const SALT_ROUNDS = 10;
+
 
 async function getGiftsById(userId) {
   const userDetails = await userController.readOne(userId)
@@ -31,10 +35,11 @@ async function login(loginData) {
     throw { code: 401, message: 'unauthorized' }
   }
   const password = loginData.password
-  user = await userController.readOne({ password: password })
-  if (!user || user.password !== password) {
-    throw { code: 401, message: 'password not correct' }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw { code: 401, message: 'Password incorrect' };
   }
+
   const token = jwtFn.createToken(user._id)
   return { token: token }
 }
@@ -74,7 +79,10 @@ module.exports.register = async userFields => {
     if (existUser) {
       throw new Error('❌ User already exists');
     }
-
+    
+    const hashedPassword = await bcrypt.hash(userFields.password, SALT_ROUNDS);
+    userFields.password = hashedPassword;
+    
     // יצירת משתמש חדש
     const user = await userController.create(userFields);
     console.log('✅ User created successfully:', user);
