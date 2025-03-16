@@ -13,10 +13,13 @@ router.post('/reset-password/:token', async (req, res) => {
             return res.status(400).json({ message: "הסיסמאות אינן תואמות" });
         }
 
-        const user = await User.findOne({ resetToken: token, resetTokenExpiry: { $gt: Date.now() } });
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const email = decoded.email; //
+
+        const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(400).json({ message: "טוקן לא תקין או פג תוקף" });
+            return res.status(400).json({ message: " טוקן לא תקין או פג תוקף או איימיל לא נמצא"  });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
