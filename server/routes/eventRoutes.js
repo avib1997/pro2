@@ -29,7 +29,6 @@ router.post('/checkEventNumber', async (req, res) => {
 router.get('/getAll', async (req, res) => {
   try {
     const allEvents = await eventService.getAllEvents()
-    console.log('getAll events', allEvents)
     return res.status(200).json(allEvents)
   } catch (error) {
     console.error('❌ Error fetching all events:', error)
