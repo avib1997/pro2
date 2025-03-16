@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 
 // איפוס סיסמה עם טוקן
 router.post('/reset-password/:token', async (req, res) => {
-    consol.log("11111",req.body);
     try {
         const { token } = req.params;
         const { password, confirmPassword } = req.body;
@@ -34,7 +33,6 @@ router.post('/reset-password/:token', async (req, res) => {
 });
 
 router.post('/reset-password', async (req, res) => {
-    consol.log("22222",req.body);
     const { email, oldPassword, newPassword } = req.body;
     try {
         const user = await User.findOne({ email }).select('+password');
