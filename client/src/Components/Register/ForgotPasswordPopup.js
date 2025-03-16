@@ -1,16 +1,10 @@
 import React, { useState, useContext, useEffect  } from 'react';
 import { Dialog, DialogTitle, DialogContent, TextField, Button, Typography } from '@mui/material';
 import axios from 'axios';
-import { Context } from '../../App';
 
 const ForgotPasswordPopup = ({ open, handleClose }) => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
-    const { userEmail } = useContext(Context);
-
-    useEffect(() => {
-        setEmail(userEmail);
-    }, [userEmail]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
