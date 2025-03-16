@@ -584,7 +584,7 @@ const handlePasswordChange = async () => {
           }
         }}
       >
-        <Typography variant="h5" sx={{ textAlign: 'center', mt: 2 }}>
+       <Typography variant="h5" sx={{ textAlign: 'center', mt: 2 }}>
           עריכת משתמש
         </Typography>
         <Divider sx={{ backgroundColor: '#fff', my: 1 }} />
@@ -638,30 +638,9 @@ const handlePasswordChange = async () => {
               '& .MuiInputBase-input': { color: '#E0E1DD' }
             }}
           />
-         
+
+
           <FormControl fullWidth variant="outlined" sx={{ backgroundColor: '#22303C', borderRadius: '8px' }}>
-            <InputLabel sx={{ color: '#E0E1DD' }}>מנהל?</InputLabel>
-            <Select
-              value={editedUser.isManager}
-              onChange={e => setEditedUser({ ...editedUser, isManager: e.target.value })}
-              label="מנהל?"
-              sx={{
-                borderRadius: '8px',
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: '8px',
-                  '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
-                },
-                '& .MuiInputLabel-root': { color: '#E0E1DD' },
-                '& .MuiSelect-icon': { color: '#E0E1DD' },
-                '& .MuiInputBase-input': { color: '#E0E1DD' }
-              }}
-            >
-              <MenuItem value={true}>כן</MenuItem>
-              <MenuItem value={false}>לא</MenuItem>
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <FormControl fullWidth variant="outlined" sx={{ backgroundColor: '#22303C', borderRadius: '8px' }}>
             <InputLabel sx={{ color: '#E0E1DD' }}>מנהל?</InputLabel>
             <Select
               value={editedUser.isManager}
