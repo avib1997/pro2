@@ -26,6 +26,7 @@ router.post('/reset-password/:token', async (req, res) => {
         await user.save();
 
         res.json({ message: "הסיסמה אופסה בהצלחה" });
+        console.log("הסיסמה אופסה בהצלחה");
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "שגיאת שרת" });
