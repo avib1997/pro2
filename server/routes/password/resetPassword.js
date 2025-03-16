@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../models/userModel'); // ודא שהנתיב נכון
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config(); // כדי להשתמש ב- JWT_SECRET מקובץ env
 
 // איפוס סיסמה עם טוקן
 router.post('/reset-password/:token', async (req, res) => {
