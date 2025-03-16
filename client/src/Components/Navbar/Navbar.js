@@ -35,6 +35,7 @@ import MenuIcon from '@mui/icons-material/Menu' // אייקון המבורגר
 import ModernLogo from './ModernLogo.jsx' // או הנתיב הנכון לפי מיקום הקובץ
 import ModernColorfulUserIcon from './ModernColorfulUserIcon.jsx' // או הנתיב הנכון לפי מיקום הקובץ
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew' // 🔹 ייבוא האייקון
+import ForgotPasswordPopup from '../Register/ForgotPasswordPopup.js';
 
 const menuBgColor = '#2B3A47' // רקע תפריט אווטאר
 
@@ -75,6 +76,13 @@ function Navbar() {
   const [errorMessage, setErrorMessage] = useState('') // הודעת שגיאה
   const [anchorElNav, setAnchorElNav] = useState(null)
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [message, setMessage] = useState('')
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
 
 
@@ -82,6 +90,13 @@ function Navbar() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    if (message) {
+        const timer = setTimeout(() => {
+          setMessage("");
+        }, 5000);
+    
+        return () => clearTimeout(timer); // מנקה את ה-timer אם ה-component יוצא מהמסך
+      }
     const eventType = event.TypeOfEvent || "אירוע";
     setEventName(event.NameOfBride
     ? `${eventType} של ${event.NameOfGroom} ו${event.NameOfBride}`
@@ -92,7 +107,7 @@ function Navbar() {
     console.log('userId:', userId)
     console.log('eventNumber:', eventNumber)
     console.log('isManager:', isManager)
-  }, [isManager, userId, eventNumber, userName, userEmail])
+  }, [isManager, userId, eventNumber, userName, userEmail, message])
 
   const navigationPages = userId === '' ? pagesGuest : isManager ? pagesManager : pagesRegistered
 
@@ -236,6 +251,34 @@ function Navbar() {
   const handleCloseUserMenu = () => {
     setAnchorUser(null)
   }
+const handlePasswordChange = async () => {
+    try {
+      const response = await axios.post(`http://localhost:2001/api/password/reset-password`, {
+        email: userEmail,
+        oldPassword: currentPassword,
+        newPassword: newPassword
+      });
+
+      console.log('response.data:', response.data);
+
+      if (response.data.message === "הסיסמה שונתה בהצלחה") {
+        setMessage("הסיסמה שונתה בהצלחה");
+        setNewPassword('');
+        setCurrentPassword('');
+        setShowChangePassword(false);
+      } else {
+        setErrorMessage(response.data.message);
+      }
+    } catch (error) {
+      console.error('שגיאה בשינוי הסיסמה:', error);
+
+      if (error.response) {
+        setErrorMessage(error.response.data?.message || 'שגיאה בלתי צפויה');
+      } else {
+        setErrorMessage('שגיאת רשת - נסה שוב מאוחר יותר.');
+      }
+    }
+  };
 
   const navButtonStyle = {
     color: '#ECEFF1',
@@ -252,276 +295,6 @@ function Navbar() {
       color: '#1A73E8'
     }
   }
-
-  {
-    /* --- דיאלוג עריכת משתמש --- */
-  }
-  // ;<Dialog
-  //   open={editUserDialogOpen}
-  //   onClose={() => setEditUserDialogOpen(false)}
-  //   dir="rtl"
-  //   PaperProps={{
-  //     sx: {
-  //       borderRadius: '25px',
-  //       backgroundColor: '#2B384D',
-  //       width: 600,
-  //       height: 800,
-  //       padding: 2,
-  //       color: '#E0E1DD'
-  //     }
-  //   }}
-  // >
-  //   <DialogTitle sx={{ textAlign: 'center', fontSize: 40 }}>עריכת משתמש</DialogTitle>
-  //   {saving || canceling ? (
-  //     <Box
-  //       sx={{
-  //         height: '100%',
-  //         display: 'flex',
-  //         justifyContent: 'center',
-  //         alignItems: 'center',
-  //         animation: `${fadeIn} 0.5s ease-in-out`
-  //       }}
-  //     >
-  //       {saving ? (
-  //         <CheckCircleIcon
-  //           sx={{
-  //             fontSize: 100,
-  //             color: 'green',
-  //             animation: `${pop} 0.5s ease`
-  //           }}
-  //         />
-  //       ) : (
-  //         <CloseIcon
-  //           sx={{
-  //             fontSize: 100,
-  //             color: 'red',
-  //             animation: `${pop} 0.5s ease`
-  //           }}
-  //         />
-  //       )}
-  //     </Box>
-  //   ) : (
-  //     <>
-  //       <DialogContent
-  //         sx={{
-  //           display: 'flex',
-  //           flexDirection: 'column',
-  //           gap: 2,
-  //           backgroundColor: '#1B263B',
-  //           borderRadius: '25px',
-  //           color: '#E0E1DD'
-  //         }}
-  //       >
-  //         <TextField
-  //           label="שם פרטי"
-  //           value={editedUser.fname || ''}
-  //           onChange={e =>
-  //             setEditedUser({
-  //               ...editedUser,
-  //               fname: e.target.value
-  //             })
-  //           }
-  //           inputProps={{
-  //             style: { textAlign: 'right' }
-  //           }}
-  //           sx={{
-  //             borderRadius: 5,
-  //             backgroundColor: '#2B384D',
-  //             mt: 4,
-  //             textAlign: 'right',
-  //             '& .MuiOutlinedInput-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5,
-  //               '&:hover fieldset': {
-  //                 borderColor: 'lightskyblue'
-  //               }
-  //             },
-  //             '& .MuiInputLabel-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5
-  //             }
-  //           }}
-  //         />
-  //         <TextField
-  //           label="שם משפחה"
-  //           value={editedUser.lname || ''}
-  //           onChange={e =>
-  //             setEditedUser({
-  //               ...editedUser,
-  //               lname: e.target.value
-  //             })
-  //           }
-  //           inputProps={{
-  //             style: { textAlign: 'right' }
-  //           }}
-  //           sx={{
-  //             borderRadius: 5,
-  //             backgroundColor: '#2B384D',
-  //             mt: 4,
-  //             textAlign: 'right',
-  //             '& .MuiOutlinedInput-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5,
-  //               '&:hover fieldset': {
-  //                 borderColor: 'lightskyblue'
-  //               }
-  //             },
-  //             '& .MuiInputLabel-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5
-  //             }
-  //           }}
-  //         />
-  //         <TextField
-  //           label="אימייל"
-  //           value={editedUser.email || ''}
-  //           onChange={e =>
-  //             setEditedUser({
-  //               ...editedUser,
-  //               email: e.target.value
-  //             })
-  //           }
-  //           inputProps={{
-  //             style: { textAlign: 'right' }
-  //           }}
-  //           sx={{
-  //             borderRadius: 5,
-  //             backgroundColor: '#2B384D',
-  //             mt: 4,
-  //             textAlign: 'right',
-  //             '& .MuiOutlinedInput-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5,
-  //               '&:hover fieldset': {
-  //                 borderColor: 'lightskyblue'
-  //               }
-  //             },
-  //             '& .MuiInputLabel-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5
-  //             }
-  //           }}
-  //         />
-  //         <TextField
-  //           label="סיסמה"
-  //           value={editedUser.password || ''}
-  //           onChange={e =>
-  //             setEditedUser({
-  //               ...editedUser,
-  //               password: e.target.value
-  //             })
-  //           }
-  //           inputProps={{
-  //             style: { textAlign: 'right' }
-  //           }}
-  //           sx={{
-  //             borderRadius: 5,
-  //             backgroundColor: '#2B384D',
-  //             mt: 4,
-  //             textAlign: 'right',
-  //             '& .MuiOutlinedInput-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5,
-  //               '&:hover fieldset': {
-  //                 borderColor: 'lightskyblue'
-  //               }
-  //             },
-  //             '& .MuiInputLabel-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5
-  //             }
-  //           }}
-  //         />
-  //         <TextField
-  //           label="מנהל?"
-  //           value={editedUser.isManager || ''}
-  //           onChange={e =>
-  //             setEditedUser({
-  //               ...editedUser,
-  //               isManager: e.target.value
-  //             })
-  //           }
-  //           inputProps={{
-  //             style: { textAlign: 'right' }
-  //           }}
-  //           sx={{
-  //             borderRadius: 5,
-  //             backgroundColor: '#2B384D',
-  //             mt: 4,
-  //             textAlign: 'right',
-  //             '& .MuiOutlinedInput-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5,
-  //               '&:hover fieldset': {
-  //                 borderColor: 'lightskyblue'
-  //               }
-  //             },
-  //             '& .MuiInputLabel-root': {
-  //               color: '#E0E1DD',
-  //               borderRadius: 5
-  //             }
-  //           }}
-  //         />
-  //       </DialogContent>
-  //       <DialogActions
-  //         sx={{
-  //           //backgroundColor: 'rgba(43,59,61,1)', // רקע דיאלוג: RGBA של #2B384D
-  //           display: 'flex',
-  //           justifyContent: 'center',
-  //           gap: 2,
-  //           margin: '10px 0'
-  //         }}
-  //       >
-  //         <Button
-  //           variant="contained"
-  //           onClick={handleCancel}
-  //           sx={{
-  //             borderRadius: 5,
-  //             margin: '0 15px',
-  //             fontWeight: 'bold',
-  //             fontSize: '1.1rem',
-  //             backgroundColor: 'rgba(87,96,111,1)', // צבע ביטול: RGBA של #57606F
-  //             color: '#E0E1DD',
-  //             padding: '10px 20px',
-  //             transition: 'background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease',
-  //             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-  //             '&:hover': {
-  //               backgroundColor: 'rgba(72,81,92,1)', // גוון כהה יותר בעת ה-hover (RGBA של #48515C)
-  //               transform: 'translateY(-2px)',
-  //               boxShadow: '0px 6px 8px rgba(0, 0, 0, 0.15)'
-  //             },
-  //             '&:active': {
-  //               animation: `${pulse} 0.5s ease-in-out`
-  //             }
-  //           }}
-  //         >
-  //           ביטול
-  //         </Button>
-  //         <Button
-  //           variant="contained"
-  //           onClick={handleSaveUser}
-  //           sx={{
-  //             borderRadius: 5,
-  //             fontWeight: 'bold',
-  //             fontSize: '1.1rem',
-  //             backgroundColor: 'rgb(0, 139, 63)', // ירוק טבעי: RGBA של MediumSeaGreen (#3CB371)
-  //             color: '#E0E1DD',
-  //             padding: '10px 20px',
-  //             transition: 'background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease',
-  //             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-  //             '&:hover': {
-  //               backgroundColor: 'rgb(0, 113, 51)', // גוון כהה יותר בעת ה-hover
-  //               transform: 'translateY(-2px)',
-  //               boxShadow: '0px 6px 8px rgba(0, 0, 0, 0.15)'
-  //             }
-  //           }}
-  //         >
-  //           שמור
-  //         </Button>
-  //       </DialogActions>
-  //     </>
-  //   )}
-  // </Dialog>
 
   return (
     <Box sx={{ marginBottom: 0 }} dir="rtl">
@@ -865,33 +638,7 @@ function Navbar() {
               '& .MuiInputBase-input': { color: '#E0E1DD' }
             }}
           />
-          <TextField
-            label="סיסמה"
-            variant="outlined"
-            type={showPassword ? 'text' : 'password'} // משנה את סוג השדה בהתאם למצב
-            value={editedUser.password || ''}
-            onChange={e => setEditedUser({ ...editedUser, password: e.target.value })}
-            sx={{
-              backgroundColor: '#22303C',
-              borderRadius: '8px',
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '8px',
-                '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
-              },
-              '& .MuiInputLabel-root': { color: '#E0E1DD' },
-              '& .MuiInputBase-input': { color: '#E0E1DD' }
-            }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={() => setShowPassword(prev => !prev)} edge="end" sx={{ color: '#E0E1DD' }}>
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-          />
-
+         
           <FormControl fullWidth variant="outlined" sx={{ backgroundColor: '#22303C', borderRadius: '8px' }}>
             <InputLabel sx={{ color: '#E0E1DD' }}>מנהל?</InputLabel>
             <Select
@@ -914,7 +661,162 @@ function Navbar() {
             </Select>
           </FormControl>
         </DialogContent>
+        <FormControl fullWidth variant="outlined" sx={{ backgroundColor: '#22303C', borderRadius: '8px' }}>
+            <InputLabel sx={{ color: '#E0E1DD' }}>מנהל?</InputLabel>
+            <Select
+              value={editedUser.isManager}
+              onChange={e => setEditedUser({ ...editedUser, isManager: e.target.value })}
+              label="מנהל?"
+              sx={{
+                borderRadius: '8px',
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '8px',
+                  '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
+                },
+                '& .MuiInputLabel-root': { color: '#E0E1DD' },
+                '& .MuiSelect-icon': { color: '#E0E1DD' },
+                '& .MuiInputBase-input': { color: '#E0E1DD' }
+              }}
+            >
+              <MenuItem value={true}>כן</MenuItem>
+              <MenuItem value={false}>לא</MenuItem>
+            </Select>
+          </FormControl>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 20 }}>
+            <Button onClick={() => setForgotPasswordOpen(true)} sx={{ fontWeight: '600', color: 'rgb(105, 192, 250)' }}>
+              שכחתי סיסמה
+            </Button>
+            <Button onClick={() => { setShowChangePassword(prev => !prev); setCurrentPassword(''); setNewPassword(''); setShowNewPassword(false); setShowCurrentPassword(false); }}
+              sx={{
+                fontWeight: '600',
+                color: showChangePassword ? '#FFFFFF' : '#82B1FF',
+                backgroundColor: showChangePassword ? '#1A73E8' : 'transparent',
+                border: showChangePassword ? '2px solid #82B1FF' : '2px solid transparent',
+                transition: 'all 0.3s ease-in-out', // מעברי צבע חלקים יותר
+                ':hover': {
+                  backgroundColor: showChangePassword ? '#1558B0' : '#E3F2FD', // כשהכפתור לחוץ - יותר כהה, כשהוא לא לחוץ - רקע בהיר
+                }
+              }}>
+              שנה סיסמה
+            </Button>
+          </Box>
 
+          {/* שדות שינוי סיסמה - מוצגים רק כאשר showChangePassword == true */}
+          {showChangePassword && (
+            <>
+              <TextField
+                label="סיסמה נוכחית"
+                type={showCurrentPassword ? 'text' : 'password'}
+                variant="outlined"
+                value={currentPassword}
+                onChange={e => setCurrentPassword(e.target.value)}
+                sx={{
+                  backgroundColor: '#22303C',
+                  borderRadius: '8px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
+                  },
+                  '& .MuiInputLabel-root': { color: '#E0E1DD' },
+                  '& .MuiInputBase-input': { color: '#E0E1DD' },
+                }}
+                InputProps={{
+                  endAdornment: currentPassword.length > 0 && ( // מציג את האייקון רק אם המשתמש הקליד משהו
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowCurrentPassword(prev => !prev)} edge="end" sx={{ color: '#E0E1DD' }}>
+                        {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+
+              <TextField
+                label="סיסמה חדשה"
+                type={showNewPassword ? 'text' : 'password'}
+                variant="outlined"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                sx={{
+                  backgroundColor: '#22303C',
+                  borderRadius: '8px',
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '8px',
+                    '& fieldset': { borderColor: '#E0E1DD', borderWidth: '1px' }
+                  },
+                  '& .MuiInputLabel-root': { color: '#E0E1DD' },
+                  '& .MuiInputBase-input': { color: '#E0E1DD' },
+
+                }}
+                InputProps={{
+                  endAdornment: newPassword.length > 0 && ( // מציג את האייקון רק אם המשתמש הקליד משהו
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowNewPassword(prev => !prev)} edge="end" sx={{ color: '#E0E1DD' }}>
+                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+              {errorMessage && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: "100%", // מבטיח שהתיבה תיקח את כל הרוחב הזמין
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      textAlign: "center",
+                      width: { xs: "80vw", sm: "30vw", md: "20vw" }, // גודל יחסי לתצוגות שונות
+                      borderRadius: "15px",
+                      color: "white",
+                      backgroundColor: "rgba(211, 47, 47, .6)", // רקע אדום כהה
+                      fontWeight: "bold",
+                      padding: "10px",
+                      fontSize: "1rem",
+                    }}
+                  >
+                    {errorMessage}
+                  </Typography>
+                </Box>
+              )}
+
+              <Button onClick={handlePasswordChange} variant="contained" sx={{ backgroundColor: 'green', color: 'white' }}>
+                אשר שינוי סיסמה
+              </Button>
+            </>
+          )}
+        </DialogContent>
+
+        <ForgotPasswordPopup open={forgotPasswordOpen} handleClose={() => setForgotPasswordOpen(false)} />
+        {message && (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%", // מבטיח שהתיבה תיקח את כל הרוחב הזמין
+            }}
+          >
+            <Typography
+              sx={{
+                textAlign: "center",
+                width: { xs: "80vw", sm: "30vw", md: "20vw" }, // גודל יחסי לתצוגות שונות
+                borderRadius: "15px",
+                color: "white",
+                backgroundColor: "rgba(47, 211, 61, 0.6)", // רקע אדום כהה
+                fontWeight: "bold",
+                padding: "10px",
+                fontSize: "1rem",
+              }}
+            >
+              {message}
+            </Typography>
+          </Box>
+        )}
         <Divider sx={{ backgroundColor: '#fff', mt: 1 }} />
         <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
           <Button onClick={handleCloseEditUserDialog} variant="contained" sx={{ backgroundColor: 'gray', mx: 2 }}>
