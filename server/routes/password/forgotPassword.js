@@ -13,8 +13,7 @@ router.post('/forgot-password', async (req, res) => {
         if (!user) return res.status(400).json({ message: 'משתמש לא נמצא' });
 
         // יצירת טוקן חד-פעמי (בתוקף של שעה)
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
+        const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
         // יצירת קישור לאיפוס הסיסמה
         const resetLink = `https://brodetsky-easy-gift.netlify.app/reset-password/${token}`;
 
