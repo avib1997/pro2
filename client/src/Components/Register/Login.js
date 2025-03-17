@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { useTheme, Box, Button, TextField, Typography, InputAdornment } from '@mui/material'
 import { Email as EmailIcon, Lock as LockIcon } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
@@ -18,6 +18,10 @@ const Login = props => {
     email: '',
     password: ''
   })
+
+  useEffect(() => {
+    setUserEmail('')
+  }, [])
 
   const handleChange = e => {
     setInput(prevState => ({
