@@ -8,8 +8,11 @@ const ForgotPasswordPopup = ({ open, handleClose }) => {
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const { userEmail } = useContext(Context);
-      const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false)
     
+    useEffect(() => {
+        setEmail(userEmail);
+    }, []);
 
 
     const handleSubmit = async (e) => {
