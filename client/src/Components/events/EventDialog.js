@@ -23,7 +23,7 @@ const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
       if (!event?._id) return
       setLoading(true)
       try {
-        const res = await axios.post('http://localhost:2001/api/events/getGiftsByEvent', { EventId: event._id })
+        const res = await axios.post('https://easygift-server.onrender.com/api/events/getGiftsByEvent', { EventId: event._id })
         console.log('🎁 מתנות שהתקבלו:', res.data)
         setGifts(res.data)
       } catch (error) {
