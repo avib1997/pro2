@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useContext } from 'react'
-import { Box, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Tooltip } from '@mui/material'
+import { TextField, Box, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Tooltip } from '@mui/material'
 import PrintIcon from '@mui/icons-material/Print'
 import GetAppIcon from '@mui/icons-material/GetApp'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -15,13 +15,15 @@ const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
   const [gifts, setGifts] = useState([])
   const [loading, setLoading] = useState(true)
   const printRef = useRef()
+  const [searchTerm, setSearchTerm] = useState("") // 🔍 משתנה חיפוש
+
 
   useEffect(() => {
     const fetchGifts = async () => {
       if (!event?._id) return
       setLoading(true)
       try {
-        const res = await axios.post('https://easygift-server.onrender.com/api/events/getGiftsByEvent', { EventId: event._id })
+        const res = await axios.post('http://localhost:2001/api/events/getGiftsByEvent', { EventId: event._id })
         console.log('🎁 מתנות שהתקבלו:', res.data)
         setGifts(res.data)
       } catch (error) {
@@ -84,7 +86,7 @@ const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
     console.log('🗑 eventId במחיקת אירוע:', eventId)
     if (!window.confirm('האם אתה בטוח שברצונך למחוק את האירוע?')) return
     try {
-      await axios.delete(`https://easygift-server.onrender.com/api/events/${eventId}`)
+      await axios.delete(`http://localhost:2001/api/events/${eventId}`)
       onDelete(event._id)
       onClose()
     } catch (error) {
@@ -92,6 +94,21 @@ const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
       //sendLog('error', 'event', 500, 'Error deleting event', 'client', 'http://localhost:3000/events', 'handleDelete', null, event._id, error)
     }
   }
+
+  const highlightText = (text, searchTerm) => {
+    if (!searchTerm) return text;
+    if (!text) return ''; // מונע שגיאה במקרה של undefined/null
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    return String(text).split(regex).map((part, index) =>
+      regex.test(part) ? <span key={index} style={{ backgroundColor: 'yellow' }}>{part}</span> : part
+    );
+  };
+
+  const filteredGifts = gifts.filter(gift =>
+    (gift.name && gift.name.toLowerCase().includes(searchTerm)) ||
+    (gift.amount && gift.amount.toString().includes(searchTerm)) ||
+    (gift.blessing && gift.blessing.toLowerCase().includes(searchTerm))
+  )
 
   return (
     <Dialog
@@ -183,6 +200,27 @@ const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
             <strong>תאריך: </strong>
             {new Date(event.DateOfEvent).toLocaleDateString('he-IL')} 📅
           </Typography>
+          <TextField
+            label="חיפוש"
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            fullWidth
+            sx={{
+              background: 'linear-gradient(135deg, rgb(100, 130, 160), rgb(140, 180, 220))',
+              borderRadius: '8px',
+              width: '80%', // הקטנת הרוחב
+              '& .MuiOutlinedInput-notchedOutline': {
+                border: 'none'
+              },
+              '&:before': {
+                display: 'none'
+              }
+            }}
+            InputLabelProps={{
+              style: { textAlign: 'right', right: 20 }, // יישור המילה "חיפוש" לימין
+            }}
+          />
           <Typography
             variant="h6"
             sx={{
@@ -203,7 +241,7 @@ const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
             >
               <CircularProgress color="secondary" />
             </Box>
-          ) : gifts?.length ? (
+          ) : filteredGifts?.length ? (
             <Table>
               <TableHead>
                 <TableRow>
@@ -213,11 +251,11 @@ const EventDialog = ({ open, event, onClose, onDelete, onEdit }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {gifts.map((gift, index) => (
+                {filteredGifts.map((gift, index) => (
                   <TableRow key={index}>
-                    <TableCell align="center">{gift.name}</TableCell>
-                    <TableCell align="center">{gift.amount} ₪</TableCell>
-                    <TableCell align="center">{gift.blessing || 'לא צורפה ברכה'}</TableCell>
+                    <TableCell align="center">{highlightText(gift.name, searchTerm)}</TableCell>
+                    <TableCell align="center">{highlightText(gift.amount, searchTerm)} ₪</TableCell>
+                    <TableCell align="center">{highlightText(gift.blessing, searchTerm) || 'לא צורפה ברכה'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
