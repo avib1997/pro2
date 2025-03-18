@@ -29,12 +29,12 @@ const Details = () => {
   }, [])
 
   useEffect(() => {
-    const eventType = event.TypeOfEvent || "אירוע";
-    setEventName(event.NameOfBride
+    if (!event) return; // ✅ מוודא שהאירוע נטען לפני השימוש
+    const eventType = event?.TypeOfEvent || "אירוע";
+    setEventName(event?.NameOfBride
       ? `${eventType} של ${event.NameOfGroom} ו${event.NameOfBride}`
       : `${eventType} של ${event.NameOfGroom}`);
-    console.log('🎉 מזהה האירוע:', eventNumber)
-  }, [setEventNumber, eventNumber, event])
+  }, [setEventNumber, eventNumber, event]);
 
   const handleChange = e => {
     e.preventDefault()
