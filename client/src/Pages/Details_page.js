@@ -14,8 +14,8 @@ import { useLayoutEffect } from 'react'
 const Details = () => {
   const navigate = useNavigate()
   const [eventNum, setEventNum] = useState('')
-  const { eventName, setEventName, giftDetails, setGiftDetails, userId, event, eventId, setEvent, eventNumber, setEventId, setEventNumber } = useContext(Context)
-  const [amount, setAmount] = useState(0)
+  const [giftDetails, setGiftDetails] = useState({ name: '', phone: '', blessing: '', amount: '' });
+  const { eventName, setEventName, userId, event, eventId, setEvent, eventNumber, setEventId, setEventNumber } = useContext(Context)  const [amount, setAmount] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
   const [file, setFile] = useState(null)
 
