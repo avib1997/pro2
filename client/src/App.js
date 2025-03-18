@@ -1,9 +1,8 @@
-//client/src/App.js
 import { createContext, useState, useEffect } from 'react'
 import React from 'react'
 import Logo from './Components/Logo'
-import { BrowserRouter, useLocation } from 'react-router-dom'
-import MainRouter from './routes/MainRouter' // או הנתיב למקום ששמרת את הקובץ
+import { BrowserRouter } from 'react-router-dom'
+import MainRouter from './routes/MainRouter'
 import WhatsAppIcon from '@mui/icons-material/WhatsApp'
 import { useTheme, Box, IconButton, Typography } from '@mui/material'
 
@@ -12,67 +11,61 @@ export const Context = createContext()
 function App() {
   const theme = useTheme()
   const whatsappGroupLink = 'https://chat.whatsapp.com/KN1etpCLloyD1wbunuEwdX'
-  const [IsEvent, setIsEvent] = useState(true)
-  const [eventNumber, setEventNumber] = useState('') // סטייט עבור ה-ID של האירוע
-  const [userName, setUserName] = useState('')
-  const [userEmail, setUserEmail] = useState('')
-  const [userId, setUserId] = useState('')
-  const [detailsId, setDetailsId] = useState([])
-  const [isEventManager, setIsEventManager] = useState(false) // הוספת סטייט למנהל אירועים
-  const [state, setState] = useState()
-  const [event, setEvent] = useState('')
-  const [eventId, setEventId] = useState('')
-  const [isManager, setIsManager] = useState(false)
-  const [eventName, setEventName] = useState('')
 
-  const getSavedGiftDetails = () => {
-    try {
-      const storedData = localStorage.getItem('giftDetails')
-      return storedData ? JSON.parse(storedData) : { name: '', phone: '', blessing: '', amount: '' }
-    } catch (error) {
-      console.error('❌ שגיאה בטעינת הנתונים מ-localStorage:', error)
-      return { name: '', phone: '', blessing: '', amount: '' } // החזרת נתונים ריקים במקרה של שגיאה
-    }
+  // פונקציה לקבלת נתונים מה-localStorage
+  const getLocalStorageItem = (key, defaultValue) => {
+    const savedValue = localStorage.getItem(key)
+    return savedValue ? JSON.parse(savedValue) : defaultValue
   }
-  const [giftDetails, setGiftDetails] = useState(getSavedGiftDetails)
 
+  // אתחול ה-states מה-localStorage
+  const [IsEvent, setIsEvent] = useState(getLocalStorageItem('IsEvent', true))
+  const [eventNumber, setEventNumber] = useState(getLocalStorageItem('eventNumber', ''))
+  const [userName, setUserName] = useState(getLocalStorageItem('userName', ''))
+  const [userEmail, setUserEmail] = useState(getLocalStorageItem('userEmail', ''))
+  const [userId, setUserId] = useState(getLocalStorageItem('userId', ''))
+  const [detailsId, setDetailsId] = useState(getLocalStorageItem('detailsId', []))
+  const [isEventManager, setIsEventManager] = useState(getLocalStorageItem('isEventManager', false))
+  const [state, setState] = useState(getLocalStorageItem('state', ''))
+  const [event, setEvent] = useState(getLocalStorageItem('event', ''))
+  const [eventId, setEventId] = useState(getLocalStorageItem('eventId', ''))
+  const [isManager, setIsManager] = useState(getLocalStorageItem('isManager', false))
+  const [eventName, setEventName] = useState(getLocalStorageItem('eventName', ''))
+
+  // שמירה אוטומטית ל-localStorage בכל שינוי בסטייטים
   useEffect(() => {
-    try {
-      localStorage.setItem('giftDetails', JSON.stringify(giftDetails))
-    } catch (error) {
-      console.error('❌ שגיאה בשמירת הנתונים ל-localStorage:', error)
-    }
-  }, [giftDetails])
+    localStorage.setItem('IsEvent', JSON.stringify(IsEvent))
+    localStorage.setItem('eventNumber', JSON.stringify(eventNumber))
+    localStorage.setItem('userName', JSON.stringify(userName))
+    localStorage.setItem('userEmail', JSON.stringify(userEmail))
+    localStorage.setItem('userId', JSON.stringify(userId))
+    localStorage.setItem('detailsId', JSON.stringify(detailsId))
+    localStorage.setItem('isEventManager', JSON.stringify(isEventManager))
+    localStorage.setItem('state', JSON.stringify(state))
+    localStorage.setItem('event', JSON.stringify(event))
+    localStorage.setItem('eventId', JSON.stringify(eventId))
+    localStorage.setItem('isManager', JSON.stringify(isManager))
+    localStorage.setItem('eventName', JSON.stringify(eventName))
+  }, [
+    IsEvent, eventNumber, userName, userEmail, userId, detailsId,
+    isEventManager, state, event, eventId, isManager, eventName
+  ])
 
   return (
     <Context.Provider
       value={{
-        giftDetails,
-        setGiftDetails,
-        isManager,
-        setIsManager,
-        isEventManager,
-        setIsEventManager, // הוספת הפונקציה לקונטקסט
-        IsEvent,
-        setIsEvent,
-        userId,
-        setUserId,
-        detailsId,
-        setDetailsId,
-        event,
-        setEvent,
-        state,
-        setState,
-        eventId,
-        setEventId,
-        userName,
-        setUserName,
-        userEmail,
-        setUserEmail,
-        eventNumber,
-        setEventNumber,
-        eventName,
-        setEventName
+        IsEvent, setIsEvent,
+        eventNumber, setEventNumber,
+        userName, setUserName,
+        userEmail, setUserEmail,
+        userId, setUserId,
+        detailsId, setDetailsId,
+        isEventManager, setIsEventManager,
+        state, setState,
+        event, setEvent,
+        eventId, setEventId,
+        isManager, setIsManager,
+        eventName, setEventName
       }}
     >
       <BrowserRouter>
@@ -82,14 +75,14 @@ function App() {
             position: 'fixed',
             bottom: { xs: 16, sm: 36 },
             left: { xs: 16, sm: 36 },
-            zIndex: 9999 // מעל כל האלמנטים
+            zIndex: 9999
           }}
         >
           <Logo />
         </Box>
       </BrowserRouter>
 
-      {/* Footer פשוט בתחתית העמוד */}
+      {/* Footer */}
       <Box
         sx={{
           marginTop: { xs: 3, sm: 5 },
@@ -97,19 +90,21 @@ function App() {
           py: { xs: 1, sm: 1.5 },
           backgroundColor: 'rgba(0,0,0,0.3)',
           color: '#E0E1DD',
-          direction: 'rtl' // כיוון הטקסט (מימין לשמאל)
+          direction: 'rtl'
         }}
       >
         <Typography variant="body2" sx={{ fontSize: { xs: '0.75rem', sm: '0.9rem' } }}>
           &copy; {new Date().getFullYear()} EASY GIFT | כל הזכויות שמורות
         </Typography>
       </Box>
+      
+      {/* כפתור וואטסאפ */}
       <Box
         sx={{
           position: 'fixed',
           bottom: { xs: 16, sm: 36 },
           right: { xs: 16, sm: 36 },
-          zIndex: 9999 // מעל כל האלמנטים
+          zIndex: 9999
         }}
       >
         <IconButton
@@ -118,7 +113,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
           sx={{
-            backgroundColor: '#25D366', // צבע וואצאפ
+            backgroundColor: '#25D366',
             color: '#fff',
             '&:hover': {
               backgroundColor: '#20b558'
