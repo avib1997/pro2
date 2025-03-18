@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { Context } from '../App'
 import axios from 'axios'
-import { Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Collapse, IconButton, CircularProgress, Button, Dialog } from '@mui/material'
+import { TextField, Box, Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Collapse, IconButton, CircularProgress, Button, Dialog } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Link } from 'react-router-dom'
 import ImageIcon from '@mui/icons-material/Image'
@@ -17,6 +17,8 @@ const GiftHistory = () => {
   const [loading, setLoading] = useState(true)
   const [openFile, setOpenFile] = useState(false)
   const [imageSrc, setImageSrc] = useState('')
+  const [searchTerm, setSearchTerm] = useState("") // 🔍 משתנה חיפוש
+
 
   // הפונקציה בוחרת איקון לפי סוג הקובץ עם הצבע המבוקש
   const getIcon = fileType => {
@@ -40,8 +42,8 @@ const GiftHistory = () => {
         // const response = await axios.post('http://localhost:2001/api/users/giftsById', { _id: userId })
         // console.log('🎁 קיבלתי מתנות:', response.data)
         console.log('setDetailsId:', detailsId)
-        const res = await axios.post('https://easygift-server.onrender.com/api/gift/getgift', { _id: detailsId })
-        console.log(res.data[0].file)
+        const res = await axios.post('http://localhost:2001/api/gift/getgift', { _id: detailsId })
+        console.log(res.data)
 
         if (res.data && res.data.length > 0) {
           setGifts(res.data)
@@ -78,7 +80,7 @@ const GiftHistory = () => {
       console.error('❌ fileId חסר!')
       return
     }
-    const fileUrl = `https://easygift-server.onrender.com/api/files/view/${fileId}`
+    const fileUrl = `http://localhost:2001/api/files/view/${fileId}`
     console.log('📂 פותח קובץ:', fileUrl)
     window.open(fileUrl, '_blank') // ✅ פותח את הקובץ בחלון חדש
   }
@@ -92,7 +94,7 @@ const GiftHistory = () => {
     try {
       console.log('📥 מוריד קובץ:', fileId)
 
-      const response = await axios.get(`https://easygift-server.onrender.com/api/files/download/${fileId}`, {
+      const response = await axios.get(`http://localhost:2001/api/files/download/${fileId}`, {
         responseType: 'blob' // ✅ קבלת הקובץ כ-Blob
       })
 
@@ -118,6 +120,23 @@ const GiftHistory = () => {
       console.error('❌ שגיאה בהורדת הקובץ:', error)
     }
   }
+
+  const highlightText = (text, searchTerm) => {
+    if (!searchTerm) return text;
+    if (!text) return ''; // מונע שגיאה במקרה של undefined/null
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    return String(text).split(regex).map((part, index) =>
+      regex.test(part) ? <span key={index} style={{ backgroundColor: 'yellow' }}>{part}</span> : part
+    );
+  };
+
+  // 📌 סינון הנתונים לפי שם אירוע, ברכה, סכום ותאריך
+  const filteredGifts = gifts.filter(gift =>
+    (gift.toEventName && gift.toEventName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (gift.blessing && gift.blessing.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    gift.amount.toString() === searchTerm || // חיפוש סכום מדויק
+    gift.entryDate.slice(0, 10, 100).includes(searchTerm) // חיפוש תאריך בפורמט YYYY-MM-DD
+  );
 
   return (
     <Box
@@ -201,7 +220,30 @@ const GiftHistory = () => {
                 😄
               </Typography>
             )}
-            {gifts.length > 0 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '20px' }}>
+              <TextField
+                label="חיפוש"
+                variant="outlined"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                fullWidth
+                sx={{
+                  background: 'linear-gradient(135deg, rgb(100, 130, 160), rgb(140, 180, 220))',
+                  borderRadius: '8px',
+                  width: '80%', // הקטנת הרוחב
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none'
+                  },
+                  '&:before': {
+                    display: 'none'
+                  }
+                }}
+                InputLabelProps={{
+                  style: { textAlign: 'right', right: 20 }, // יישור המילה "חיפוש" לימין
+                }}
+              />
+            </Box>
+            {filteredGifts.length > 0 && (
               <TableContainer
                 component={Paper}
                 size="lg"
@@ -230,7 +272,7 @@ const GiftHistory = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {gifts.map((gift, index) => (
+                    {filteredGifts.map((gift, index) => (
                       <React.Fragment key={gift._id}>
                         <TableRow
                           onClick={() => toggleRow(gift._id)}
@@ -252,10 +294,10 @@ const GiftHistory = () => {
                               <ExpandMoreIcon />
                             </IconButton>
                           </TableCell>
-                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{index + 1}</TableCell>
-                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{gift.toEventName}</TableCell>
-                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{gift.amount} ₪</TableCell>
-                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{new Date(gift.entryDate).toLocaleDateString()}</TableCell>
+                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{highlightText(gift.toEventName, searchTerm)}</TableCell>
+                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{highlightText(gift.amount, searchTerm)} ₪</TableCell>
+                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{highlightText(gift.blessing, searchTerm)}</TableCell>
+                          <TableCell sx={{ color: '#E0E1DD', textAlign: 'center' }}>{highlightText(new Date(gift.entryDate).toLocaleDateString(), searchTerm)}</TableCell>
 
                           <TableCell sx={{ textAlign: 'center', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
                             {getIcon(gift.file?.fileType)}
