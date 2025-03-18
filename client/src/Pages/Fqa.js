@@ -1,6 +1,6 @@
+import React, { useState } from 'react'
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material'
-import { Accordion, AccordionDetails, AccordionSummary, Box, Container, Paper, Typography } from '@mui/material'
-import React from 'react'
+import { Accordion, AccordionDetails, AccordionSummary, Box, Container, Paper, Typography, TextField } from '@mui/material'
 
 const faqs = [
   {
@@ -205,8 +205,31 @@ const faqs = [
     answer: 'כן, ניתן להפעיל התראות במייל דרך הגדרות החשבון.'
   }
 ]
+function highlightText(text, searchTerm) {
+  if (!searchTerm) return text;
+  // בניית regex לדוגמה: חיפוש לא רגיש לרישיות
+  const regex = new RegExp(`(${searchTerm})`, 'gi');
+  // חלוקת הטקסט לחלקים לפי המילה
+  const parts = text.split(regex);
+  return parts.map((part, index) =>
+    regex.test(part) ? (
+      <span key={index} style={{ backgroundColor: 'yellow' }}>
+        {part}
+      </span>
+    ) : (
+      part
+    )
+  );
+}
 
 export default function FaqPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredFaqs = faqs.filter(faq =>
+    faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div dir="rtl">
       <Box
@@ -218,7 +241,7 @@ export default function FaqPage() {
           width: '100%',
           height: '370%',
           zIndex: -1,
-          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)', // צבע רקע דף
+          background: 'linear-gradient(135deg, #0D1B2A, #1B263B)',
           backgroundSize: '400% 400%',
           animation: 'animateBg 15s ease infinite'
         }}
@@ -230,12 +253,39 @@ export default function FaqPage() {
           marginTop: '200px',
           marginBottom: '100px',
           fontWeight: 'bold',
-          color: '#1976D2', // צבע הטקסט
-          fontFamily: 'Roboto, sans-serif' // שינוי פונט
+          color: '#1976D2',
+          fontFamily: 'Roboto, sans-serif'
         }}
       >
         שאלות ותשובות נפוצות
       </Typography>
+
+      {/* שדה חיפוש מעוצב */}
+      <Container maxWidth="lg" sx={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+        <TextField
+          label="חיפוש"
+          variant="outlined"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          fullWidth
+          sx={{
+            background: 'linear-gradient(135deg, rgb(100, 130, 160), rgb(140, 180, 220))',
+            borderRadius: '8px',
+            width: '80%', // הקטנת הרוחב
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none'
+            },
+            '&:before': {
+              display: 'none'
+            }
+          }}
+          InputLabelProps={{
+            style: { textAlign: 'right', right: 20 }, // יישור המילה "חיפוש" לימין
+          }}
+        />
+
+      </Container>
+
       <Container
         maxWidth="lg"
         sx={{
@@ -258,14 +308,14 @@ export default function FaqPage() {
             transition: 'transform 0.3s, box-shadow 0.3s',
             '&:hover': {
               transform: 'scale(1.01)',
-              background: 'linear-gradient(135deg, #1B263B,rgb(81, 113, 148))',
+              background: 'linear-gradient(135deg, #1B263B, rgb(81, 113, 148))',
               boxShadow: '0px 12px 30px rgba(0, 0, 0, 0.3)'
             },
             marginBottom: '30px'
           }}
         >
           <Box sx={{ width: '100%' }}>
-            {faqs.map(faq => (
+            {filteredFaqs.map(faq => (
               <Paper
                 key={faq.id}
                 elevation={3}
@@ -284,10 +334,14 @@ export default function FaqPage() {
                   }}
                 >
                   <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: '#0d47a1', fontSize: '3rem' }} />} aria-controls={`faq-content-${faq.id}`} id={`faq-header-${faq.id}`}>
-                    <Typography sx={{ fontWeight: 'bold', color: '#0d47a1' }}>{faq.question}</Typography>
+                    <Typography sx={{ fontWeight: 'bold', color: '#0d47a1' }}>
+                      {highlightText(faq.question, searchTerm)}
+                    </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Typography sx={{ color: 'black' }}>{faq.answer}</Typography>
+                    <Typography sx={{ color: 'black' }}>
+                      {highlightText(faq.answer, searchTerm)}
+                    </Typography>
                   </AccordionDetails>
                 </Accordion>
               </Paper>
