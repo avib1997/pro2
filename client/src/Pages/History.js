@@ -42,7 +42,7 @@ const GiftHistory = () => {
         // const response = await axios.post('http://localhost:2001/api/users/giftsById', { _id: userId })
         // console.log('🎁 קיבלתי מתנות:', response.data)
         console.log('setDetailsId:', detailsId)
-        const res = await axios.post('http://localhost:2001/api/gift/getgift', { _id: detailsId })
+        const res = await axios.post('https://easygift-server.onrender.com/api/gift/getgift', { _id: detailsId })
         console.log(res.data)
 
         if (res.data && res.data.length > 0) {
@@ -80,7 +80,7 @@ const GiftHistory = () => {
       console.error('❌ fileId חסר!')
       return
     }
-    const fileUrl = `http://localhost:2001/api/files/view/${fileId}`
+    const fileUrl = `https://easygift-server.onrender.com/api/files/view/${fileId}`
     console.log('📂 פותח קובץ:', fileUrl)
     window.open(fileUrl, '_blank') // ✅ פותח את הקובץ בחלון חדש
   }
@@ -94,7 +94,7 @@ const GiftHistory = () => {
     try {
       console.log('📥 מוריד קובץ:', fileId)
 
-      const response = await axios.get(`http://localhost:2001/api/files/download/${fileId}`, {
+      const response = await axios.get(`https://easygift-server.onrender.com/api/files/download/${fileId}`, {
         responseType: 'blob' // ✅ קבלת הקובץ כ-Blob
       })
 
