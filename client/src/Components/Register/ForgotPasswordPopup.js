@@ -20,7 +20,7 @@ const ForgotPasswordPopup = ({ open, handleClose }) => {
         setLoading(true)
         //בדיקה אם המייל קיים
         try {
-            const response = await axios.post('http://localhost:2001/api/users/userid', { email });
+            const response = await axios.post('https://easygift-server.onrender.com/api/users/userid', { email });
             if (response.data.userid[0].email === email) {
                 console.log('response.data:', response.data)
             }
@@ -31,7 +31,7 @@ const ForgotPasswordPopup = ({ open, handleClose }) => {
             return;
         }
         try {
-            const response = await axios.post('http://localhost:2001/api/password/forgot-password', { email });
+            const response = await axios.post('https://easygift-server.onrender.com/api/password/forgot-password', { email });
             setLoading(false)
             setMessage(response.data.message);
             setTimeout(() => {
